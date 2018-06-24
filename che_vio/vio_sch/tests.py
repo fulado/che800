@@ -125,14 +125,54 @@ def get_vio_from_ddyc2(v_number, v_type, v_code, e_code):
     return json.loads(response_data.read().decode('utf-8'))
 
 
+def get_vio_from_ddyc3(v_number, v_type, v_code, e_code, city):
+    """
+    调用典典接口查询违章
+    :param v_number: 车牌号
+    :param v_type: 车辆类型
+    :param v_code: 车架号
+    :param e_code: 发动机号
+    :return: 违章数据, json格式
+    """
+    # 查询接口url
+    url = 'https://openapi.ddyc.com/violation/query/1.0'
+
+    # 构造查询数据
+    app_key = 'X9N7TKSN9JXGBAJ0'                        # 账号
+    app_secret = '5KKVT1X1LAB9ILIQ3EJPQGGI3Q5FWB7W'     # 密码
+
+    timestamp = int(time.time() * 1000)                 # 时间戳
+
+    # 构造查询数据
+    data = {'plateNumber': v_number, 'carType': v_type, 'engineNo': e_code, 'vin': v_code, 'city': city}
+    data = json.dumps(data).replace(' ', '')
+
+    # 构造sign
+    sign = "%s%sapp_key=%s&timestamp=%d%s" % (app_key, app_secret, app_key, timestamp, data)
+    sign = sign[::-1]
+    sign = hashlib.md5(sign.encode('utf-8')).hexdigest().upper()
+
+    # 构造完整查询url
+    url = '%s?app_key=%s&timestamp=%d&sign=%s' % (url, app_key, timestamp, sign)
+
+    # 请求头
+    headers = {'Content-type': 'application/json'}
+
+    # 创建request请求
+    request = urllib.request.Request(url, headers=headers, data=data.encode('utf-8'))
+
+    # 获得response
+    response_data = urllib.request.urlopen(request)
+
+    return json.loads(response_data.read().decode('utf-8'))
+
+
 if __name__ == '__main__':
-    carno = '京HD9596'
-    cartype = '02'
-    vcode = 'LGBF5AE00HR276883'
-    ecode = '751757V'
+    car1 = {'v_number': '京HD9596', 'v_type': '02', 'v_code': 'LGBF5AE00HR276883', 'e_code': '751757V'}
+    car2 = {'v_number': '沪AUT715', 'v_type': '02', 'v_code': 'LSKG4AC12FA411099', 'e_code': 'H1SF1220128'}
 
-    # response_data = get_vio_from_chelun(carno, cartype, vcode, ecode)
+    response_data = get_vio_from_chelun(car2['v_number'], car2['v_type'], car2['v_code'], car2['e_code'])
 
-    response_data = get_vio_from_ddyc2(carno, cartype, vcode, ecode)
+    # response_data = get_vio_from_ddyc2(car2['v_number'], car2['v_type'], car2['v_code'], car2['e_code'])
 
     print(response_data)
