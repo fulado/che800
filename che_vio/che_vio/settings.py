@@ -27,6 +27,45 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'violation',
+        'HOST': 'localhost',
+        'PORT': 3306,
+        'USER': 'root',
+        'PASSWORD': 'xiaobai',
+    }
+}
+
+# Settings for production!
+# DEBUG = False
+#
+# ALLOWED_HOSTS = ['*', ]
+#
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.mysql',
+#         'NAME': 'violation',
+#         'HOST': '172.21.0.2',
+#         'PORT': 3306,
+#         'USER': 'root',
+#         'PASSWORD': 'Init1234',
+#     }
+# }
+
+# Database setting for configuration
+#
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.mysql',
+#         'NAME': 'violation',
+#         'HOST': 'bj-cdb-gq8xi5ya.sql.tencentcdb.com',
+#         'PORT': 63226,
+#         'USER': 'root',
+#         'PASSWORD': 'Init1234',
+#     }
+# }
 
 # Application definition
 
@@ -69,22 +108,6 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'che_vio.wsgi.application'
-
-
-# Database
-# https://docs.djangoproject.com/en/2.0/ref/settings/#databases
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'violation',
-        'HOST': 'localhost',
-        'PORT': 3306,
-        'USER': 'root',
-        'PASSWORD': 'xiaobai',
-    }
-}
-
 
 # Password validation
 # https://docs.djangoproject.com/en/2.0/ref/settings/#auth-password-validators

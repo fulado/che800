@@ -1,10 +1,9 @@
 from django.http import JsonResponse
 from .forms import SearchForm
-from .models import UserInfo, LocInfo
-from .utils import get_vio_from_chelun, get_vio_from_ddyc, vio_dic_for_ddyc, vio_dic_for_chelun
+from .models import UserInfo, LocInfo, VioInfo, VehicleInfo, LogInfo
+from .utils import get_vio_from_tj, get_vio_from_chelun, get_vio_from_ddyc, vio_dic_for_ddyc, vio_dic_for_chelun
 import time
 import hashlib
-import json
 
 
 # 违章查询请求
@@ -65,7 +64,7 @@ def violation(request):
     # 校验sign
     sign = '%s%d%s' % (user.username, timestamp_user, user.password)
     # print(sign)
-    sign = hashlib.sha1(sign.encode('utf-8')).hexdigest()
+    sign = hashlib.sha1(sign.encode('utf-8')).hexdigest().upper()
     print(sign)
     if sign != data['sign']:
         result = {'status': 12}
@@ -73,50 +72,132 @@ def violation(request):
 
     # 查询违章信息
     # print('查询车辆, 号牌号码: %s, 号牌种类: %s' % (data['vehicleNumber'], data['vehicleType']))
+    vio_data, url_id = get_violations(v_number=data['vehicleNumber'], v_type=data['vehicleType'], v_code=data['vehicleCode'], e_code=data['engineCode'], city=data['city'])
 
-    vio_data = get_violations(data['vehicleNumber'], data['vehicleType'], data['engineCode'], data['vehicleCode'],
-                              data['city'])
+    # 根据查询结果记录车辆信息
+    # 将车辆信息保存都本地数据库
+    # 判断本地数据库中是否已经存在该车辆信息
+    # 车辆信息在第一次保存到数据库中时, 默认无效, 无效车辆在下次查询同一车辆时, 需要更新车辆信息,
+    # 车辆信息在完成一次正确查询后, 后变为有效, 有效车辆信息应该每天更新一次
+    try:
+        vehicle = VehicleInfo.objects.filter(vehicle_number=data['vehicleNumber']).filter(vehicle_type=
+                                                                                          data['vehicleType'])
+        if vehicle.exists():
+            vehicle = vehicle[0]
+            vehicle.query_counter += 1
+            if not vehicle.status:
+                vehicle.vehicle_code = data['vehicleCode']
+                vehicle.engine_code = data['engineCode']
+                vehicle.city = data['city']
+                if not vio_data['status']:
+                    vehicle.status = 1
+        else:
+            vehicle = VehicleInfo()
+            vehicle.vehicle_number = data['vehicleNumber']
+            vehicle.vehicle_type = data['vehicleType']
+            vehicle.vehicle_code = data['vehicleCode']
+            vehicle.engine_code = data['engineCode']
+            vehicle.city = data['city']
+            vehicle.create_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+
+        vehicle.save()
+    except Exception as e:
+        print(e)
+
+    # 记录查询日志
+    log_info = LogInfo()
+    log_info.vehicle = vehicle
+    log_info.user = user
+    log_info.url_id = url_id
+    log_info.status = vio_data['status']
+    log_info.query_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+
+    log_info.save()
+
+    # 查询结果保存到本地数据
+    vio_list = VioInfo.objects.filter(vehicle_number=data['vehicleNumber']).filter(vehicle_type=data['vehicleType'])
+
+    if not vio_list:
+        for vio in vio_data['data']:
+            vio_info = VioInfo()
+            vio_info.vehicle_number = data['vehicleNumber']
+            vio_info.vehicle_type = data['vehicleType']
+            vio_info.vio_time = vio['time']
+            vio_info.vio_position = vio['position']
+            vio_info.vio_activity = vio['activity']
+            vio_info.vio_point = vio['point']
+            vio_info.vio_money = vio['money']
+            vio_info.vio_code = vio['code']
+            vio_info.vio_loc = vio['location']
+
+            vio_info.save()
 
     return JsonResponse(vio_data)
 
 
 # 根据车辆信息查询违章
-def get_violations(v_number, v_type='02', e_code='', vin='', city=''):
+def get_violations(v_number, v_type='02', v_code='', e_code='', city=''):
     """
     根据车辆信息调用不同的接口查询违章
     :param v_number: 车牌号
     :param v_type: 车辆类型
+    :param v_code: 车架号
     :param e_code: 发动机号
-    :param vin: 车架号
     :param city: 查询城市
     :return: 违章数据, json格式
     """
-    # 获取查询城市和查询url_id
-    # 目前看来这个功能没啥用, 暂时先把它省略了吧, 只判断车牌开头的城市简称, 根据这个确定调用哪个查询接口
+    # 先从本地数据库查询, 如果本地数据库没有该违章数据, 再通过接口查询
     try:
-        city = ''  # 未来如有需要在修改次功能
+        vio_info_list = VioInfo.objects.filter(vehicle_number=v_number).filter(vehicle_type=v_type)
+    except Exception as e:
+        print(e)
+    else:
+        # 如果有数据, 构造违章信息
+        if vio_info_list:
+            vio_list = []
+            for vio in vio_info_list:
+                vio_data = {
+                    'time': vio.vio_time,
+                    'position': vio.vio_position,
+                    'activity': vio.vio_activity,
+                    'point': vio.vio_point,
+                    'money': vio.vio_money,
+                    'code': vio.vio_code,
+                    'location': vio.vio_loc
+                }
+
+                vio_list.append(vio_data)
+
+            return {'vehicleNumber': v_number, 'status': 0, 'data': vio_list}, 99
+
+    # 获取查询城市和查询url_id
+    # 目前看来这个功能没啥用, 暂时先把它省略了吧, 只判断车牌开头的城市简称, 根据这个确定调用哪个查询接口, 现在只查询天津的车
+    try:
+        if city not in ['天津市', '天津', '津']:
+            city = ''  # 未来如有需要在修改次功能
+
         if city != '':
             loc_info = LocInfo.objects.get(loc_name__contains=city)
         else:
-            short_name = v_number[0]
-            loc_info = LocInfo.objects.get(short_name=short_name)
+            plate_name = v_number[0]
+            loc_info = LocInfo.objects.get(plate_name=plate_name)
 
         # city = loc_info.loc_name
-        url_id = loc_info.url_id
+        url_id = loc_info.url_id.id
     except Exception as e:
         print(e)
-        return {'status': 999}  # 查询城市错误
+        return {'status': 16}  # 查询城市错误
 
     # 根据url_id调用不同接口, 1-天津接口, 2-典典接口, 3-车轮接口
     if url_id == 1:
-        pass
+        data = get_vio_from_tj(v_number, v_type)
     elif url_id == 2:
-        data = get_vio_from_ddyc(v_number, v_type, e_code, vin, city)
+        data = get_vio_from_ddyc(v_number, v_type, v_code, e_code, city)
         data = vio_dic_for_ddyc(v_number, data)
     else:
-        data = get_vio_from_chelun(v_number, v_type, e_code, vin)
+        data = get_vio_from_chelun(v_number, v_type, v_code, e_code)
         data = vio_dic_for_chelun(v_number, data)
 
     # 不能直接返回data, 应该把data再次封装后再返回
-    return data
+    return data, url_id
 

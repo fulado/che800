@@ -4,6 +4,38 @@ import json
 import urllib.request
 
 
+# 从天津接口查询违章数据
+def get_vio_from_tj(v_number, v_type):
+    """
+    从天津接口查询违章数据
+    :param v_number: 车牌号
+    :param v_type: 车辆类型
+    :return: 违章数据, json格式
+    """
+    # 查询接口rul
+    url = 'http://111.160.75.92:9528/violation'
+
+    # 构造查询数据
+    username = 'test'
+    password = 'test'
+    timestamp = int(time.time())
+    sign = hashlib.sha1(('%s%d%s' % (username, timestamp, password)).encode('utf-8')).hexdigest()
+
+    data = {'username': username, 'timestamp': timestamp, 'sign': sign, 'vehicleNumber': v_number,
+            'vehicleType': v_type}
+
+    # url转码
+    data = urllib.parse.urlencode(data)
+
+    # 创建request请求
+    request = urllib.request.Request(url, data.encode())
+
+    # 获得response
+    response = urllib.request.urlopen(request)
+
+    return json.loads(response.read().decode('utf-8'))
+
+
 # 从车轮接口查询违章数据
 def get_vio_from_chelun(v_number, v_type, v_code, e_code):
     """
@@ -151,14 +183,16 @@ def vio_dic_for_chelun(v_number, data):
 
 
 if __name__ == '__main__':
-    carno = '京HD95961'
+    carno = '京HD9596'
     cartype = '02'
     vcode = 'LGBF5AE00HR276883'
-    ecode = '751757V111111'
+    ecode = '751757V'
     car2 = {'v_number': '沪AUT715', 'v_type': '02', 'v_code': 'LSKG4AC12FA411099', 'e_code': 'H1SF1220128'}
     response_data = get_vio_from_chelun(car2['v_number'], car2['v_type'], car2['v_code'], car2['e_code'])
 
-    # response_data = get_vio_from_ddyc(v_number=carno, v_type=cartype, v_code=vcode, e_code=ecode, city='')
+    # response_data = get_vio_from_ddyc(v_number=carno, v_type=cartype, v_code=vcode, e_code=ecode, city='杭州市')
+
+    # response_data = get_vio_from_tj('津NWX388', '02')
     print(response_data)
 
     # v_data = vio_dic_for_ddyc(carno, response_data)
