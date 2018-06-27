@@ -2,6 +2,7 @@ import time
 import hashlib
 import json
 import urllib.request
+from .models import VioInfo
 
 
 # 从天津接口查询违章数据
@@ -182,19 +183,38 @@ def vio_dic_for_chelun(v_number, data):
     return vio_dict
 
 
+# 查询结果保存到本地数据库
+def save_to_loc_db(vio_data, vehicle_number, vehicle_type):
+    # 创建违章数据对象
+
+    for vio in vio_data['data']:
+        vio_info = VioInfo()
+        vio_info.vehicle_number = vehicle_number
+        vio_info.vehicle_type = vehicle_type
+        vio_info.vio_time = vio['time']
+        vio_info.vio_position = vio['position']
+        vio_info.vio_activity = vio['activity']
+        vio_info.vio_point = vio['point']
+        vio_info.vio_money = vio['money']
+        vio_info.vio_code = vio['code']
+        vio_info.vio_loc = vio['location']
+
+        vio_info.save()
+
+
 if __name__ == '__main__':
     carno = '京HD9596'
     cartype = '02'
     vcode = 'LGBF5AE00HR276883'
     ecode = '751757V'
     car2 = {'v_number': '沪AUT715', 'v_type': '02', 'v_code': 'LSKG4AC12FA411099', 'e_code': 'H1SF1220128'}
-    response_data = get_vio_from_chelun(car2['v_number'], car2['v_type'], car2['v_code'], car2['e_code'])
+    # response_data = get_vio_from_chelun(car2['v_number'], car2['v_type'], car2['v_code'], car2['e_code'])
 
     # response_data = get_vio_from_ddyc(v_number=carno, v_type=cartype, v_code=vcode, e_code=ecode, city='杭州市')
 
-    # response_data = get_vio_from_tj('津NWX388', '02')
+    response_data = get_vio_from_tj('津N02070', '02')
     print(response_data)
 
     # v_data = vio_dic_for_ddyc(carno, response_data)
-    v_data = vio_dic_for_chelun(car2['v_number'], response_data)
-    print(v_data)
+    # v_data = vio_dic_for_chelun(car2['v_number'], response_data)
+    # print(v_data)

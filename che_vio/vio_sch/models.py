@@ -36,7 +36,7 @@ class VehicleInfo(models.Model):
     status = models.IntegerField(default=0)                                     # 状态: 0-无效, 1-有效, 如果车辆信息不正确, 则无效
     city = models.CharField(max_length=20, blank=True, null=True)               # 运营地
     create_time = models.DateTimeField(blank=True, null=True)                   # 创建时间
-    query_counter = models.IntegerField(default=1)                              # 查询违章次数
+    query_counter = models.IntegerField(default=1)                              # 近7天查询违章次数
 
 
 class VioInfo(models.Model):

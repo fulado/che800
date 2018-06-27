@@ -167,12 +167,25 @@ def get_vio_from_ddyc3(v_number, v_type, v_code, e_code, city):
     return json.loads(response_data.read().decode('utf-8'))
 
 
+# 生成查询sign
+def create_sign(username, password):
+    password = hashlib.sha1(password.encode('utf_8')).hexdigest().upper()
+    timestamp = int(time.time())
+    sign = '%s%d%s' % (username, timestamp, password)
+    sign = hashlib.sha1(sign.encode('utf_8')).hexdigest().upper()
+
+    print(timestamp)
+    print(sign)
+
+
 if __name__ == '__main__':
-    car1 = {'v_number': '京HD9596', 'v_type': '02', 'v_code': 'LGBF5AE00HR276883', 'e_code': '751757V'}
-    car2 = {'v_number': '沪AUT715', 'v_type': '02', 'v_code': 'LSKG4AC12FA411099', 'e_code': 'H1SF1220128'}
-
-    response_data = get_vio_from_chelun(car2['v_number'], car2['v_type'], car2['v_code'], car2['e_code'])
-
+    # car1 = {'v_number': '京HD9596', 'v_type': '02', 'v_code': 'LGBF5AE00HR276883', 'e_code': '751757V'}
+    # car2 = {'v_number': '沪AUT715', 'v_type': '02', 'v_code': 'LSKG4AC12FA411099', 'e_code': 'H1SF1220128'}
+    #
+    # response_data = get_vio_from_chelun(car2['v_number'], car2['v_type'], car2['v_code'], car2['e_code'])
+    #
     # response_data = get_vio_from_ddyc2(car2['v_number'], car2['v_type'], car2['v_code'], car2['e_code'])
+    #
+    # print(response_data)
 
-    print(response_data)
+    create_sign('test', 'test')

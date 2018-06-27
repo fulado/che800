@@ -1,7 +1,8 @@
 from django.http import JsonResponse
 from .forms import SearchForm
 from .models import UserInfo, LocInfo, VioInfo, VehicleInfo, LogInfo
-from .utils import get_vio_from_tj, get_vio_from_chelun, get_vio_from_ddyc, vio_dic_for_ddyc, vio_dic_for_chelun
+from .utils import get_vio_from_tj, get_vio_from_chelun, get_vio_from_ddyc, vio_dic_for_ddyc, vio_dic_for_chelun,\
+    save_to_loc_db
 import time
 import hashlib
 
@@ -65,14 +66,15 @@ def violation(request):
     sign = '%s%d%s' % (user.username, timestamp_user, user.password)
     # print(sign)
     sign = hashlib.sha1(sign.encode('utf-8')).hexdigest().upper()
-    print(sign)
+
     if sign != data['sign']:
         result = {'status': 12}
         return JsonResponse(result)
 
     # 查询违章信息
     # print('查询车辆, 号牌号码: %s, 号牌种类: %s' % (data['vehicleNumber'], data['vehicleType']))
-    vio_data, url_id = get_violations(v_number=data['vehicleNumber'], v_type=data['vehicleType'], v_code=data['vehicleCode'], e_code=data['engineCode'], city=data['city'])
+    vio_data, url_id = get_violations(v_number=data['vehicleNumber'], v_type=data['vehicleType'],
+                                      v_code=data['vehicleCode'], e_code=data['engineCode'], city=data['city'])
 
     # 根据查询结果记录车辆信息
     # 将车辆信息保存都本地数据库
@@ -113,24 +115,6 @@ def violation(request):
     log_info.query_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
 
     log_info.save()
-
-    # 查询结果保存到本地数据
-    vio_list = VioInfo.objects.filter(vehicle_number=data['vehicleNumber']).filter(vehicle_type=data['vehicleType'])
-
-    if not vio_list:
-        for vio in vio_data['data']:
-            vio_info = VioInfo()
-            vio_info.vehicle_number = data['vehicleNumber']
-            vio_info.vehicle_type = data['vehicleType']
-            vio_info.vio_time = vio['time']
-            vio_info.vio_position = vio['position']
-            vio_info.vio_activity = vio['activity']
-            vio_info.vio_point = vio['point']
-            vio_info.vio_money = vio['money']
-            vio_info.vio_code = vio['code']
-            vio_info.vio_loc = vio['location']
-
-            vio_info.save()
 
     return JsonResponse(vio_data)
 
@@ -198,6 +182,22 @@ def get_violations(v_number, v_type='02', v_code='', e_code='', city=''):
         data = get_vio_from_chelun(v_number, v_type, v_code, e_code)
         data = vio_dic_for_chelun(v_number, data)
 
+    # 保存数据到本地数据库
+    save_to_loc_db(data, v_number, v_type)
     # 不能直接返回data, 应该把data再次封装后再返回
     return data, url_id
 
+
+# 定时查询车辆库中车辆违章数据
+def query_vio_auto():
+    # 查询数据库中的车辆数据
+    vehicle_list = VehicleInfo.objects.all()
+
+    # 查询违章
+    for vehicle in vehicle_list:
+        data = get_violations(vehicle.vehicle_number, vehicle.vehicle_type, vehicle.vehicle_code, vehicle.engine_code,
+                              vehicle.city)
+
+        # 记录日志
+        print(data)
+    print('auto query complete')
