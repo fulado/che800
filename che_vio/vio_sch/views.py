@@ -160,14 +160,18 @@ def get_violations(v_number, v_type='02', v_code='', e_code='', city=''):
         if city not in ['天津市', '天津', '津']:
             city = ''  # 未来如有需要在修改次功能
 
-        if city != '':
-            loc_info = LocInfo.objects.get(loc_name__contains=city)
+        try:
+            if city != '':
+                loc_info = LocInfo.objects.get(loc_name__contains=city)
+            else:
+                plate_name = v_number[0]
+                loc_info = LocInfo.objects.get(plate_name=plate_name)
+        except Exception as e:
+            print(e)
+            url_id = 2
         else:
-            plate_name = v_number[0]
-            loc_info = LocInfo.objects.get(plate_name=plate_name)
-
-        # city = loc_info.loc_name
-        url_id = loc_info.url_id.id
+            # city = loc_info.loc_name
+            url_id = loc_info.url_id.id
     except Exception as e:
         print(e)
         return {'status': 16}  # 查询城市错误
@@ -177,13 +181,17 @@ def get_violations(v_number, v_type='02', v_code='', e_code='', city=''):
         data = get_vio_from_tj(v_number, v_type)
     elif url_id == 2:
         data = get_vio_from_ddyc(v_number, v_type, v_code, e_code, city)
+        # print(data)
         data = vio_dic_for_ddyc(v_number, data)
     else:
         data = get_vio_from_chelun(v_number, v_type, v_code, e_code)
+        # print(data)
         data = vio_dic_for_chelun(v_number, data)
 
-    # 保存数据到本地数据库
-    save_to_loc_db(data, v_number, v_type)
+    # 如果查询成功, 保存数据到本地数据库
+    if data['status'] == 0:
+        save_to_loc_db(data, v_number, v_type)
+
     # 不能直接返回data, 应该把data再次封装后再返回
     return data, url_id
 
@@ -195,9 +203,17 @@ def query_vio_auto():
 
     # 查询违章
     for vehicle in vehicle_list:
-        data = get_violations(vehicle.vehicle_number, vehicle.vehicle_type, vehicle.vehicle_code, vehicle.engine_code,
-                              vehicle.city)
+        print(vehicle.vehicle_number)
+        get_violations(vehicle.vehicle_number, vehicle.vehicle_type, vehicle.vehicle_code, vehicle.engine_code,
+                       vehicle.city)
 
         # 记录日志
-        print(data)
+
     print('auto query complete')
+
+
+# 清空车辆违章数据表
+def empty_vio_db():
+    VioInfo.objects.all().delete()
+
+    print('empty vio db complete')

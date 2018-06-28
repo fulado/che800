@@ -2,7 +2,7 @@ from django.test import TestCase
 import urllib
 import base64
 import json
-import pymongo
+# import pymongo
 import time
 import hashlib
 
@@ -111,6 +111,17 @@ def test_tsn_vio(vehicle_number, vehicle_type):
     return response.read()
 
 
+# 生成查询sign
+def create_sign(username, password):
+    # password = hashlib.sha1(password.encode('utf_8')).hexdigest().upper()
+    timestamp = int(time.time())
+    sign = '%s%d%s' % (username, timestamp, password)
+    sign = hashlib.sha1(sign.encode('utf_8')).hexdigest()
+
+    print(timestamp)
+    print(sign)
+
+
 if __name__ == '__main__':
     # cars = [{"engineNumber": "121111", "platNumber": "冀JD7697", "carType": "01"},
     #         {"engineNumber": "15E51A", "platNumber": "津CA9257", "carType": "01"},
@@ -123,14 +134,16 @@ if __name__ == '__main__':
     #     print(e)
 
     # get_violation_from_mongo()
-    vehicle_number = '津NWX388'
-    vehicle_type = '02'
+    # vehicle_number = '津NWX388'
+    # vehicle_type = '02'
+    #
+    # start_time = time.time()
+    # for i in range(10):
+    #     response_data = test_tsn_vio(vehicle_number, vehicle_type)
+    #     # print(i, ' ')
+    # end_time = time.time()
+    #
+    # print(json.loads(response_data.decode('utf-8')))
+    # print(end_time - start_time)
 
-    start_time = time.time()
-    for i in range(10):
-        response_data = test_tsn_vio(vehicle_number, vehicle_type)
-        # print(i, ' ')
-    end_time = time.time()
-
-    print(json.loads(response_data.decode('utf-8')))
-    print(end_time - start_time)
+    create_sign('test', 'test')

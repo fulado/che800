@@ -16,7 +16,7 @@ Including another URLconf
 # from django.contrib import admin
 from django.conf.urls import url, include
 from apscheduler.schedulers.background import BackgroundScheduler
-from vio_sch.views import query_vio_auto
+from vio_sch.views import query_vio_auto, empty_vio_db
 
 urlpatterns = [
     # path('admin/', admin.site.urls),
@@ -26,7 +26,10 @@ urlpatterns = [
 # 定时任务
 Scheduler = BackgroundScheduler()
 
-# 每月25日0点, 禁止提交申请
-Scheduler.add_job(query_vio_auto, 'cron', hour=21, minute=32, second=0)
+# 每天2点, 清空违章数据库
+Scheduler.add_job(empty_vio_db, 'cron', hour=17, minute=36, second=0)
+
+# 每天2点30分, 开始查询违章数据
+Scheduler.add_job(query_vio_auto, 'cron', hour=19, minute=52, second=0)
 
 Scheduler.start()

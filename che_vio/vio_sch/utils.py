@@ -127,22 +127,75 @@ def vio_dic_for_ddyc(v_number, data):
     :param data: 车轮接口返回数据, dict
     :return: 车八佰违章数据, dict
     """
-    if data['success']:
+    if 'success' in data and data['success']:
         status = 0
 
         vio_list = []
-        for vio in data['data']['violations']:
-            vio_data = {
-                'time': vio['time'],
-                'position': vio['address'],
-                'activity': vio['reason'],
-                'point': vio['point'],
-                'money': vio['fine'],
-                'code': vio['violationNum'],
-                'location': vio['violationCity']
-            }
+        if 'data' in data and 'violations' in data['data']:
+            for vio in data['data']['violations']:
+                # 缴费状态
+                if 'paymentStatus' in vio:
+                    vio_pay = int(vio['paymentStatus'])
+                else:
+                    vio_pay = 1
 
-            vio_list.append(vio_data)
+                # 已经缴费的违章数据不再返回
+                if vio_pay == 2:
+                    continue
+
+                # 违法时间
+                if 'time' in vio:
+                    vio_time = vio['time']
+                else:
+                    vio_time = ''
+
+                # 违法地点
+                if 'address' in vio:
+                    vio_address = vio['address']
+                else:
+                    vio_address = ''
+
+                # 违法行为
+                if 'reason' in vio:
+                    vio_activity = vio['reason']
+                else:
+                    vio_activity = ''
+
+                # 扣分
+                if 'point' in vio:
+                    vio_point = vio['point']
+                else:
+                    vio_point = ''
+
+                # 罚款
+                if 'fine' in vio:
+                    vio_money = vio['fine']
+                else:
+                    vio_money = ''
+
+                # 违法代码
+                if 'violationNum' in vio:
+                    vio_code = vio['violationNum']
+                else:
+                    vio_code = ''
+
+                # 处理机关
+                if 'violationCity' in vio:
+                    vio_loc = vio['violationCity']
+                else:
+                    vio_loc = ''
+
+                vio_data = {
+                    'time': vio_time,
+                    'position': vio_address,
+                    'activity': vio_activity,
+                    'point': vio_point,
+                    'money': vio_money,
+                    'code': vio_code,
+                    'location': vio_loc
+                }
+
+                vio_list.append(vio_data)
 
         vio_dict = {'vehicleNumber': v_number, 'status': status, 'data': vio_list}
     else:
@@ -159,22 +212,65 @@ def vio_dic_for_chelun(v_number, data):
     :param data: 车轮接口返回数据, dict
     :return: 车八佰违章数据, dict
     """
-    if data['code'] == 0:
+    if 'code' in data and data['code'] == 0:
         status = 0
 
         vio_list = []
-        for vio in data['data']:
-            vio_data = {
-                'time': time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(int(vio['date']))),
-                'position': vio['address'],
-                'activity': vio['detail'],
-                'point': vio['point'],
-                'money': vio['money'],
-                'code': '',
-                'location': vio['office_name']
-            }
+        if 'data' in data:
+            for vio in data['data']:
+                # 违法时间
+                if 'date' in vio:
+                    vio_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(int(vio['date'])))
+                else:
+                    vio_time = ''
 
-            vio_list.append(vio_data)
+                # 违法地点
+                if 'address' in vio:
+                    vio_address = vio['address']
+                else:
+                    vio_address = ''
+
+                # 违法行为
+                if 'detail' in vio:
+                    vio_activity = vio['detail']
+                else:
+                    vio_activity = ''
+
+                # 扣分
+                if 'point' in vio:
+                    vio_point = vio['point']
+                else:
+                    vio_point = ''
+
+                # 罚款
+                if 'money' in vio:
+                    vio_money = vio['money']
+                else:
+                    vio_money = ''
+
+                # 违法代码
+                if 'code' in vio:
+                    vio_code = vio['code']
+                else:
+                    vio_code = ''
+
+                # 处理机关
+                if 'office_name' in vio:
+                    vio_loc = vio['office_name']
+                else:
+                    vio_loc = ''
+
+                vio_data = {
+                    'time': vio_time,
+                    'position': vio_address,
+                    'activity': vio_activity,
+                    'point': vio_point,
+                    'money': vio_money,
+                    'code': vio_code,
+                    'location': vio_loc
+                }
+
+                vio_list.append(vio_data)
 
         vio_dict = {'vehicleNumber': v_number, 'status': status, 'data': vio_list}
     else:
@@ -200,6 +296,8 @@ def save_to_loc_db(vio_data, vehicle_number, vehicle_type):
         vio_info.vio_loc = vio['location']
 
         vio_info.save()
+
+    print('saved to local db')
 
 
 if __name__ == '__main__':
