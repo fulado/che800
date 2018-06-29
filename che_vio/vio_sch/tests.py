@@ -3,6 +3,8 @@ import urllib
 import time
 import hashlib
 import json
+import threading
+import queue
 
 
 # Create your tests here.
@@ -178,14 +180,36 @@ def create_sign(username, password):
     print(sign)
 
 
+# 线程测试
+class MyThread(threading.Thread):
+    def __init__(self, num):
+        threading.Thread.__init__(self)
+        self.num = num
+
+    def run(self):
+        time.sleep(1)
+        print('running thread is num %d' % self.num)
+
+
 if __name__ == '__main__':
     # car1 = {'v_number': '京HD9596', 'v_type': '02', 'v_code': 'LGBF5AE00HR276883', 'e_code': '751757V'}
-    car2 = {'v_number': '苏AQ6R59', 'v_type': '02', 'v_code': 'LSGUD84X3FE009951', 'e_code': '150330725'}
+    # car2 = {'v_number': '苏AQ6R59', 'v_type': '02', 'v_code': 'LSGUD84X3FE009951', 'e_code': '150330725'}
     #
     # response_data = get_vio_from_chelun(car2['v_number'], car2['v_type'], car2['v_code'], car2['e_code'])
     #
-    response_data = get_vio_from_ddyc2(car2['v_number'], car2['v_type'], car2['v_code'], car2['e_code'])
+    # response_data = get_vio_from_ddyc2(car2['v_number'], car2['v_type'], car2['v_code'], car2['e_code'])
     #
-    print(response_data)
+    # print(response_data)
 
     create_sign('test', 'test')
+
+    # t_list = []
+    q = queue.Queue(maxsize=5)
+    for i in range(10):
+        t = MyThread(i)
+        q.put(t)
+        t.start()
+
+    print('end')
+
+

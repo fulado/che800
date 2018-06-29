@@ -30,7 +30,7 @@ class LocInfo(models.Model):
 
 class VehicleInfo(models.Model):
     vehicle_number = models.CharField(max_length=20, blank=True, null=True)     # 号牌号码
-    vehicle_type = models.CharField(max_length=10, blank=True, null=True)       # 车辆类型
+    vehicle_type = models.IntegerField(default=2, blank=True, null=True)        # 车辆类型
     vehicle_code = models.CharField(max_length=50, blank=True, null=True)       # 车架号
     engine_code = models.CharField(max_length=50, blank=True, null=True)        # 发动机号
     status = models.IntegerField(default=0)                                     # 状态: 0-无效, 1-有效, 如果车辆信息不正确, 则无效

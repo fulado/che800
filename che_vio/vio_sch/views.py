@@ -5,6 +5,7 @@ from .utils import get_vio_from_tj, get_vio_from_chelun, get_vio_from_ddyc, vio_
     save_to_loc_db
 import time
 import hashlib
+import threading
 
 
 # 违章查询请求
@@ -58,18 +59,18 @@ def violation(request):
         return JsonResponse(result)
 
     # 判断时间戳是否超时, 默认5分钟
-    if int(time.time()) - timestamp_user > 60 * 5:
-        result = {'status': 15}
-        return JsonResponse(result)
+    # if int(time.time()) - timestamp_user > 60 * 5:
+    #     result = {'status': 15}
+    #     return JsonResponse(result)
 
     # 校验sign
     sign = '%s%d%s' % (user.username, timestamp_user, user.password)
     # print(sign)
     sign = hashlib.sha1(sign.encode('utf-8')).hexdigest().upper()
 
-    if sign != data['sign']:
-        result = {'status': 12}
-        return JsonResponse(result)
+    # if sign != data['sign']:
+    #     result = {'status': 12}
+    #     return JsonResponse(result)
 
     # 查询违章信息
     # print('查询车辆, 号牌号码: %s, 号牌种类: %s' % (data['vehicleNumber'], data['vehicleType']))
@@ -131,8 +132,9 @@ def get_violations(v_number, v_type='02', v_code='', e_code='', city=''):
     :return: 违章数据, json格式
     """
     # 先从本地数据库查询, 如果本地数据库没有该违章数据, 再通过接口查询
+
     try:
-        vio_info_list = VioInfo.objects.filter(vehicle_number=v_number).filter(vehicle_type=v_type)
+        vio_info_list = VioInfo.objects.filter(vehicle_number=v_number).filter(vehicle_type=int(v_type))
     except Exception as e:
         print(e)
     else:
@@ -151,7 +153,7 @@ def get_violations(v_number, v_type='02', v_code='', e_code='', city=''):
                 }
 
                 vio_list.append(vio_data)
-
+            print('from local db')
             return {'vehicleNumber': v_number, 'status': 0, 'data': vio_list}, 99
 
     # 获取查询城市和查询url_id
@@ -179,21 +181,37 @@ def get_violations(v_number, v_type='02', v_code='', e_code='', city=''):
     # 根据url_id调用不同接口, 1-天津接口, 2-典典接口, 3-车轮接口
     if url_id == 1:
         data = get_vio_from_tj(v_number, v_type)
+        print('from tj api')
     elif url_id == 2:
         data = get_vio_from_ddyc(v_number, v_type, v_code, e_code, city)
         # print(data)
         data = vio_dic_for_ddyc(v_number, data)
+        print('from ddyc api')
     else:
         data = get_vio_from_chelun(v_number, v_type, v_code, e_code)
         # print(data)
         data = vio_dic_for_chelun(v_number, data)
-
+        print('from chelun api')
+    print(data['status'])
     # 如果查询成功, 保存数据到本地数据库
     if data['status'] == 0:
         save_to_loc_db(data, v_number, v_type)
 
     # 不能直接返回data, 应该把data再次封装后再返回
     return data, url_id
+
+
+# 定义查询线程类
+class QueryThread(threading.Thread):
+
+    def __init__(self, vehicle):
+        threading.Thread.__init__(self)
+        self.vehicle = vehicle
+
+    def run(self):
+        data = get_violations(self.vehicle.vehicle_number, self.vehicle.vehicle_type, self.vehicle.vehicle_code,
+                              self.vehicle.engine_code, self.vehicle.city)
+        print(data['status'])
 
 
 # 定时查询车辆库中车辆违章数据
@@ -204,6 +222,7 @@ def query_vio_auto():
     # 查询违章
     for vehicle in vehicle_list:
         print(vehicle.vehicle_number)
+
         get_violations(vehicle.vehicle_number, vehicle.vehicle_type, vehicle.vehicle_code, vehicle.engine_code,
                        vehicle.city)
 

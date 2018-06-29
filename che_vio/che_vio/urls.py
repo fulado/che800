@@ -30,6 +30,6 @@ Scheduler = BackgroundScheduler()
 Scheduler.add_job(empty_vio_db, 'cron', hour=17, minute=36, second=0)
 
 # 每天2点30分, 开始查询违章数据
-Scheduler.add_job(query_vio_auto, 'cron', hour=19, minute=52, second=0)
+Scheduler.add_job(query_vio_auto, 'cron', hour=15, minute=31, second=0)
 
 Scheduler.start()
