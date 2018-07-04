@@ -2,7 +2,7 @@ import time
 import hashlib
 import json
 import urllib.request
-from .models import VioInfo
+from .models import VioInfo, LogInfo
 
 
 # 从天津接口查询违章数据
@@ -281,23 +281,105 @@ def vio_dic_for_chelun(v_number, data):
 
 # 查询结果保存到本地数据库
 def save_to_loc_db(vio_data, vehicle_number, vehicle_type):
-    # 创建违章数据对象
 
-    for vio in vio_data['data']:
+    # 如果没有违章, 创建一条只包含车牌和车辆类型的数据
+    if len(vio_data) == 0:
         vio_info = VioInfo()
         vio_info.vehicle_number = vehicle_number
         vio_info.vehicle_type = vehicle_type
-        vio_info.vio_time = vio['time']
-        vio_info.vio_position = vio['position']
-        vio_info.vio_activity = vio['activity']
-        vio_info.vio_point = vio['point']
-        vio_info.vio_money = vio['money']
-        vio_info.vio_code = vio['code']
-        vio_info.vio_loc = vio['location']
+        vio_info.vio_code = '999999'                #  专用代码表示无违章
 
         vio_info.save()
+    else:
+        # 如果有, 逐条创建违章数据
+        for vio in vio_data['data']:
+            vio_info = VioInfo()
+            vio_info.vehicle_number = vehicle_number
+            vio_info.vehicle_type = vehicle_type
+            vio_info.vio_time = vio['time']
+            vio_info.vio_position = vio['position']
+            vio_info.vio_activity = vio['activity']
+            vio_info.vio_point = vio['point']
+            vio_info.vio_money = vio['money']
+            vio_info.vio_code = vio['code']
+            vio_info.vio_loc = vio['location']
 
-    print('saved to local db')
+            vio_info.save()
+
+    # print('saved to local db')
+
+
+# 保存查询日志
+def save_log(v_number, vio_data, user_id, url_id):
+    """
+    保存典典返回的查询结果到日志
+    :param v_number:
+    :param vio_data:
+    :return:
+    """
+    # {'success': False, 'errCode': 1001, 'message': '车牌长度不正确'}
+
+    # 构造日志数据
+    log_info = LogInfo()
+
+    # 保存基本查询信息
+    log_info.vehicle_number = v_number
+    log_info.user_id = user_id
+    log_info.url_id = url_id
+    log_info.query_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+
+    # 判断使用的接口url_id
+    if url_id == 1:
+
+        # 天津接口
+        if 'status' in vio_data and vio_data['status'] == 0:
+            # 查询成功
+            log_info.status = 0
+            log_info.comments = '查询成功'
+        else:
+            # 查询失败
+            if 'status' in vio_data:
+                log_info.status = vio_data['status']
+            log_info.comments = '查询失败'
+
+    elif url_id == 2:
+
+        # 典典接口
+        if 'success' in vio_data and vio_data['success']:
+            # 如果查询成功, 保存查询成功
+            log_info.status = 0
+            log_info.comments = '查询成功'
+        else:
+            # 如果查询失败, 保存错误代码和错误信息
+            if 'errCode' in vio_data:
+                log_info.status = vio_data['errCode']
+
+            if 'message' in vio_data:
+                log_info.comments = vio_data['message']
+
+    elif url_id == 3:
+
+        # 车轮接口
+        if 'code' in vio_data and vio_data['code'] == 0:
+            # 查询成功
+            log_info.status = 0
+            log_info.comments = '查询成功'
+        else:
+            # 查询失败
+            if 'code' in vio_data:
+                log_info.status = vio_data['code']
+
+            if 'msg' in vio_data:
+                log_info.comments = vio_data['msg']
+
+    else:
+
+        # 本地数据库
+        log_info.status = 0
+        log_info.comments = '查询成功'
+
+    # 保存日志到数据库
+    log_info.save()
 
 
 if __name__ == '__main__':
@@ -305,13 +387,13 @@ if __name__ == '__main__':
     cartype = '02'
     vcode = 'LGBF5AE00HR276883'
     ecode = '751757V'
-    car2 = {'v_number': '沪AUT715', 'v_type': '02', 'v_code': 'LSKG4AC12FA411099', 'e_code': 'H1SF1220128'}
+    car2 = {'v_number': '沪AUT71', 'v_type': '02', 'v_code': 'LSKG4AC12FA411099', 'e_code': 'H1SF1220128'}
     # response_data = get_vio_from_chelun(car2['v_number'], car2['v_type'], car2['v_code'], car2['e_code'])
 
     # response_data = get_vio_from_ddyc(v_number=carno, v_type=cartype, v_code=vcode, e_code=ecode, city='杭州市')
 
-    response_data = get_vio_from_tj('津N02070', '02')
-    print(response_data)
+    # response_data = get_vio_from_tj('津N02070', '02')
+    # print(response_data)
 
     # v_data = vio_dic_for_ddyc(carno, response_data)
     # v_data = vio_dic_for_chelun(car2['v_number'], response_data)

@@ -2,10 +2,11 @@ from django.http import JsonResponse
 from .forms import SearchForm
 from .models import UserInfo, LocInfo, VioInfo, VehicleInfo, LogInfo
 from .utils import get_vio_from_tj, get_vio_from_chelun, get_vio_from_ddyc, vio_dic_for_ddyc, vio_dic_for_chelun,\
-    save_to_loc_db
+    save_to_loc_db, save_log
+from multiprocessing import Queue
+from threading import Thread
 import time
 import hashlib
-import threading
 
 
 # 违章查询请求
@@ -75,7 +76,8 @@ def violation(request):
     # 查询违章信息
     # print('查询车辆, 号牌号码: %s, 号牌种类: %s' % (data['vehicleNumber'], data['vehicleType']))
     vio_data, url_id = get_violations(v_number=data['vehicleNumber'], v_type=data['vehicleType'],
-                                      v_code=data['vehicleCode'], e_code=data['engineCode'], city=data['city'])
+                                      v_code=data['vehicleCode'], e_code=data['engineCode'], city=data['city'],
+                                      user_id=user.id)
 
     # 根据查询结果记录车辆信息
     # 将车辆信息保存都本地数据库
@@ -108,20 +110,12 @@ def violation(request):
         print(e)
 
     # 记录查询日志
-    log_info = LogInfo()
-    log_info.vehicle = vehicle
-    log_info.user = user
-    log_info.url_id = url_id
-    log_info.status = vio_data['status']
-    log_info.query_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-
-    log_info.save()
 
     return JsonResponse(vio_data)
 
 
 # 根据车辆信息查询违章
-def get_violations(v_number, v_type='02', v_code='', e_code='', city=''):
+def get_violations(v_number, v_type='02', v_code='', e_code='', city='', user_id=99):
     """
     根据车辆信息调用不同的接口查询违章
     :param v_number: 车牌号
@@ -142,6 +136,10 @@ def get_violations(v_number, v_type='02', v_code='', e_code='', city=''):
         if vio_info_list:
             vio_list = []
             for vio in vio_info_list:
+                # 如果没有违章直接略过
+                if vio.vio_code == '999999':
+                    continue
+
                 vio_data = {
                     'time': vio.vio_time,
                     'position': vio.vio_position,
@@ -153,7 +151,11 @@ def get_violations(v_number, v_type='02', v_code='', e_code='', city=''):
                 }
 
                 vio_list.append(vio_data)
-            print('from local db')
+            print('%s -- local db' % v_number)
+
+            # 保存日志
+            save_log(v_number, '', user_id, 99)
+
             return {'vehicleNumber': v_number, 'status': 0, 'data': vio_list}, 99
 
     # 获取查询城市和查询url_id
@@ -181,18 +183,24 @@ def get_violations(v_number, v_type='02', v_code='', e_code='', city=''):
     # 根据url_id调用不同接口, 1-天津接口, 2-典典接口, 3-车轮接口
     if url_id == 1:
         data = get_vio_from_tj(v_number, v_type)
-        print('from tj api')
+        # print('%s -- tj api' % v_number)
+        # 保存日志
+        save_log(v_number, data, user_id, url_id)
     elif url_id == 2:
         data = get_vio_from_ddyc(v_number, v_type, v_code, e_code, city)
         # print(data)
+        # 保存日志
+        save_log(v_number, data, user_id, url_id)
         data = vio_dic_for_ddyc(v_number, data)
-        print('from ddyc api')
+        # print('%s -- ddyc api' % v_number)
     else:
         data = get_vio_from_chelun(v_number, v_type, v_code, e_code)
         # print(data)
+        # 保存日志
+        save_log(v_number, data, user_id, url_id)
         data = vio_dic_for_chelun(v_number, data)
-        print('from chelun api')
-    print(data['status'])
+        # print('%s -- chelun api' % v_number)
+    # print(data['status'])
     # 如果查询成功, 保存数据到本地数据库
     if data['status'] == 0:
         save_to_loc_db(data, v_number, v_type)
@@ -201,32 +209,46 @@ def get_violations(v_number, v_type='02', v_code='', e_code='', city=''):
     return data, url_id
 
 
-# 定义查询线程类
-class QueryThread(threading.Thread):
-
-    def __init__(self, vehicle):
-        threading.Thread.__init__(self)
-        self.vehicle = vehicle
-
-    def run(self):
-        data = get_violations(self.vehicle.vehicle_number, self.vehicle.vehicle_type, self.vehicle.vehicle_code,
-                              self.vehicle.engine_code, self.vehicle.city)
-        print(data['status'])
-
-
-# 定时查询车辆库中车辆违章数据
-def query_vio_auto():
+# 车辆读取线程
+def get_vehicle_thread(v_queue):
     # 查询数据库中的车辆数据
     vehicle_list = VehicleInfo.objects.all()
 
     # 查询违章
     for vehicle in vehicle_list:
-        print(vehicle.vehicle_number)
+        # 将车辆信息放入队列
+        v_queue.put(vehicle, True)
 
-        get_violations(vehicle.vehicle_number, vehicle.vehicle_type, vehicle.vehicle_code, vehicle.engine_code,
-                       vehicle.city)
 
-        # 记录日志
+# 违章查询线程
+def query_thread(v_queue, t_id):
+    while True:
+        try:
+            # print('query thread %d start' % t_id)
+            vehicle = v_queue.get(True, 5)
+            get_violations(vehicle.vehicle_number, vehicle.vehicle_type, vehicle.vehicle_code,
+                           vehicle.engine_code, vehicle.city)
+
+        except Exception as e:
+            print(e)
+            break
+
+
+# 定时查询车辆库中车辆违章数据
+def query_vio_auto():
+    print('auto query start')
+
+    # 创建车辆队列
+    vehicle_queue = Queue(3)
+
+    # 创建车辆读取线程
+    t_get_vehicle_thread = Thread(target=get_vehicle_thread, args=(vehicle_queue,))
+    t_get_vehicle_thread.start()
+
+    # 创建5个车辆查询线程
+    for i in range(5):
+        t_query_thread = Thread(target=query_thread, args=(vehicle_queue, i+1))
+        t_query_thread.start()
 
     print('auto query complete')
 

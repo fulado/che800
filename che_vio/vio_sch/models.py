@@ -52,7 +52,7 @@ class VioInfo(models.Model):
 
 
 class LogInfo(models.Model):
-    vehicle = models.ForeignKey(VehicleInfo, on_delete=models.CASCADE, blank=True, null=True)   # 车辆信息
+    vehicle_number = models.CharField(max_length=20, blank=True, null=True)                     # 车牌号
     user = models.ForeignKey(UserInfo, on_delete=models.CASCADE, blank=True, null=True)         # 所属用户
     url = models.ForeignKey(UrlInfo, on_delete=models.CASCADE, blank=True, null=True)           # 查询接口url
     query_time = models.DateTimeField(blank=True, null=True)                                    # 查询时间
