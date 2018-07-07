@@ -33,7 +33,7 @@ class VehicleInfo(models.Model):
     vehicle_type = models.IntegerField(default=2, blank=True, null=True)        # 车辆类型
     vehicle_code = models.CharField(max_length=50, blank=True, null=True)       # 车架号
     engine_code = models.CharField(max_length=50, blank=True, null=True)        # 发动机号
-    status = models.IntegerField(default=0)                                     # 状态: 0-无效, 1-有效, 如果车辆信息不正确, 则无效
+    status = models.IntegerField(default=0)                                     # 状态: 0-失败, 1-成功
     city = models.CharField(max_length=20, blank=True, null=True)               # 运营地
     create_time = models.DateTimeField(blank=True, null=True)                   # 创建时间
     query_counter = models.IntegerField(default=1)                              # 近7天查询违章次数
@@ -57,5 +57,5 @@ class LogInfo(models.Model):
     url = models.ForeignKey(UrlInfo, on_delete=models.CASCADE, blank=True, null=True)           # 查询接口url
     query_time = models.DateTimeField(blank=True, null=True)                                    # 查询时间
     status = models.IntegerField(default=-1, blank=True, null=True)                             # 状态码
-    comments = models.CharField(max_length=200, blank=True, null=True)                          # 备注信
-
+    comments = models.CharField(max_length=200, blank=True, null=True)                          # 备注信息
+    ip = models.CharField(max_length=20, blank=True, null=True)                                 # ip地址

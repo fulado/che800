@@ -287,7 +287,7 @@ def save_to_loc_db(vio_data, vehicle_number, vehicle_type):
         vio_info = VioInfo()
         vio_info.vehicle_number = vehicle_number
         vio_info.vehicle_type = vehicle_type
-        vio_info.vio_code = '999999'                #  专用代码表示无违章
+        vio_info.vio_code = '999999'                # 专用代码表示无违章
 
         vio_info.save()
     else:
@@ -310,14 +310,13 @@ def save_to_loc_db(vio_data, vehicle_number, vehicle_type):
 
 
 # 保存查询日志
-def save_log(v_number, vio_data, user_id, url_id):
+def save_log(v_number, vio_data, user_id, url_id, user_ip):
     """
     保存典典返回的查询结果到日志
     :param v_number:
     :param vio_data:
     :return:
     """
-    # {'success': False, 'errCode': 1001, 'message': '车牌长度不正确'}
 
     # 构造日志数据
     log_info = LogInfo()
@@ -327,6 +326,7 @@ def save_log(v_number, vio_data, user_id, url_id):
     log_info.user_id = user_id
     log_info.url_id = url_id
     log_info.query_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+    log_info.ip = user_ip
 
     # 判断使用的接口url_id
     if url_id == 1:

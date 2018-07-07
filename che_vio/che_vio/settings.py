@@ -23,39 +23,39 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = '_c_nkqad*5jqhc4v2%pippkzd$s7v-n52qtr#tczdh+rax9!g7'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-ALLOWED_HOSTS = []
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'violation',
-        'HOST': 'localhost',
-        'PORT': 3306,
-        'USER': 'root',
-        'PASSWORD': 'xiaobai',
-    }
-}
-
-# Settings for production!
-# DEBUG = False
+# DEBUG = True
 #
-# ALLOWED_HOSTS = ['*', ]
+# ALLOWED_HOSTS = []
 #
 # DATABASES = {
 #     'default': {
 #         'ENGINE': 'django.db.backends.mysql',
 #         'NAME': 'violation',
-#         'HOST': '172.21.0.2',
+#         'HOST': 'localhost',
 #         'PORT': 3306,
 #         'USER': 'root',
-#         'PASSWORD': 'Init1234',
+#         'PASSWORD': 'xiaobai',
 #     }
 # }
 
+# Settings for production!
+DEBUG = False
+
+ALLOWED_HOSTS = ['*', ]
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'violation',
+        'HOST': '172.21.0.2',
+        'PORT': 3306,
+        'USER': 'root',
+        'PASSWORD': 'Init1234',
+    }
+}
+
 # Database setting for configuration
-#
+
 # DATABASES = {
 #     'default': {
 #         'ENGINE': 'django.db.backends.mysql',

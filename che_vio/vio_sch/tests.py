@@ -4,6 +4,7 @@ import time
 import hashlib
 import json
 import threading
+import pymysql
 
 
 # Create your tests here.
@@ -190,18 +191,89 @@ class MyThread(threading.Thread):
         print('running thread is num %d' % self.num)
 
 
+# 备份表
+def backup():
+
+    # 数据库连接信息
+    host = '127.0.0.1'
+    port = 3306
+    user = 'root'
+    password = 'xiaobai'
+    database = 'violation'
+    charset = 'utf8mb4'
+
+    try:
+        # 创建连接
+        conn = pymysql.connect(host=host, port=port, user=user, password=password, database=database, charset=charset)
+
+        # 获取Cursor对象
+        cs = conn.cursor()
+
+        # 表名中包含的日期
+        name_time = time.strftime('%Y%m%d', time.localtime())
+
+        # 日志表改名
+        sql = 'RENAME TABLE vio_sch_loginfo TO vio_sch_loginfo_%s;' % name_time
+        cs.execute(sql)
+
+        # 新建日志表
+        sql = """CREATE TABLE `vio_sch_loginfo` (
+                      `id` int(11) NOT NULL AUTO_INCREMENT,
+                      `query_time` datetime(6) DEFAULT NULL,
+                      `status` int(11) DEFAULT NULL,
+                      `comments` varchar(200) DEFAULT NULL,
+                      `url_id` int(11) DEFAULT NULL,
+                      `user_id` int(11) DEFAULT NULL,
+                      `vehicle_number` varchar(20) DEFAULT NULL,
+                      `ip` varchar(20) DEFAULT NULL,
+                      PRIMARY KEY (`id`),
+                      FOREIGN KEY (`url_id`) REFERENCES `vio_sch_urlinfo` (`id`),
+                      FOREIGN KEY (`user_id`) REFERENCES `vio_sch_userinfo` (`id`)
+                  ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4"""
+        cs.execute(sql)
+
+        # 违章表改名
+        sql = 'RENAME TABLE vio_sch_vioinfo TO vio_sch_vioinfo_%s;' % name_time
+        cs.execute(sql)
+
+        # 新建违章表
+        sql = """CREATE TABLE `vio_sch_vioinfo` (
+                    `id` int(11) NOT NULL AUTO_INCREMENT,
+                    `vehicle_number` varchar(20) DEFAULT NULL,
+                    `vehicle_type` varchar(10) DEFAULT NULL,
+                    `vio_time` varchar(30) DEFAULT NULL,
+                    `vio_position` varchar(100) DEFAULT NULL,
+                    `vio_activity` varchar(100) DEFAULT NULL,
+                    `vio_point` int(11) DEFAULT NULL,
+                    `vio_money` int(11) DEFAULT NULL,
+                    `vio_code` varchar(20) DEFAULT NULL,
+                    `vio_loc` varchar(50) DEFAULT NULL,
+                    PRIMARY KEY (`id`)
+                ) ENGINE=InnoDB AUTO_INCREMENT=6238 DEFAULT CHARSET=utf8mb4"""
+        cs.execute(sql)
+    except Exception as e:
+        print(e)
+
+    finally:
+        # 关闭Cursor
+        cs.close()
+
+        # 关闭连接
+        conn.close()
+
+
 if __name__ == '__main__':
     # car1 = {'v_number': '京HD9596', 'v_type': '02', 'v_code': 'LGBF5AE00HR276883', 'e_code': '751757V'}
     # car2 = {'v_number': '苏AQ6R59', 'v_type': '02', 'v_code': 'LSGUD84X3FE009951', 'e_code': '150330725'}
-    car2 = {'v_number': '陕A62MS', 'v_type': '02', 'v_code': 'LSVNB4181HN040515', 'e_code': 'DT4979'}
+    # car2 = {'v_number': '陕A62MS', 'v_type': '02', 'v_code': 'LSVNB4181HN040515', 'e_code': 'DT4979'}
     #
-    response_data = get_vio_from_chelun(car2['v_number'], car2['v_type'], car2['v_code'], car2['e_code'])
+    # response_data = get_vio_from_chelun(car2['v_number'], car2['v_type'], car2['v_code'], car2['e_code'])
     #
     # response_data = get_vio_from_ddyc2(car2['v_number'], car2['v_type'], car2['v_code'], car2['e_code'])
     #
-    print(response_data)
+    # print(response_data)
 
-    # create_sign('test', 'test')
+    create_sign('test', 'test')
 
     # q = queue.Queue(maxsize=5)
     # for i in range(10):
@@ -211,4 +283,4 @@ if __name__ == '__main__':
     #
     # print('end')
 
-
+    # backup()

@@ -7,6 +7,7 @@ from multiprocessing import Queue
 from threading import Thread
 import time
 import hashlib
+import pymysql
 
 
 # 违章查询请求
@@ -17,11 +18,19 @@ def violation(request):
     :return: 违章数据, json格式
     """
 
+    # 判断当前时间, 每天00:10 ~ 00.30禁止查询, 系统自动日志
+    current_hour = time.localtime().tm_hour
+    current_min = time.localtime().tm_min
+
+    if current_hour == 0 and current_min in range(10, 30):
+        return JsonResponse({'status': 19})
+
     # 判断请求ip是否在白名单中
     if 'HTTP_X_FORWARDED_FOR' in request.META.keys():
-        ip_addr = request.META['HTTP e_code=ecode_X_FORWARDED_FOR']
+        user_ip = request.META['HTTP e_code=ecode_X_FORWARDED_FOR']
     else:
-        ip_addr = request.META['REMOTE_ADDR']
+        user_ip = request.META['REMOTE_ADDR']
+
     # print(ip_addr)
 
     # 如果ip不在白名单返回状态码14, 暂不校验ip
@@ -60,54 +69,54 @@ def violation(request):
         return JsonResponse(result)
 
     # 判断时间戳是否超时, 默认5分钟
-    # if int(time.time()) - timestamp_user > 60 * 5:
-    #     result = {'status': 15}
-    #     return JsonResponse(result)
+    if int(time.time()) - timestamp_user > 60 * 5:
+        result = {'status': 15}
+        return JsonResponse(result)
 
     # 校验sign
     sign = '%s%d%s' % (user.username, timestamp_user, user.password)
     # print(sign)
     sign = hashlib.sha1(sign.encode('utf-8')).hexdigest().upper()
 
-    # if sign != data['sign']:
-    #     result = {'status': 12}
-    #     return JsonResponse(result)
+    if sign != data['sign']:
+        result = {'status': 12}
+        return JsonResponse(result)
 
     # 查询违章信息
     # print('查询车辆, 号牌号码: %s, 号牌种类: %s' % (data['vehicleNumber'], data['vehicleType']))
-    vio_data, url_id = get_violations(v_number=data['vehicleNumber'], v_type=data['vehicleType'],
-                                      v_code=data['vehicleCode'], e_code=data['engineCode'], city=data['city'],
-                                      user_id=user.id)
+    vio_data = get_violations(v_number=data['vehicleNumber'], v_type=data['vehicleType'],
+                              v_code=data['vehicleCode'], e_code=data['engineCode'], city=data['city'],
+                              user_id=user.id, user_ip=user_ip)
 
     # 根据查询结果记录车辆信息
     # 将车辆信息保存都本地数据库
     # 判断本地数据库中是否已经存在该车辆信息
     # 车辆信息在第一次保存到数据库中时, 默认无效, 无效车辆在下次查询同一车辆时, 需要更新车辆信息,
     # 车辆信息在完成一次正确查询后, 后变为有效, 有效车辆信息应该每天更新一次
-    try:
-        vehicle = VehicleInfo.objects.filter(vehicle_number=data['vehicleNumber']).filter(vehicle_type=
-                                                                                          data['vehicleType'])
-        if vehicle.exists():
-            vehicle = vehicle[0]
-            vehicle.query_counter += 1
-            if not vehicle.status:
-                vehicle.vehicle_code = data['vehicleCode']
-                vehicle.engine_code = data['engineCode']
-                vehicle.city = data['city']
-                if not vio_data['status']:
-                    vehicle.status = 1
-        else:
-            vehicle = VehicleInfo()
-            vehicle.vehicle_number = data['vehicleNumber']
-            vehicle.vehicle_type = data['vehicleType']
-            vehicle.vehicle_code = data['vehicleCode']
-            vehicle.engine_code = data['engineCode']
-            vehicle.city = data['city']
-            vehicle.create_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-
-        vehicle.save()
-    except Exception as e:
-        print(e)
+    # try:
+    #     vehicle = VehicleInfo.objects.filter(vehicle_number=data['vehicleNumber']).filter(vehicle_type=
+    #                                                                                       data['vehicleType'])
+    #     if vehicle.exists():
+    #         vehicle = vehicle[0]
+    #         vehicle.query_counter += 1
+    #         if not vehicle.status:
+    #             vehicle.vehicle_code = data['vehicleCode']
+    #             vehicle.engine_code = data['engineCode']
+    #             vehicle.city = data['city']
+    #             if not vio_data['status']:
+    #                 vehicle.status = 1
+    #     else:
+    #         vehicle = VehicleInfo()
+    #         vehicle.vehicle_number = data['vehicleNumber']
+    #         vehicle.vehicle_type = data['vehicleType']
+    #         vehicle.vehicle_code = data['vehicleCode']
+    #         vehicle.engine_code = data['engineCode']
+    #         vehicle.city = data['city']
+    #         vehicle.create_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+    #
+    #     vehicle.save()
+    # except Exception as e:
+    #     print(e)
 
     # 记录查询日志
 
@@ -115,7 +124,7 @@ def violation(request):
 
 
 # 根据车辆信息查询违章
-def get_violations(v_number, v_type='02', v_code='', e_code='', city='', user_id=99):
+def get_violations(v_number, v_type='02', v_code='', e_code='', city='', user_id=99, user_ip='127.0.0.1'):
     """
     根据车辆信息调用不同的接口查询违章
     :param v_number: 车牌号
@@ -151,12 +160,12 @@ def get_violations(v_number, v_type='02', v_code='', e_code='', city='', user_id
                 }
 
                 vio_list.append(vio_data)
-            print('%s -- local db' % v_number)
+            # print('%s -- local db' % v_number)
 
             # 保存日志
-            save_log(v_number, '', user_id, 99)
+            save_log(v_number, '', user_id, 99, user_ip)
 
-            return {'vehicleNumber': v_number, 'status': 0, 'data': vio_list}, 99
+            return {'vehicleNumber': v_number, 'status': 0, 'data': vio_list}
 
     # 获取查询城市和查询url_id
     # 目前看来这个功能没啥用, 暂时先把它省略了吧, 只判断车牌开头的城市简称, 根据这个确定调用哪个查询接口, 现在只查询天津的车
@@ -182,64 +191,80 @@ def get_violations(v_number, v_type='02', v_code='', e_code='', city='', user_id
 
     # 根据url_id调用不同接口, 1-天津接口, 2-典典接口, 3-车轮接口
     if url_id == 1:
+
         data = get_vio_from_tj(v_number, v_type)
         # print('%s -- tj api' % v_number)
+
         # 保存日志
-        save_log(v_number, data, user_id, url_id)
+        save_log(v_number, data, user_id, url_id, user_ip)
+
     elif url_id == 2:
+
         data = get_vio_from_ddyc(v_number, v_type, v_code, e_code, city)
         # print(data)
         # 保存日志
-        save_log(v_number, data, user_id, url_id)
+        save_log(v_number, data, user_id, url_id, user_ip)
         data = vio_dic_for_ddyc(v_number, data)
         # print('%s -- ddyc api' % v_number)
+
     else:
+
         data = get_vio_from_chelun(v_number, v_type, v_code, e_code)
         # print(data)
         # 保存日志
-        save_log(v_number, data, user_id, url_id)
+        save_log(v_number, data, user_id, url_id, user_ip)
         data = vio_dic_for_chelun(v_number, data)
+
         # print('%s -- chelun api' % v_number)
     # print(data['status'])
+
     # 如果查询成功, 保存数据到本地数据库
     if data['status'] == 0:
         save_to_loc_db(data, v_number, v_type)
 
     # 不能直接返回data, 应该把data再次封装后再返回
-    return data, url_id
+    return data
 
 
 # 车辆读取线程
 def get_vehicle_thread(v_queue):
-    # 查询数据库中的车辆数据
-    vehicle_list = VehicleInfo.objects.all()
 
-    # 查询违章
-    for vehicle in vehicle_list:
-        # 将车辆信息放入队列
-        v_queue.put(vehicle, True)
+    # 循环3次, 每次只查询之前查询失败的车辆
+    for i in range(3):
+        # 查询数据库中的车辆数据, 已经查询成功的不再查询
+        vehicle_list = VehicleInfo.objects.filter(status=0)
+
+        # 查询违章
+        for vehicle in vehicle_list:
+            # 将车辆信息放入队列
+            v_queue.put(vehicle, True)
 
 
 # 违章查询线程
-def query_thread(v_queue, t_id):
+def query_thread(v_queue):
     while True:
         try:
             # print('query thread %d start' % t_id)
             vehicle = v_queue.get(True, 5)
-            get_violations(vehicle.vehicle_number, vehicle.vehicle_type, vehicle.vehicle_code,
-                           vehicle.engine_code, vehicle.city)
+            data = get_violations(vehicle.vehicle_number, vehicle.vehicle_type, vehicle.vehicle_code,
+                                  vehicle.engine_code, vehicle.city)
+
+            # 如果查询成功, 将讲车辆查询状态置为1
+            if data['status'] == 0:
+                vehicle.status = 1
+                vehicle.save()
 
         except Exception as e:
             print(e)
             break
 
 
-# 定时查询车辆库中车辆违章数据
+# 定时任务, 查询车辆库中车辆违章数据
 def query_vio_auto():
-    print('auto query start')
+    # print('auto query start')
 
     # 创建车辆队列
-    vehicle_queue = Queue(3)
+    vehicle_queue = Queue(5)
 
     # 创建车辆读取线程
     t_get_vehicle_thread = Thread(target=get_vehicle_thread, args=(vehicle_queue,))
@@ -247,14 +272,85 @@ def query_vio_auto():
 
     # 创建5个车辆查询线程
     for i in range(5):
-        t_query_thread = Thread(target=query_thread, args=(vehicle_queue, i+1))
+        t_query_thread = Thread(target=query_thread, args=(vehicle_queue,))
         t_query_thread.start()
 
-    print('auto query complete')
+    # print('auto query complete')
 
 
-# 清空车辆违章数据表
-def empty_vio_db():
-    VioInfo.objects.all().delete()
+# 定时任务, 备份并初始化违章表和日志表
+def backup_log():
 
-    print('empty vio db complete')
+    # 数据库连接信息
+    host = '127.0.0.1'
+    port = 3306
+    user = 'root'
+    password = 'xiaobai'
+    database = 'violation'
+    charset = 'utf8mb4'
+
+    try:
+        # 创建连接
+        conn = pymysql.connect(host=host, port=port, user=user, password=password, database=database, charset=charset)
+
+        # 获取Cursor对象
+        cs = conn.cursor()
+
+        # 表名中包含的日期
+        name_time = time.strftime('%Y%m%d', time.localtime())
+
+        # 日志表改名
+        sql = 'RENAME TABLE vio_sch_loginfo TO vio_sch_loginfo_%s;' % name_time
+        cs.execute(sql)
+
+        # 新建日志表
+        sql = """CREATE TABLE `vio_sch_loginfo` (
+                      `id` int(11) NOT NULL AUTO_INCREMENT,
+                      `query_time` datetime(6) DEFAULT NULL,
+                      `status` int(11) DEFAULT NULL,
+                      `comments` varchar(200) DEFAULT NULL,
+                      `url_id` int(11) DEFAULT NULL,
+                      `user_id` int(11) DEFAULT NULL,
+                      `vehicle_number` varchar(20) DEFAULT NULL,
+                      `ip` varchar(20) DEFAULT NULL,
+                      PRIMARY KEY (`id`),
+                      FOREIGN KEY (`url_id`) REFERENCES `vio_sch_urlinfo` (`id`),
+                      FOREIGN KEY (`user_id`) REFERENCES `vio_sch_userinfo` (`id`)
+                  ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4"""
+        cs.execute(sql)
+
+        # 违章表改名
+        sql = 'RENAME TABLE vio_sch_vioinfo TO vio_sch_vioinfo_%s;' % name_time
+        cs.execute(sql)
+
+        # 新建违章表
+        sql = """CREATE TABLE `vio_sch_vioinfo` (
+                    `id` int(11) NOT NULL AUTO_INCREMENT,
+                    `vehicle_number` varchar(20) DEFAULT NULL,
+                    `vehicle_type` varchar(10) DEFAULT NULL,
+                    `vio_time` varchar(30) DEFAULT NULL,
+                    `vio_position` varchar(100) DEFAULT NULL,
+                    `vio_activity` varchar(100) DEFAULT NULL,
+                    `vio_point` int(11) DEFAULT NULL,
+                    `vio_money` int(11) DEFAULT NULL,
+                    `vio_code` varchar(20) DEFAULT NULL,
+                    `vio_loc` varchar(50) DEFAULT NULL,
+                    PRIMARY KEY (`id`)
+                ) ENGINE=InnoDB AUTO_INCREMENT=6238 DEFAULT CHARSET=utf8mb4"""
+        cs.execute(sql)
+    except Exception as e:
+        print(e)
+
+    finally:
+        # 关闭Cursor
+        cs.close()
+
+        # 关闭连接
+        conn.close()
+
+        print('Initial complete')
+
+
+# 定时任务, 重置车辆违章查询状态status为0
+def reset_status():
+    VehicleInfo.objects.all().update(status=0)

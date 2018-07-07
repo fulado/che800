@@ -15,8 +15,8 @@ Including another URLconf
 """
 # from django.contrib import admin
 from django.conf.urls import url, include
-from apscheduler.schedulers.background import BackgroundScheduler
-from vio_sch.views import query_vio_auto, empty_vio_db
+# from apscheduler.schedulers.background import BackgroundScheduler
+# from vio_sch.views import query_vio_auto, backup_log, reset_status
 
 urlpatterns = [
     # path('admin/', admin.site.urls),
@@ -24,12 +24,15 @@ urlpatterns = [
 ]
 
 # 定时任务
-Scheduler = BackgroundScheduler()
+# Scheduler = BackgroundScheduler()
 
-# 每天2点, 清空违章数据库
-Scheduler.add_job(empty_vio_db, 'cron', hour=17, minute=37, second=0)
+# 每天00:10开始, 备份并清空违章表和日志表
+# Scheduler.add_job(backup_log, 'cron', hour=0, minute=10, second=0)
 
-# 每天2点30分, 开始查询违章数据
-Scheduler.add_job(query_vio_auto, 'cron', hour=18, minute=59, second=0)
+# 每天00:30, 重置车辆违章查询状态status为0
+# Scheduler.add_job(reset_status, 'cron', hour=0, minute=30, second=0)
 
-Scheduler.start()
+# 每天01:00, 开始查询违章数据
+# Scheduler.add_job(query_vio_auto, 'cron', hour=1, minute=0, second=0)
+#
+# Scheduler.start()
