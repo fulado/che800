@@ -282,29 +282,32 @@ def vio_dic_for_chelun(v_number, data):
 # 查询结果保存到本地数据库
 def save_to_loc_db(vio_data, vehicle_number, vehicle_type):
 
-    # 如果没有违章, 创建一条只包含车牌和车辆类型的数据
-    if len(vio_data) == 0:
-        vio_info = VioInfo()
-        vio_info.vehicle_number = vehicle_number
-        vio_info.vehicle_type = vehicle_type
-        vio_info.vio_code = '999999'                # 专用代码表示无违章
-
-        vio_info.save()
-    else:
-        # 如果有, 逐条创建违章数据
-        for vio in vio_data['data']:
+    try:
+        # 如果没有违章, 创建一条只包含车牌和车辆类型的数据
+        if len(vio_data) == 0:
             vio_info = VioInfo()
             vio_info.vehicle_number = vehicle_number
             vio_info.vehicle_type = vehicle_type
-            vio_info.vio_time = vio['time']
-            vio_info.vio_position = vio['position']
-            vio_info.vio_activity = vio['activity']
-            vio_info.vio_point = vio['point']
-            vio_info.vio_money = vio['money']
-            vio_info.vio_code = vio['code']
-            vio_info.vio_loc = vio['location']
+            vio_info.vio_code = '999999'                # 专用代码表示无违章
 
             vio_info.save()
+        else:
+            # 如果有, 逐条创建违章数据
+            for vio in vio_data['data']:
+                vio_info = VioInfo()
+                vio_info.vehicle_number = vehicle_number
+                vio_info.vehicle_type = vehicle_type
+                vio_info.vio_time = vio['time']
+                vio_info.vio_position = vio['position']
+                vio_info.vio_activity = vio['activity']
+                vio_info.vio_point = vio['point']
+                vio_info.vio_money = vio['money']
+                vio_info.vio_code = vio['code']
+                vio_info.vio_loc = vio['location']
+
+                vio_info.save()
+    except Exception as e:
+        print(e)
 
     # print('saved to local db')
 
@@ -379,7 +382,10 @@ def save_log(v_number, vio_data, user_id, url_id, user_ip):
         log_info.comments = '查询成功'
 
     # 保存日志到数据库
-    log_info.save()
+    try:
+        log_info.save()
+    except Exception as e:
+        print(e)
 
 
 if __name__ == '__main__':

@@ -124,7 +124,7 @@ def violation(request):
 
 
 # 根据车辆信息查询违章
-def get_violations(v_number, v_type='02', v_code='', e_code='', city='', user_id=99, user_ip='127.0.0.1'):
+def get_violations(v_number, v_type=2, v_code='', e_code='', city='', user_id=99, user_ip='127.0.0.1'):
     """
     根据车辆信息调用不同的接口查询违章
     :param v_number: 车牌号
@@ -134,10 +134,13 @@ def get_violations(v_number, v_type='02', v_code='', e_code='', city='', user_id
     :param city: 查询城市
     :return: 违章数据, json格式
     """
+    # 将车辆类型转为int型
+    v_type = int(v_type)
+
     # 先从本地数据库查询, 如果本地数据库没有该违章数据, 再通过接口查询
 
     try:
-        vio_info_list = VioInfo.objects.filter(vehicle_number=v_number).filter(vehicle_type=int(v_type))
+        vio_info_list = VioInfo.objects.filter(vehicle_number=v_number).filter(vehicle_type=v_type)
     except Exception as e:
         print(e)
     else:
