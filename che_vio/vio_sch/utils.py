@@ -220,7 +220,7 @@ def vio_dic_for_chelun(v_number, data):
             for vio in data['data']:
                 # 违法时间
                 if 'date' in vio:
-                    vio_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(int(vio['date'])))
+                    vio_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(int(vio['date'])))
                 else:
                     vio_time = ''
 
@@ -284,7 +284,7 @@ def save_to_loc_db(vio_data, vehicle_number, vehicle_type):
 
     try:
         # 如果没有违章, 创建一条只包含车牌和车辆类型的数据
-        if len(vio_data) == 0:
+        if len(vio_data['data']) == 0:
             vio_info = VioInfo()
             vio_info.vehicle_number = vehicle_number
             vio_info.vehicle_type = vehicle_type

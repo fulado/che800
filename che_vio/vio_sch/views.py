@@ -1,4 +1,4 @@
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from .forms import SearchForm
 from .models import UserInfo, LocInfo, VioInfo, VehicleInfo, LogInfo
 from .utils import get_vio_from_tj, get_vio_from_chelun, get_vio_from_ddyc, vio_dic_for_ddyc, vio_dic_for_chelun,\
@@ -138,7 +138,6 @@ def get_violations(v_number, v_type=2, v_code='', e_code='', city='', user_id=99
     v_type = int(v_type)
 
     # 先从本地数据库查询, 如果本地数据库没有该违章数据, 再通过接口查询
-
     try:
         vio_info_list = VioInfo.objects.filter(vehicle_number=v_number).filter(vehicle_type=v_type)
     except Exception as e:
@@ -172,6 +171,12 @@ def get_violations(v_number, v_type=2, v_code='', e_code='', city='', user_id=99
 
     # 获取查询城市和查询url_id
     # 目前看来这个功能没啥用, 暂时先把它省略了吧, 只判断车牌开头的城市简称, 根据这个确定调用哪个查询接口, 现在只查询天津的车
+    # 将车牌类型转为字符串'02'
+    if v_type < 10:
+        v_type = '0%d' % v_type
+    else:
+        v_type = str(v_type)
+
     try:
         if city not in ['天津市', '天津', '津']:
             city = ''  # 未来如有需要在修改次功能
@@ -285,10 +290,12 @@ def query_vio_auto():
 def backup_log():
 
     # 数据库连接信息
-    host = '127.0.0.1'
+    # host = '127.0.0.1'
+    host = '172.21.0.2'
     port = 3306
     user = 'root'
-    password = 'xiaobai'
+    password = 'Init1234'
+    # password = 'xiaobai'
     database = 'violation'
     charset = 'utf8mb4'
 
@@ -299,8 +306,10 @@ def backup_log():
         # 获取Cursor对象
         cs = conn.cursor()
 
+        # 计算昨天的时间
+        yesterday_time = time.time() - 60 * 60 * 12
         # 表名中包含的日期
-        name_time = time.strftime('%Y%m%d', time.localtime())
+        name_time = time.strftime('%Y%m%d', time.localtime(yesterday_time))
 
         # 日志表改名
         sql = 'RENAME TABLE vio_sch_loginfo TO vio_sch_loginfo_%s;' % name_time
@@ -357,3 +366,22 @@ def backup_log():
 # 定时任务, 重置车辆违章查询状态status为0
 def reset_status():
     VehicleInfo.objects.all().update(status=0)
+
+
+# 定时任务, 测试
+def test_task():
+    loginfo = LogInfo()
+
+    loginfo.vehicle_number = 'test123'
+    loginfo.user_id = 99
+    loginfo.url_id = 99
+    loginfo.query_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
+    loginfo.comments = '123'
+    loginfo.ip = '123,456.789.1'
+
+    loginfo.save()
+
+
+# 负载均衡测试
+def nginx_test(request):
+    return HttpResponse('<h1>server 02</h1>')

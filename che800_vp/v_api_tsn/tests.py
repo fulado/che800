@@ -13,20 +13,21 @@ class ViolationException(Exception):
 
 
 def get_token():
-    data = '{"username":"ceshihttp","password":"ceshihttp"}'
-    url = 'http://192.168.100.234:7000/login'
+    data = str({'username': 'numtest', 'password': '111111'})
+    url = 'http://47.94.18.47/IllegalData-search/login'
     data = get_json(get_response_encoded_data(url, data))
-    # print(data)
+    print(data)
     return data['token']
 
 
 def get_violation(car_list):
-    url = 'http://192.168.100.234:7000/illgledata/vehicle'
+    url = 'http://47.94.18.47/IllegalData-search/vehicle'
 
     token = get_token()
-    data = str({"token": token, "cars": car_list})
+    data = str({'userId': 'numtest', 'token': token, 'cars': car_list})
+    # print(data)
     data = get_response_encoded_data(url, data)
-    print(data)
+    # print(data)
     if b'\xef\xbf\xbd' in data:
         raise ViolationException()
 
@@ -37,6 +38,7 @@ def get_response_encoded_data(url, data):
     # base64加密
     data = base64.b64encode(data.encode('utf-8'))
     data = 'param=%s' % data.decode('utf-8')
+    # print(data)
 
     request = urllib.request.Request(url, data.encode('utf-8'))
 
@@ -52,8 +54,9 @@ def get_json(data):
 
 def get_violation_count(cars):
     try:
-        data = get_violation(cars)['result']
-        # print(data)
+        data = get_violation(cars)
+        print(data)
+        data = data['result']
         violation_dict = {}
         for violation_data in data:
             print(violation_data)
@@ -123,15 +126,16 @@ def create_sign(username, password):
 
 
 if __name__ == '__main__':
-    # cars = [{"engineNumber": "121111", "platNumber": "冀JD7697", "carType": "01"},
-    #         {"engineNumber": "15E51A", "platNumber": "津CA9257", "carType": "01"},
-    #         {"engineNumber": "15E51A", "platNumber": "津CA9257", "carType": "01"}]
-    #
-    # try:
-    #     violation_count = get_violation_count(cars)
-    #     print(violation_count)
-    # except Exception as e:
-    #     print(e)
+    cars = [{'engineNumber': 'H1SF5210072',
+             'platNumber': '沪AYC967',
+             'carType': '02',
+             'vinNumber': 'LSKG4AC1XFA413599'}]
+
+    try:
+        violation_count = get_violation_count(cars)
+        print(violation_count)
+    except Exception as e:
+        print(e)
 
     # get_violation_from_mongo()
     # vehicle_number = '津NWX388'
@@ -146,4 +150,10 @@ if __name__ == '__main__':
     # print(json.loads(response_data.decode('utf-8')))
     # print(end_time - start_time)
 
-    create_sign('test', 'test')
+    # create_sign('test', 'test')
+
+    # get_token()
+
+    """
+    {'feedback': {'cars': '沪AYC967', 'requestIp': '47.94.18.47', 'responseTime': '2018-07-11 19:31:39'}, 'result': {'platNumber': '沪AYC967', 'punishs': [{'reason': '驾驶中型以上载客载货汽车、危险物品运输车辆以外的其他机动车行驶超过规定时速10%未达20%的', 'paystat': '1', 'viocjjg': '和静县公安局交警大队', 'punishPoint': '3', 'location': '国道218线575公里300米', 'state': '1', 'time': '2017-07-29 12:44:00', 'punishMoney': '200'}, {'reason': '驾驶中型以上载客载货汽车、校车、危险物品运输车辆以外的其他机动车行驶超过规定时速20%以上未达到50%的', 'paystat': '1', 'viocjjg': '吉木乃县交通警察大队', 'punishPoint': '6', 'location': '国道217线173公里', 'state': '1', 'time': '2018-07-03 15:28:00', 'punishMoney': '200'}], 'status': '0'}}
+platNumber"""
