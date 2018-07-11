@@ -13,8 +13,9 @@ class ViolationException(Exception):
 
 
 def get_token():
-    data = str({'username': 'numtest', 'password': '111111'})
-    url = 'http://47.94.18.47/IllegalData-search/login'
+    data = str({"username": 'numtest1', 'password': '111111'})
+    # url = 'http://47.94.18.47/IllegalData-search/login'
+    url = 'http://127.0.0.1:8000/login'
     data = get_json(get_response_encoded_data(url, data))
     print(data)
     return data['token']
@@ -38,7 +39,7 @@ def get_response_encoded_data(url, data):
     # base64加密
     data = base64.b64encode(data.encode('utf-8'))
     data = 'param=%s' % data.decode('utf-8')
-    # print(data)
+    print(data)
 
     request = urllib.request.Request(url, data.encode('utf-8'))
 

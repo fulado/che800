@@ -9,6 +9,7 @@ class UserInfo(models.Model):
     info = models.CharField(max_length=200, blank=True, null=True)                    # 用户信息
     authority = models.IntegerField(default=0)                                        # 权限: 0-企业, 1-管理员
     is_valid = models.BooleanField(default=True)                                      # 是否可用
+    timestamp = models.IntegerField(default=0, blank=False, null=False)                            # 时间戳
 
 
 class VehicleType(models.Model):
