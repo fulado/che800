@@ -2,7 +2,62 @@ import time
 import hashlib
 import json
 import urllib.request
-from .models import VioInfo, LogInfo
+from .models import VioInfo, LogInfo, LocInfo
+
+
+# 判断查询城市是否正确
+def get_url_id(v_number, city):
+    if city not in ['天津市', '天津', '津']:
+        city = ''  # 未来如有需要在修改次功能
+
+    try:
+        if city != '':
+            loc_info = LocInfo.objects.get(loc_name__contains=city)
+        else:
+            plate_name = v_number[0]
+            loc_info = LocInfo.objects.get(plate_name=plate_name)
+    except Exception as e:
+        print(e)
+        return None
+    else:
+        # city = loc_info.loc_name
+        url_id = loc_info.url_id.id
+
+    return url_id
+
+
+# 从本地数据库查询违章
+def get_vio_from_loc(v_number, v_type=2):
+    try:
+        vio_info_list = VioInfo.objects.filter(vehicle_number=v_number).filter(vehicle_type=v_type)
+    except Exception as e:
+        print(e)
+        return None
+
+    # 如果有数据, 构造违章信息
+    if vio_info_list:
+        vio_list = []
+        for vio in vio_info_list:
+            # 如果没有违章直接略过
+            if vio.vio_code == '999999':
+                continue
+
+            vio_data = {
+                'time': vio.vio_time,
+                'position': vio.vio_position,
+                'activity': vio.vio_activity,
+                'point': vio.vio_point,
+                'money': vio.vio_money,
+                'code': vio.vio_code,
+                'location': vio.vio_loc
+            }
+
+            vio_list.append(vio_data)
+        # print('%s -- local db' % v_number)
+
+        return {'vehicleNumber': v_number, 'status': 0, 'data': vio_list}
+    else:
+        return None
 
 
 # 从天津接口查询违章数据
@@ -374,6 +429,11 @@ def save_log(v_number, vio_data, user_id, url_id, user_ip):
 
             if 'msg' in vio_data:
                 log_info.comments = vio_data['msg']
+
+    elif url_id is None:
+
+        log_info.status = 16
+        log_info.comments = '查询城市错误'
 
     else:
 

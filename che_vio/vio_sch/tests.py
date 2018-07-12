@@ -265,8 +265,8 @@ def backup():
 if __name__ == '__main__':
     # car1 = {'v_number': '京HD9596', 'v_type': '02', 'v_code': 'LGBF5AE00HR276883', 'e_code': '751757V'}
     # car2 = {'v_number': '苏AQ6R59', 'v_type': '02', 'v_code': 'LSGUD84X3FE009951', 'e_code': '150330725'}
-    # car2 = {'v_number': '沪E59583', 'v_type': '02', 'v_code': 'LTVBJ874960003131', 'e_code': '5GRC044604'}
-    car2 = {'v_number': '沪AYC335', 'v_type': '02', 'v_code': 'LSKG4AC11FA413877', 'e_code': 'H1SF5250141'}
+    car2 = {'v_number': '沪E595831', 'v_type': '02', 'v_code': 'LTVBJ874960003131', 'e_code': '5GRC044604'}
+    # car2 = {'v_number': '沪AYC335', 'v_type': '02', 'v_code': 'LSKG4AC11FA413877', 'e_code': 'H1SF5250141'}
     #
     response_data = get_vio_from_chelun(car2['v_number'], car2['v_type'], car2['v_code'], car2['e_code'])
     #
@@ -274,7 +274,7 @@ if __name__ == '__main__':
     #
     print(response_data)
 
-    create_sign('test', 'test')
+    # create_sign('test', 'test')
 
     # q = queue.Queue(maxsize=5)
     # for i in range(10):

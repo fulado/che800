@@ -2,7 +2,7 @@ from django.http import JsonResponse, HttpResponse
 from .forms import SearchForm
 from .models import UserInfo, LocInfo, VioInfo, VehicleInfo, LogInfo
 from .utils import get_vio_from_tj, get_vio_from_chelun, get_vio_from_ddyc, vio_dic_for_ddyc, vio_dic_for_chelun,\
-    save_to_loc_db, save_log
+    save_to_loc_db, save_log, get_vio_from_loc, get_url_id
 from multiprocessing import Queue
 from threading import Thread
 import time
@@ -138,36 +138,15 @@ def get_violations(v_number, v_type=2, v_code='', e_code='', city='', user_id=99
     v_type = int(v_type)
 
     # 先从本地数据库查询, 如果本地数据库没有该违章数据, 再通过接口查询
-    try:
-        vio_info_list = VioInfo.objects.filter(vehicle_number=v_number).filter(vehicle_type=v_type)
-    except Exception as e:
-        print(e)
-    else:
-        # 如果有数据, 构造违章信息
-        if vio_info_list:
-            vio_list = []
-            for vio in vio_info_list:
-                # 如果没有违章直接略过
-                if vio.vio_code == '999999':
-                    continue
+    result = get_vio_from_loc(v_number, v_type)
 
-                vio_data = {
-                    'time': vio.vio_time,
-                    'position': vio.vio_position,
-                    'activity': vio.vio_activity,
-                    'point': vio.vio_point,
-                    'money': vio.vio_money,
-                    'code': vio.vio_code,
-                    'location': vio.vio_loc
-                }
+    # 如果查询成功, 保存日志, 并返回查询结果
+    if result is not None:
 
-                vio_list.append(vio_data)
-            # print('%s -- local db' % v_number)
+        # 保存日志
+        save_log(v_number, '', user_id, 99, user_ip)
 
-            # 保存日志
-            save_log(v_number, '', user_id, 99, user_ip)
-
-            return {'vehicleNumber': v_number, 'status': 0, 'data': vio_list}
+        return result
 
     # 获取查询城市和查询url_id
     # 目前看来这个功能没啥用, 暂时先把它省略了吧, 只判断车牌开头的城市简称, 根据这个确定调用哪个查询接口, 现在只查询天津的车
@@ -177,24 +156,12 @@ def get_violations(v_number, v_type=2, v_code='', e_code='', city='', user_id=99
     else:
         v_type = str(v_type)
 
-    try:
-        if city not in ['天津市', '天津', '津']:
-            city = ''  # 未来如有需要在修改次功能
+    # 根据城市选择确定查询端口的url_id
+    url_id = get_url_id(v_number, city)
 
-        try:
-            if city != '':
-                loc_info = LocInfo.objects.get(loc_name__contains=city)
-            else:
-                plate_name = v_number[0]
-                loc_info = LocInfo.objects.get(plate_name=plate_name)
-        except Exception as e:
-            print(e)
-            url_id = 2
-        else:
-            # city = loc_info.loc_name
-            url_id = loc_info.url_id.id
-    except Exception as e:
-        print(e)
+    # 如果url_id是None就返回查询城市错误
+    if url_id is None:
+        save_log(v_number, '', user_id, 99, user_ip)
         return {'status': 16}  # 查询城市错误
 
     # 根据url_id调用不同接口, 1-天津接口, 2-典典接口, 3-车轮接口
@@ -228,7 +195,7 @@ def get_violations(v_number, v_type=2, v_code='', e_code='', city='', user_id=99
 
     # 如果查询成功, 保存数据到本地数据库
     if data['status'] == 0:
-        save_to_loc_db(data, v_number, v_type)
+        save_to_loc_db(data, v_number, int(v_type))
 
     # 不能直接返回data, 应该把data再次封装后再返回
     return data
@@ -290,12 +257,12 @@ def query_vio_auto():
 def backup_log():
 
     # 数据库连接信息
-    # host = '127.0.0.1'
-    host = '172.21.0.2'
+    host = '127.0.0.1'
+    # host = '172.21.0.2'
     port = 3306
     user = 'root'
-    password = 'Init1234'
-    # password = 'xiaobai'
+    # password = 'Init1234'
+    password = 'xiaobai'
     database = 'violation'
     charset = 'utf8mb4'
 
