@@ -257,12 +257,12 @@ def query_vio_auto():
 def backup_log():
 
     # 数据库连接信息
-    host = '127.0.0.1'
-    # host = '172.21.0.2'
+    # host = '127.0.0.1'
+    # password = 'xiaobai'
+    host = '172.21.0.2'
+    password = 'Init1234'
     port = 3306
     user = 'root'
-    # password = 'Init1234'
-    password = 'xiaobai'
     database = 'violation'
     charset = 'utf8mb4'
 
@@ -351,4 +351,4 @@ def test_task():
 
 # 负载均衡测试
 def nginx_test(request):
-    return HttpResponse('<h1>server 02</h1>')
+    return HttpResponse('<h1>server 03</h1>')

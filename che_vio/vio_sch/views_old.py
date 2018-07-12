@@ -31,7 +31,7 @@ def login_service(request):
 
     # 获取用户传递的参数
     param = request.POST.get('param', '')
-    print(param)
+
     if param == '':
         response_data = {'status': 99, 'message': 'request invalid'}
         response_data = base64.b64encode(json.dumps(response_data).encode('utf-8'))
@@ -43,7 +43,6 @@ def login_service(request):
         # 获取用户名和密码
         username = param['username']
         password = param['password']
-        print('%s : %s' % (username, password))
 
         # 对比用户和密码
         user = UserInfo.objects.filter(username=username).get(password=password)
@@ -84,7 +83,7 @@ def violation_service(request):
         user_ip = request.META['REMOTE_ADDR']
 
     param = json.loads(base64.b64decode(param).decode('utf-8').replace('\'', '\"'))
-
+    print(param)
     try:
         # 获取用户名和密码
         username = param['userId']
@@ -100,6 +99,7 @@ def violation_service(request):
 
     # 判断token是否过期
     current_timestamp = int(time.time())
+
     if current_timestamp - user.timestamp > 3600:
         response_data = {'status': 5, 'message': 'token is out of time'}
         response_data = base64.b64encode(json.dumps(response_data).encode('utf-8'))
@@ -115,9 +115,18 @@ def violation_service(request):
         response_data = base64.b64encode(json.dumps(response_data).encode('utf-8'))
         return HttpResponse(response_data)
 
+    # 获取车辆数据
+    try:
+        v_data = param['cars'][0]
+    except Exception as e:
+        print(e)
+        response_data = {'status': 5, 'message': 'vehicle info error'}
+        response_data = base64.b64encode(json.dumps(response_data).encode('utf-8'))
+        return HttpResponse(response_data)
+
     # 判断车辆类型
     try:
-        v_type = int(param['vehicleType'])
+        v_type = int(v_data['carType'])
         if v_type < 10:
             v_type = '0%d' % v_type
         else:
@@ -130,7 +139,7 @@ def violation_service(request):
 
     # 判断车牌号
     try:
-        v_number = param['platNumber']
+        v_number = v_data['platNumber']
         if v_type == '02' and len(v_number) < 7:
             raise Exception
     except Exception as e:
@@ -141,8 +150,8 @@ def violation_service(request):
 
     # 判断车辆识别代号, 发动机号
     try:
-        vin = param['vinNumber']
-        e_code = param['engineNumber']
+        vin = v_data['vinNumber']
+        e_code = v_data['engineNumber']
     except Exception as e:
         print(e)
         response_data = {'status': 5, 'message': 'vin or engine code error'}
@@ -150,11 +159,14 @@ def violation_service(request):
         return HttpResponse(response_data)
 
     if 'city' in param:
-        city = param['workcity']
+        city = v_data['workcity']
     else:
         city = ''
 
-    get_violations_old(v_number, v_type, vin, e_code, city, user.id, user_ip)
+    response_data = get_violations_old(v_number, v_type, vin, e_code, city, user.id, user_ip)
+    print(response_data)
+    response_data = base64.b64encode(json.dumps(response_data).encode('utf-8'))
+    return HttpResponse(response_data)
 
 
 # 根据车辆信息查询违章
@@ -230,7 +242,7 @@ def get_violations_old(v_number, v_type=2, v_code='', e_code='', city='', user_i
     # print(data['status'])
 
     # 如果查询成功, 保存数据到本地数据库
-    if data['status'] == 0:
+    if 'result' in data:
         save_to_loc_db_old(data, v_number, int(v_type))
 
     # 不能直接返回data, 应该把data再次封装后再返回

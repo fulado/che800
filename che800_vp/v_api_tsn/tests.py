@@ -13,7 +13,7 @@ class ViolationException(Exception):
 
 
 def get_token():
-    data = str({"username": 'numtest1', 'password': '111111'})
+    data = str({"username": 'numtest', 'password': '111111'})
     # url = 'http://47.94.18.47/IllegalData-search/login'
     url = 'http://127.0.0.1:8000/login'
     data = get_json(get_response_encoded_data(url, data))
@@ -22,7 +22,8 @@ def get_token():
 
 
 def get_violation(car_list):
-    url = 'http://47.94.18.47/IllegalData-search/vehicle'
+    # url = 'http://47.94.18.47/IllegalData-search/vehicle'
+    url = 'http://127.0.0.1:8000/illegal'
 
     token = get_token()
     data = str({'userId': 'numtest', 'token': token, 'cars': car_list})
