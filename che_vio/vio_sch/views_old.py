@@ -61,7 +61,7 @@ def login_service(request):
     token = hashlib.sha1(token.encode('utf-8')).hexdigest().upper()
 
     # 构造返回数据
-    response_data = base64.b64encode(json.dumps({'status': 0, 'token': token}).encode('utf-8'))
+    response_data = base64.b64encode(json.dumps({'status': 9, 'token': token}).encode('utf-8'))
 
     return HttpResponse(response_data)
 
@@ -83,7 +83,7 @@ def violation_service(request):
         user_ip = request.META['REMOTE_ADDR']
 
     param = json.loads(base64.b64decode(param).decode('utf-8').replace('\'', '\"'))
-    print(param)
+    # print(param)
     try:
         # 获取用户名和密码
         username = param['userId']
@@ -164,7 +164,7 @@ def violation_service(request):
         city = ''
 
     response_data = get_violations_old(v_number, v_type, vin, e_code, city, user.id, user_ip)
-    print(response_data)
+    # print(response_data)
     response_data = base64.b64encode(json.dumps(response_data).encode('utf-8'))
     return HttpResponse(response_data)
 
@@ -287,7 +287,8 @@ def get_vio_from_loc_old(v_number, v_type, user_ip):
 
         result = {
             'platNumber': v_number,
-            'punishs': vio_list
+            'punishs': vio_list,
+            'status': '0'
         }
 
         vio_dict = {'feedback': feedback, 'result': result}
@@ -378,7 +379,8 @@ def vio_div_for_ddyc_old(v_number, data, user_ip):
 
         result = {
             'platNumber': v_number,
-            'punishs': vio_list
+            'punishs': vio_list,
+            'status': '0'
         }
 
         vio_dict = {'feedback': feedback, 'result': result}
@@ -467,7 +469,8 @@ def vio_dic_for_chelun_old(v_number, data, user_ip):
 
         result = {
             'platNumber': v_number,
-            'punishs': vio_list
+            'punishs': vio_list,
+            'status': '0'
         }
 
         vio_dict = {'feedback': feedback, 'result': result}
@@ -482,6 +485,11 @@ def vio_dic_for_chelun_old(v_number, data, user_ip):
         vio_dict = {'status': status, 'message': message}
 
     return vio_dict
+
+
+# 根据天津接口返回数据构造违章数据
+def vio_div_for_tj_old(v_number, data, user_ip):
+    pass
 
 
 # 查询结果保存到本地数据库

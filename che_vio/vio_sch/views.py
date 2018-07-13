@@ -257,10 +257,10 @@ def query_vio_auto():
 def backup_log():
 
     # 数据库连接信息
-    # host = '127.0.0.1'
-    # password = 'xiaobai'
-    host = '172.21.0.2'
-    password = 'Init1234'
+    host = '127.0.0.1'
+    password = 'xiaobai'
+    # host = '172.21.0.2'
+    # password = 'Init1234'
     port = 3306
     user = 'root'
     database = 'violation'

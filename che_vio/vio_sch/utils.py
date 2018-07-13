@@ -61,11 +61,12 @@ def get_vio_from_loc(v_number, v_type=2):
 
 
 # 从天津接口查询违章数据
-def get_vio_from_tj(v_number, v_type):
+def get_vio_from_tj(v_number, v_type, e_code):
     """
     从天津接口查询违章数据
     :param v_number: 车牌号
     :param v_type: 车辆类型
+    :param e_code: 发动机号
     :return: 违章数据, json格式
     """
     # 查询接口rul
@@ -78,7 +79,7 @@ def get_vio_from_tj(v_number, v_type):
     sign = hashlib.sha1(('%s%d%s' % (username, timestamp, password)).encode('utf-8')).hexdigest()
 
     data = {'username': username, 'timestamp': timestamp, 'sign': sign, 'vehicleNumber': v_number,
-            'vehicleType': v_type}
+            'vehicleType': v_type, 'engineCode': e_code}
 
     # url转码
     data = urllib.parse.urlencode(data)

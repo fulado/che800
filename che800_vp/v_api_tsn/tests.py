@@ -13,9 +13,10 @@ class ViolationException(Exception):
 
 
 def get_token():
-    data = str({"username": 'numtest', 'password': '111111'})
+    data = str({"username": 'test_old', 'password': 'test_old'})
     # url = 'http://47.94.18.47/IllegalData-search/login'
     url = 'http://127.0.0.1:8000/login'
+    # url = 'http://vio.che800.cc/login'
     data = get_json(get_response_encoded_data(url, data))
     print(data)
     return data['token']
@@ -24,9 +25,10 @@ def get_token():
 def get_violation(car_list):
     # url = 'http://47.94.18.47/IllegalData-search/vehicle'
     url = 'http://127.0.0.1:8000/illegal'
+    # url = 'http://vio.che800.cc/illegal'
 
     token = get_token()
-    data = str({'userId': 'numtest', 'token': token, 'cars': car_list})
+    data = str({'userId': 'test_old', 'token': token, 'cars': car_list})
     # print(data)
     data = get_response_encoded_data(url, data)
     # print(data)
@@ -40,7 +42,7 @@ def get_response_encoded_data(url, data):
     # base64加密
     data = base64.b64encode(data.encode('utf-8'))
     data = 'param=%s' % data.decode('utf-8')
-    print(data)
+    # print(data)
 
     request = urllib.request.Request(url, data.encode('utf-8'))
 
@@ -61,7 +63,7 @@ def get_violation_count(cars):
         data = data['result']
         violation_dict = {}
         for violation_data in data:
-            print(violation_data)
+            # print(violation_data)
             if violation_data['status'] == 0:
                 number = violation_data['platNumber']
                 violation_count = len(violation_data['punishs'])
@@ -134,8 +136,8 @@ if __name__ == '__main__':
              'vinNumber': 'LSKG4AC1XFA413599'}]
 
     try:
-        violation_count = get_violation_count(cars)
-        print(violation_count)
+        violation_data = get_violation(cars)
+        print(violation_data)
     except Exception as e:
         print(e)
 
