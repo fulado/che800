@@ -28,7 +28,7 @@ def get_violation(car_list):
     # url = 'http://vio.che800.cc/illegal'
 
     token = get_token()
-    data = str({'userId': 'test_old', 'token': token, 'cars': car_list})
+    data = json.dumps({'userId': 'test_old', 'token': token, 'cars': car_list})
     # print(data)
     data = get_response_encoded_data(url, data)
     # print(data)
@@ -130,8 +130,18 @@ def create_sign(username, password):
 
 
 if __name__ == '__main__':
-    cars = [{'engineNumber': 'H1SF5210072',
-             'platNumber': '沪AYC967',
+    # cars = [{'engineNumber': 'H1SF5210072',
+    #          'platNumber': '沪AYC967',
+    #          'carType': '02',
+    #          'vinNumber': 'LSKG4AC1XFA413599'}]
+
+    # cars = [{'engineNumber': '751757V',
+    #          'platNumber': '京HD9596',
+    #          'carType': '02',
+    #          'vinNumber': 'LGBF5AE00HR276883'}]
+
+    cars = [{'engineNumber': 'H07967',
+             'platNumber': '津NWX388',
              'carType': '02',
              'vinNumber': 'LSKG4AC1XFA413599'}]
 

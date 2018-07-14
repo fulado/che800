@@ -21,7 +21,7 @@ def get_url_id(v_number, city):
         return None
     else:
         # city = loc_info.loc_name
-        url_id = loc_info.url_id.id
+        url_id = loc_info.url.id
 
     return url_id
 
@@ -447,6 +447,11 @@ def save_log(v_number, vio_data, user_id, url_id, user_ip):
         log_info.save()
     except Exception as e:
         print(e)
+
+
+# 查询失败时保存日志
+def save_error_log(status, msg, user_id, user_ip):
+    pass
 
 
 if __name__ == '__main__':

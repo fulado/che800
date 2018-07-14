@@ -25,7 +25,7 @@ class LocInfo(models.Model):
     loc_id = models.CharField(max_length=20, primary_key=True)              # 城市代码
     loc_name = models.CharField(max_length=20, blank=True, null=True)       # 城市名称
     plate_name = models.CharField(max_length=10, blank=True, null=True)     # 车牌简称
-    url_id = models.ForeignKey(UrlInfo, on_delete=models.CASCADE, blank=True, null=True, default=2)  # 查询接口url
+    url = models.ForeignKey(UrlInfo, on_delete=models.CASCADE, blank=True, null=True, default=2)  # 查询接口url
     status = models.BooleanField(default=1)         # 是否可以查询违章
 
 

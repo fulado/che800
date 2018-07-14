@@ -167,7 +167,7 @@ def get_violations(v_number, v_type=2, v_code='', e_code='', city='', user_id=99
     # 根据url_id调用不同接口, 1-天津接口, 2-典典接口, 3-车轮接口
     if url_id == 1:
 
-        data = get_vio_from_tj(v_number, v_type)
+        data = get_vio_from_tj(v_number, v_type, e_code)
         # print('%s -- tj api' % v_number)
 
         # 保存日志
@@ -257,10 +257,10 @@ def query_vio_auto():
 def backup_log():
 
     # 数据库连接信息
-    host = '127.0.0.1'
-    password = 'xiaobai'
-    # host = '172.21.0.2'
-    # password = 'Init1234'
+    # host = '127.0.0.1'
+    # password = 'xiaobai'
+    host = '172.21.0.2'
+    password = 'Init1234'
     port = 3306
     user = 'root'
     database = 'violation'

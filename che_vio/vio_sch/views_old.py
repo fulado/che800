@@ -1,7 +1,7 @@
 """
 老接口应用
 """
-from django.http import JsonResponse, HttpResponse
+from django.http import HttpResponse
 from .models import UserInfo, VioInfo
 from .utils import get_vio_from_tj, get_vio_from_ddyc, get_vio_from_chelun, get_url_id, save_log
 import base64
@@ -82,7 +82,14 @@ def violation_service(request):
     else:
         user_ip = request.META['REMOTE_ADDR']
 
-    param = json.loads(base64.b64decode(param).decode('utf-8').replace('\'', '\"'))
+    try:
+        param = json.loads(base64.b64decode(param).decode('utf-8').replace('\'', '\"'))
+    except Exception as e:
+        print(e)
+        response_data = {'status': 5, 'message': 'parameters json serialize error'}
+        response_data = base64.b64encode(json.dumps(response_data).encode('utf-8'))
+        return HttpResponse(response_data)
+
     # print(param)
     try:
         # 获取用户名和密码
@@ -170,7 +177,7 @@ def violation_service(request):
 
 
 # 根据车辆信息查询违章
-def get_violations_old(v_number, v_type=2, v_code='', e_code='', city='', user_id=99, user_ip='127.0.0.1'):
+def get_violations_old(v_number, v_type, v_code='', e_code='', city='', user_id=99, user_ip='127.0.0.1'):
     """
     根据车辆信息调用不同的接口查询违章
     :param v_number: 车牌号
@@ -215,11 +222,12 @@ def get_violations_old(v_number, v_type=2, v_code='', e_code='', city='', user_i
     # 根据url_id调用不同接口, 1-天津接口, 2-典典接口, 3-车轮接口
     if url_id == 1:
 
-        data = get_vio_from_tj(v_number, v_type)
+        data = get_vio_from_tj(v_number, v_type, e_code)
         # print('%s -- tj api' % v_number)
 
         # 保存日志
         save_log(v_number, data, user_id, url_id, user_ip)
+        data = vio_dic_for_tj_old(v_number, data, user_ip)
 
     elif url_id == 2:
 
@@ -227,7 +235,7 @@ def get_violations_old(v_number, v_type=2, v_code='', e_code='', city='', user_i
         # print(data)
         # 保存日志
         save_log(v_number, data, user_id, url_id, user_ip)
-        data = vio_div_for_ddyc_old(v_number, data, user_ip)
+        data = vio_dic_for_ddyc_old(v_number, data, user_ip)
         # print('%s -- ddyc api' % v_number)
 
     else:
@@ -272,8 +280,8 @@ def get_vio_from_loc_old(v_number, v_type, user_ip):
                 'location': vio.vio_position,
                 'time': vio.vio_time,
                 'punishMoney': vio.vio_money,
-                'paystat': None,
-                'state': None
+                'paystat': '',
+                'state': ''
             }
 
             vio_list.append(vio_data)
@@ -299,9 +307,9 @@ def get_vio_from_loc_old(v_number, v_type, user_ip):
 
 
 # 根据典典返回数据构造违章数据
-def vio_div_for_ddyc_old(v_number, data, user_ip):
+def vio_dic_for_ddyc_old(v_number, data, user_ip):
     if 'success' in data and data['success']:
-        status = 0
+        status = '0'
 
         vio_list = []
         if 'data' in data and 'violations' in data['data']:
@@ -346,12 +354,6 @@ def vio_div_for_ddyc_old(v_number, data, user_ip):
                 else:
                     vio_money = ''
 
-                # 违法代码
-                if 'violationNum' in vio:
-                    vio_code = vio['violationNum']
-                else:
-                    vio_code = ''
-
                 # 处理机关
                 if 'violationCity' in vio:
                     vio_loc = vio['violationCity']
@@ -365,8 +367,8 @@ def vio_div_for_ddyc_old(v_number, data, user_ip):
                     'location': vio_address,
                     'time': vio_time,
                     'punishMoney': vio_money,
-                    'paystat': None,
-                    'state': None
+                    'paystat': '',
+                    'state': ''
                 }
 
                 vio_list.append(vio_data)
@@ -380,7 +382,7 @@ def vio_div_for_ddyc_old(v_number, data, user_ip):
         result = {
             'platNumber': v_number,
             'punishs': vio_list,
-            'status': '0'
+            'status': status
         }
 
         vio_dict = {'feedback': feedback, 'result': result}
@@ -388,9 +390,13 @@ def vio_div_for_ddyc_old(v_number, data, user_ip):
         # 查询失败
         if 'errCode' in data:
             status = data['errCode']
+        else:
+            status = 99
 
         if 'message' in data:
             message = data['message']
+        else:
+            message = 'query error'
 
         vio_dict = {'status': status, 'message': message}
 
@@ -401,7 +407,7 @@ def vio_div_for_ddyc_old(v_number, data, user_ip):
 def vio_dic_for_chelun_old(v_number, data, user_ip):
 
     if 'code' in data and data['code'] == 0:
-        status = 0
+        status = '0'
 
         vio_list = []
         if 'data' in data:
@@ -436,12 +442,6 @@ def vio_dic_for_chelun_old(v_number, data, user_ip):
                 else:
                     vio_money = ''
 
-                # 违法代码
-                if 'code' in vio:
-                    vio_code = vio['code']
-                else:
-                    vio_code = ''
-
                 # 处理机关
                 if 'office_name' in vio:
                     vio_loc = vio['office_name']
@@ -455,8 +455,8 @@ def vio_dic_for_chelun_old(v_number, data, user_ip):
                     'location': vio_address,
                     'time': vio_time,
                     'punishMoney': vio_money,
-                    'paystat': None,
-                    'state': None
+                    'paystat': '',
+                    'state': ''
                 }
 
                 vio_list.append(vio_data)
@@ -470,7 +470,7 @@ def vio_dic_for_chelun_old(v_number, data, user_ip):
         result = {
             'platNumber': v_number,
             'punishs': vio_list,
-            'status': '0'
+            'status': status
         }
 
         vio_dict = {'feedback': feedback, 'result': result}
@@ -478,9 +478,13 @@ def vio_dic_for_chelun_old(v_number, data, user_ip):
         # 查询失败
         if 'code' in data:
             status = data['code']
+        else:
+            status = 99
 
         if 'msg' in data:
             message = data['msg']
+        else:
+            message = 'query error'
 
         vio_dict = {'status': status, 'message': message}
 
@@ -488,8 +492,91 @@ def vio_dic_for_chelun_old(v_number, data, user_ip):
 
 
 # 根据天津接口返回数据构造违章数据
-def vio_div_for_tj_old(v_number, data, user_ip):
-    pass
+def vio_dic_for_tj_old(v_number, data, user_ip):
+
+    if 'status' in data and data['status'] == 0:
+        status = '0'
+
+        vio_list = []
+        if 'data' in data:
+            for vio in data['data']:
+                # 违法时间
+                if 'time' in vio:
+                    vio_time = vio['time']
+                else:
+                    vio_time = ''
+
+                # 违法地点
+                if 'position' in vio:
+                    vio_address = vio['position']
+                else:
+                    vio_address = ''
+
+                # 违法行为
+                if 'activity' in vio:
+                    vio_activity = vio['activity']
+                else:
+                    vio_activity = ''
+
+                # 扣分
+                if 'point' in vio:
+                    vio_point = vio['point']
+                else:
+                    vio_point = ''
+
+                # 罚款
+                if 'money' in vio:
+                    vio_money = vio['money']
+                else:
+                    vio_money = ''
+
+                # 处理机关
+                if 'location' in vio:
+                    vio_loc = vio['location']
+                else:
+                    vio_loc = ''
+
+                vio_data = {
+                    'reason': vio_activity,
+                    'viocjjg': vio_loc,
+                    'punishPoint': vio_point,
+                    'location': vio_address,
+                    'time': vio_time,
+                    'punishMoney': vio_money,
+                    'paystat': '',
+                    'state': ''
+                }
+
+                vio_list.append(vio_data)
+
+        feedback = {
+            'cars': v_number,
+            'requestIp': user_ip,
+            'responseTime': time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+        }
+
+        result = {
+            'platNumber': v_number,
+            'punishs': vio_list,
+            'status': status
+        }
+
+        vio_dict = {'feedback': feedback, 'result': result}
+    else:
+        # 查询失败
+        if 'status' in data:
+            status = data['status']
+        else:
+            status = 99
+
+        if 'msg' in data:
+            message = data['msg']
+        else:
+            message = 'query error'
+
+        vio_dict = {'status': status, 'message': message}
+
+    return vio_dict
 
 
 # 查询结果保存到本地数据库
@@ -520,5 +607,3 @@ def save_to_loc_db_old(vio_data, vehicle_number, vehicle_type):
                 vio_info.save()
     except Exception as e:
         print(e)
-
-
