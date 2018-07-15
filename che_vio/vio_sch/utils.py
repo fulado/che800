@@ -194,6 +194,7 @@ def vio_dic_for_ddyc(v_number, data):
     :param data: 车轮接口返回数据, dict
     :return: 车八佰违章数据, dict
     """
+    print(data)
     if 'success' in data and data['success']:
         status = 0
 
@@ -266,8 +267,8 @@ def vio_dic_for_ddyc(v_number, data):
 
         vio_dict = {'vehicleNumber': v_number, 'status': status, 'data': vio_list}
     else:
-        if 'status' in data:
-            return get_status(data['status'], 2)
+        if 'errCode' in data:
+            return get_status(data['errCode'], 2)
         else:
             return {'status': 53, 'msg': '查询失败'}
 
@@ -388,11 +389,12 @@ def save_to_loc_db(vio_data, vehicle_number, vehicle_type):
 
 
 # 保存查询日志
-def save_log(v_number, vio_data, user_id, url_id, user_ip, city=''):
+def save_log(v_number, origin_data, vio_data, user_id, url_id, user_ip, city=''):
     """
     保存典典返回的查询结果到日志
     :param v_number: 车牌号
-    :param vio_data: 违章返回数据
+    :param origin_data: 违章接口返回原始数据
+    :param vio_data: 标准化后的违章数据
     :param user_id: 用户id
     :param url_id: 查询url_id
     :param user_ip: 用户ip
@@ -412,60 +414,50 @@ def save_log(v_number, vio_data, user_id, url_id, user_ip, city=''):
     log_info.city = city
 
     # 判断使用的接口url_id
-    if url_id == 1:
-
-        # 天津接口
-        if 'status' in vio_data and vio_data['status'] == 0:
-            # 查询成功
-            log_info.status = 0
-
-        else:
-            # 查询失败
-            if 'status' in vio_data:
-                log_info.origin_status = vio_data['status']
-                log_info.status = vio_data['status']
-            if 'msg' in vio_data:
-                log_info.origin_msg = vio_data['msg']
-                log_info.msg = vio_data['msg']
-
-    elif url_id == 2:
-
-        # 典典接口
-        if 'success' in vio_data and vio_data['success']:
-            # 如果查询成功, 保存查询成功
-            log_info.status = 0
-        else:
-            # 如果查询失败, 保存错误代码和错误信息
-            if 'errCode' in vio_data:
-                log_info.origin_status = vio_data['errCode']
-
-            if 'message' in vio_data:
-                log_info.origin_msg = vio_data['message']
-
-    elif url_id == 3:
-
-        # 车轮接口
-        if 'code' in vio_data and vio_data['code'] == 0:
-            # 查询成功
-            log_info.status = 0
-            log_info.comments = '查询成功'
-        else:
-            # 查询失败
-            if 'code' in vio_data:
-                log_info.origin_status = vio_data['code']
-
-            if 'msg' in vio_data:
-                log_info.origin_msg = vio_data['msg']
-
-    elif url_id is None:
+    if url_id is None:
 
         log_info.status = 17
         log_info.msg = '查询城市错误'
 
+    elif url_id == 99 or ('status' in vio_data and vio_data['status'] == 0):
+
+        # 查询成功
+        log_info.status = 0
+
     else:
 
-        # 本地数据库
-        log_info.status = 0
+        if 'status' in vio_data:
+            log_info.status = vio_data['status']
+
+        if 'msg' in vio_data:
+            log_info.msg = vio_data['msg']
+
+        if url_id == 1:
+
+            # 天津接口
+            if 'status' in origin_data:
+                log_info.origin_status = origin_data['status']
+
+            if 'msg' in origin_data:
+                log_info.origin_msg = origin_data['msg']
+
+        elif url_id == 2:
+
+            # 典典接口
+            if 'errCode' in origin_data:
+                log_info.origin_status = origin_data['errCode']
+
+            if 'message' in origin_data:
+                log_info.origin_msg = origin_data['message']
+
+        elif url_id == 3:
+
+            # 车轮接口
+            if 'code' in origin_data:
+                log_info.origin_status = origin_data['code']
+
+            if 'msg' in origin_data:
+                log_info.origin_msg = origin_data['msg']
 
     # 保存日志到数据库
     try:
@@ -525,7 +517,7 @@ def create_status_from_ddyc(origin_status):
     if origin_status == 1015:
         status = 31
         msg = '交管数据维护中'
-    elif origin_status in [1020, 1030]:
+    elif origin_status in [1001, 1020, 1030]:
         status = 32
         msg = '车牌号或车辆类型错误'
     elif origin_status == 1021:
@@ -535,7 +527,7 @@ def create_status_from_ddyc(origin_status):
         status = 34
         msg = '车架号错误'
     elif origin_status == 1032:
-        status = 34
+        status = 35
         msg = '车架号或发动机号错误'
     elif origin_status == 1013:
         status = 39
@@ -559,12 +551,18 @@ def create_status_from_chelun(origin_status, origin_msg):
     if origin_status == -3:
         status = 31
         msg = '交管数据维护中'
-    elif origin_status == -10 and origin_msg == '车辆类型参数错误':
+    elif origin_status == -10 and origin_msg in['车辆类型参数错误', '车牌号码格式错误']:
         status = 32
         msg = '车牌号或车辆类型错误'
     elif origin_status == -10 and origin_msg == '请输入完整发动机号':
         status = 33
         msg = '发动机号错误'
+    elif origin_status == -10 and origin_msg == '请输入完整车架号':
+        status = 34
+        msg = '车架号错误'
+    elif origin_status == -2 and origin_msg == '输入信息有误，请核对':
+        status = 36
+        msg = '车辆信息不正确'
     elif origin_status == -2:
         status = 39
         msg = '数据源不稳定, 请稍后再查'
@@ -577,18 +575,18 @@ def create_status_from_chelun(origin_status, origin_msg):
 
 # 根据不同接口的返回状态码构造本地平台返回给用户的状态码
 def get_status(origin_status, url_id, origin_msg=''):
-
+    print(origin_status)
     # 天津接口
     if url_id == 1:
-        return create_status_from_tj(origin_status)
+        return create_status_from_tj(int(origin_status))
 
     # 典典接口
     elif url_id == 2:
-        return create_status_from_ddyc(origin_status)
+        return create_status_from_ddyc(int(origin_status))
 
     # 车轮接口
     elif url_id == 3:
-        return create_status_from_chelun(origin_status, origin_msg)
+        return create_status_from_chelun(int(origin_status), origin_msg)
 
     else:
         return {'status': 52, 'msg': '违章查询接口异常'}

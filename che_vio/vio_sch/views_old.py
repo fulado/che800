@@ -2,8 +2,8 @@
 老接口应用
 """
 from django.http import HttpResponse
-from .models import UserInfo, VioInfo
-from .utils import get_vio_from_tj, get_vio_from_ddyc, get_vio_from_chelun, get_url_id, save_log
+from .models import UserInfo, VioInfo, LogInfo
+from .utils import get_vio_from_tj, get_vio_from_ddyc, get_vio_from_chelun, get_url_id, save_error_log
 import base64
 import json
 import time
@@ -12,17 +12,17 @@ import hashlib
 
 # 用户登录
 def login_service(request):
+    if 'HTTP_X_FORWARDED_FOR' in request.META.keys():
+        user_ip = request.META['HTTP e_code=ecode_X_FORWARDED_FOR']
+    else:
+        user_ip = request.META['REMOTE_ADDR']
+
     # 不接收get方式请求
     if request.method == 'GET':
-        response_data = {'status': 31, 'message': 'request method error'}
+        response_data = {'status': -11, 'message': 'request method error'}
         response_data = base64.b64encode(json.dumps(response_data).encode('utf-8'))
+        save_error_log(-11, 'request method error', '', user_ip)
         return HttpResponse(response_data)
-
-    # 判断请求ip是否在白名单中
-    # if 'HTTP_X_FORWARDED_FOR' in request.META.keys():
-    #     user_ip = request.META['HTTP e_code=ecode_X_FORWARDED_FOR']
-    # else:
-    #     user_ip = request.META['REMOTE_ADDR']
 
     # 如果ip不在白名单返回状态码14, 暂不验证ip
     # if not IpInfo.objects.filter(ip_addr=user_ip).exists():
@@ -33,8 +33,9 @@ def login_service(request):
     param = request.POST.get('param', '')
 
     if param == '':
-        response_data = {'status': 99, 'message': 'request invalid'}
+        response_data = {'status': -11, 'message': 'request invalid'}
         response_data = base64.b64encode(json.dumps(response_data).encode('utf-8'))
+        save_error_log(-11, 'request invalid', '', user_ip)
         return HttpResponse(response_data)
 
     param = json.loads(base64.b64decode(param).decode('utf-8').replace('\'', '\"'))
@@ -52,8 +53,9 @@ def login_service(request):
         user.save()
     except Exception as e:
         print(e)
-        response_data = {'status': 5, 'message': 'username or password error'}
+        response_data = {'status': -11, 'message': 'username or password error'}
         response_data = base64.b64encode(json.dumps(response_data).encode('utf-8'))
+        save_error_log(-11, 'username or password error', '', user_ip)
         return HttpResponse(response_data)
 
     # 根据用户名密码和时间戳计算token
@@ -62,32 +64,33 @@ def login_service(request):
 
     # 构造返回数据
     response_data = base64.b64encode(json.dumps({'status': 9, 'token': token}).encode('utf-8'))
-
+    save_error_log(9, 'login success', user.id, user_ip)
     return HttpResponse(response_data)
 
 
 # 查询违章
 def violation_service(request):
-    # 获取用户传递的参数
-    param = request.POST.get('param', '')
-
-    if param == '':
-        response_data = {'status': 99, 'message': 'request invalid'}
-        response_data = base64.b64encode(json.dumps(response_data).encode('utf-8'))
-        return HttpResponse(response_data)
-
-    # 判断请求ip是否在白名单中
     if 'HTTP_X_FORWARDED_FOR' in request.META.keys():
         user_ip = request.META['HTTP e_code=ecode_X_FORWARDED_FOR']
     else:
         user_ip = request.META['REMOTE_ADDR']
 
+    # 获取用户传递的参数
+    param = request.POST.get('param', '')
+
+    if param == '':
+        response_data = {'status': -11, 'message': 'request invalid'}
+        response_data = base64.b64encode(json.dumps(response_data).encode('utf-8'))
+        save_error_log(-11, 'request invalid', '', user_ip)
+        return HttpResponse(response_data)
+
     try:
         param = json.loads(base64.b64decode(param).decode('utf-8').replace('\'', '\"'))
     except Exception as e:
         print(e)
-        response_data = {'status': 5, 'message': 'parameters json serialize error'}
+        response_data = {'status': -11, 'message': 'parameters json serialize error'}
         response_data = base64.b64encode(json.dumps(response_data).encode('utf-8'))
+        save_error_log(-11, 'parameters json serialize error', '', user_ip)
         return HttpResponse(response_data)
 
     # print(param)
@@ -100,16 +103,18 @@ def violation_service(request):
         user = UserInfo.objects.get(username=username)
     except Exception as e:
         print(e)
-        response_data = {'status': 5, 'message': 'userId or token error'}
+        response_data = {'status': -11, 'message': 'userId or token error'}
         response_data = base64.b64encode(json.dumps(response_data).encode('utf-8'))
+        save_error_log(-11, 'userId or token error', '', user_ip)
         return HttpResponse(response_data)
 
     # 判断token是否过期
     current_timestamp = int(time.time())
 
     if current_timestamp - user.timestamp > 3600:
-        response_data = {'status': 5, 'message': 'token is out of time'}
+        response_data = {'status': -11, 'message': 'token is out of time'}
         response_data = base64.b64encode(json.dumps(response_data).encode('utf-8'))
+        save_error_log(-11, 'token is out of time', user.id, user_ip)
         return HttpResponse(response_data)
 
     # 计算token
@@ -118,8 +123,9 @@ def violation_service(request):
 
     # 对比token
     if token != user_token:
-        response_data = {'status': 5, 'message': 'userId or token error'}
+        response_data = {'status': -11, 'message': 'userId or token error'}
         response_data = base64.b64encode(json.dumps(response_data).encode('utf-8'))
+        save_error_log(-11, 'userId or token error', user.id, user_ip)
         return HttpResponse(response_data)
 
     # 获取车辆数据
@@ -127,8 +133,9 @@ def violation_service(request):
         v_data = param['cars'][0]
     except Exception as e:
         print(e)
-        response_data = {'status': 5, 'message': 'vehicle info error'}
+        response_data = {'status': -12, 'message': 'vehicle info error'}
         response_data = base64.b64encode(json.dumps(response_data).encode('utf-8'))
+        save_error_log(-12, 'vehicle info error', user.id, user_ip)
         return HttpResponse(response_data)
 
     # 判断车辆类型
@@ -140,8 +147,9 @@ def violation_service(request):
             v_type = str(v_type)
     except Exception as e:
         print(e)
-        response_data = {'status': 5, 'message': 'vehicle type error'}
+        response_data = {'status': -12, 'message': 'vehicle type error'}
         response_data = base64.b64encode(json.dumps(response_data).encode('utf-8'))
+        save_error_log(-12, 'vehicle type error', user.id, user_ip)
         return HttpResponse(response_data)
 
     # 判断车牌号
@@ -151,8 +159,9 @@ def violation_service(request):
             raise Exception
     except Exception as e:
         print(e)
-        response_data = {'status': 5, 'message': 'vehicle platNumber error'}
+        response_data = {'status': -12, 'message': 'vehicle platNumber error'}
         response_data = base64.b64encode(json.dumps(response_data).encode('utf-8'))
+        save_error_log(-12, 'vehicle platNumber error', user.id, user_ip)
         return HttpResponse(response_data)
 
     # 判断车辆识别代号, 发动机号
@@ -161,8 +170,9 @@ def violation_service(request):
         e_code = v_data['engineNumber']
     except Exception as e:
         print(e)
-        response_data = {'status': 5, 'message': 'vin or engine code error'}
+        response_data = {'status': -12, 'message': 'vin or engine code error'}
         response_data = base64.b64encode(json.dumps(response_data).encode('utf-8'))
+        save_error_log(-12, 'vin or engine code error', user.id, user_ip)
         return HttpResponse(response_data)
 
     if 'city' in param:
@@ -193,15 +203,15 @@ def get_violations_old(v_number, v_type, v_code='', e_code='', city='', user_id=
     v_type = int(v_type)
 
     # 先从本地数据库查询, 如果本地数据库没有该违章数据, 再通过接口查询
-    result = get_vio_from_loc_old(v_number, v_type, user_ip)
+    vio_data = get_vio_from_loc_old(v_number, v_type, user_ip)
 
     # 如果查询成功, 保存日志, 并返回查询结果
-    if result is not None:
+    if vio_data is not None:
 
         # 保存日志
-        save_log(v_number, '', user_id, 99, user_ip)
+        save_log_old(v_number, '', '', user_id, 99, user_ip)
 
-        return result
+        return vio_data
 
     # 获取查询城市和查询url_id
     # 目前看来这个功能没啥用, 暂时先把它省略了吧, 只判断车牌开头的城市简称, 根据这个确定调用哪个查询接口, 现在只查询天津的车
@@ -216,45 +226,34 @@ def get_violations_old(v_number, v_type, v_code='', e_code='', city='', user_id=
 
     # 如果url_id是None就返回查询城市错误
     if url_id is None:
-        save_log(v_number, '', user_id, 99, user_ip)
-        return {'status': 16}  # 查询城市错误
+        save_log_old(v_number, '', '', user_id, url_id, user_ip)
+        return {'status': 17, 'message': 'city error'}  # 查询城市错误
 
     # 根据url_id调用不同接口, 1-天津接口, 2-典典接口, 3-车轮接口
     if url_id == 1:
 
-        data = get_vio_from_tj(v_number, v_type, e_code)
-        # print('%s -- tj api' % v_number)
-
-        # 保存日志
-        save_log(v_number, data, user_id, url_id, user_ip)
-        data = vio_dic_for_tj_old(v_number, data, user_ip)
+        origin_data = get_vio_from_tj(v_number, v_type, e_code)
+        vio_data = vio_dic_for_tj_old(v_number, origin_data, user_ip)
 
     elif url_id == 2:
 
-        data = get_vio_from_ddyc(v_number, v_type, v_code, e_code, city)
-        # print(data)
-        # 保存日志
-        save_log(v_number, data, user_id, url_id, user_ip)
-        data = vio_dic_for_ddyc_old(v_number, data, user_ip)
-        # print('%s -- ddyc api' % v_number)
+        origin_data = get_vio_from_ddyc(v_number, v_type, v_code, e_code, city)
+        vio_data = vio_dic_for_ddyc_old(v_number, origin_data, user_ip)
 
     else:
 
-        data = get_vio_from_chelun(v_number, v_type, v_code, e_code)
-        # print(data)
-        # 保存日志
-        save_log(v_number, data, user_id, url_id, user_ip)
-        data = vio_dic_for_chelun_old(v_number, data, user_ip)
+        origin_data = get_vio_from_chelun(v_number, v_type, v_code, e_code)
+        vio_data = vio_dic_for_chelun_old(v_number, origin_data, user_ip)
 
-        # print('%s -- chelun api' % v_number)
-    # print(data['status'])
+    # 保存日志
+    save_log_old(v_number, origin_data, vio_data, user_id, url_id, user_ip)
 
     # 如果查询成功, 保存数据到本地数据库
-    if 'result' in data:
-        save_to_loc_db_old(data, v_number, int(v_type))
+    if 'result' in vio_data:
+        save_to_loc_db_old(vio_data, v_number, int(v_type))
 
     # 不能直接返回data, 应该把data再次封装后再返回
-    return data
+    return vio_data
 
 
 # 从本地数据库查询违章
@@ -605,5 +604,84 @@ def save_to_loc_db_old(vio_data, vehicle_number, vehicle_type):
                 vio_info.vio_loc = vio['viocjjg']
 
                 vio_info.save()
+    except Exception as e:
+        print(e)
+
+
+# 保存查询日志
+def save_log_old(v_number, origin_data, vio_data, user_id, url_id, user_ip, city=''):
+    """
+    保存典典返回的查询结果到日志
+    :param v_number: 车牌号
+    :param origin_data: 违章接口返回原始数据
+    :param vio_data: 标准化后的违章数据
+    :param user_id: 用户id
+    :param url_id: 查询url_id
+    :param user_ip: 用户ip
+    :param city: 查询城市
+    :return:
+    """
+
+    # 构造日志数据
+    log_info = LogInfo()
+
+    # 保存基本查询信息
+    log_info.vehicle_number = v_number
+    log_info.user_id = user_id
+    log_info.url_id = url_id
+    log_info.query_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+    log_info.ip = user_ip
+    log_info.city = city
+
+    # 判断使用的接口url_id
+    if url_id is None:
+
+        log_info.status = 17
+        log_info.msg = '查询城市错误'
+
+    elif url_id == 99 or ('result' in vio_data and 'status' in vio_data['result'] and
+                          int(vio_data['result']['status']) == 0):
+
+        # 查询成功
+        log_info.status = 0
+
+    else:
+
+        if 'status' in vio_data:
+            log_info.status = vio_data['status']
+
+        if 'message' in vio_data:
+            log_info.msg = vio_data['message']
+
+        if url_id == 1:
+
+            # 天津接口
+            if 'status' in origin_data:
+                log_info.origin_status = origin_data['status']
+
+            if 'msg' in origin_data:
+                log_info.origin_msg = origin_data['msg']
+
+        elif url_id == 2:
+
+            # 典典接口
+            if 'errCode' in origin_data:
+                log_info.origin_status = origin_data['errCode']
+
+            if 'message' in origin_data:
+                log_info.origin_msg = origin_data['message']
+
+        elif url_id == 3:
+
+            # 车轮接口
+            if 'code' in origin_data:
+                log_info.origin_status = origin_data['code']
+
+            if 'msg' in origin_data:
+                log_info.origin_msg = origin_data['msg']
+
+    # 保存日志到数据库
+    try:
+        log_info.save()
     except Exception as e:
         print(e)

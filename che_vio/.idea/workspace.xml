@@ -10,10 +10,10 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="CoverageDataManager">
-    <SUITE FILE_PATH="coverage/che_vio$views_old.coverage" NAME="views_old Coverage Results" MODIFIED="1531320385576" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/vio_sch" />
-    <SUITE FILE_PATH="coverage/che_vio$utils.coverage" NAME="utils Coverage Results" MODIFIED="1530692775630" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/vio_sch" />
-    <SUITE FILE_PATH="coverage/che_vio$tests.coverage" NAME="tests Coverage Results" MODIFIED="1531643991419" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/vio_sch" />
     <SUITE FILE_PATH="coverage/che_vio$views.coverage" NAME="views Coverage Results" MODIFIED="1530613916811" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/vio_sch" />
+    <SUITE FILE_PATH="coverage/che_vio$utils.coverage" NAME="utils Coverage Results" MODIFIED="1530692775630" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/vio_sch" />
+    <SUITE FILE_PATH="coverage/che_vio$views_old.coverage" NAME="views_old Coverage Results" MODIFIED="1531320385576" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/vio_sch" />
+    <SUITE FILE_PATH="coverage/che_vio$tests.coverage" NAME="tests Coverage Results" MODIFIED="1531663748779" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/vio_sch" />
   </component>
   <component name="DjangoConsoleOptions" custom-start-script="import sys; print('Python %s on %s' % (sys.version, sys.platform))&#10;import django; print('Django %s' % django.get_version())&#10;sys.path.extend([WORKING_DIR_AND_PYTHON_PATHS])&#10;if 'setup' in dir(django): django.setup()&#10;import django_manage_shell; django_manage_shell.run(PROJECT_ROOT)">
     <option name="myCustomStartScript" value="import sys; print('Python %s on %s' % (sys.version, sys.platform))&#10;import django; print('Django %s' % django.get_version())&#10;sys.path.extend([WORKING_DIR_AND_PYTHON_PATHS])&#10;if 'setup' in dir(django): django.setup()&#10;import django_manage_shell; django_manage_shell.run(PROJECT_ROOT)" />
@@ -23,20 +23,33 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="views_old.py" pinned="false" current-in-tab="false">
+      <file leaf-file-name="views_old.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/vio_sch/views_old.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="157">
-              <caret line="593" column="13" selection-start-line="593" selection-start-column="13" selection-end-line="593" selection-end-column="13" />
+            <state relative-caret-position="-2404">
+              <caret line="73" column="67" lean-forward="true" selection-start-line="73" selection-start-column="67" selection-end-line="73" selection-end-column="67" />
+              <folding>
+                <element signature="e#14#50#0" expanded="true" />
+                <element signature="e#6021#8036#0" />
+                <element signature="e#8109#9328#0" />
+                <element signature="e#9403#11966#0" />
+                <element signature="e#12044#14328#0" />
+                <element signature="e#14404#16639#0" />
+                <element signature="e#16726#17690#0" />
+                <element signature="e#17585#19446#0" />
+              </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="settings.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/che_vio/settings.py">
+      <file leaf-file-name="views.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/vio_sch/views.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="31">
-              <caret line="38" column="1" lean-forward="true" selection-start-line="38" selection-start-column="1" selection-end-line="38" selection-end-column="1" />
+            <state relative-caret-position="418">
+              <caret line="178" column="16" selection-start-line="178" selection-start-column="8" selection-end-line="178" selection-end-column="16" />
+              <folding>
+                <element signature="e#0#50#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -44,8 +57,8 @@
       <file leaf-file-name="models.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/vio_sch/models.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="601">
-              <caret line="63" column="96" selection-start-line="63" selection-start-column="96" selection-end-line="63" selection-end-column="96" />
+            <state relative-caret-position="1364">
+              <caret line="65" selection-start-line="65" selection-end-line="65" />
             </state>
           </provider>
         </entry>
@@ -53,7 +66,7 @@
       <file leaf-file-name="wsgi.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/che_vio/wsgi.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="677">
+            <state relative-caret-position="726">
               <caret line="35" selection-start-line="35" selection-end-line="35" />
               <folding>
                 <element signature="e#223#232#0" expanded="true" />
@@ -65,7 +78,7 @@
       <file leaf-file-name="urls.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/vio_sch/urls.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="156">
+            <state relative-caret-position="132">
               <caret line="8" column="18" selection-start-line="8" selection-start-column="11" selection-end-line="8" selection-end-column="18" />
               <folding>
                 <element signature="e#0#32#0" expanded="true" />
@@ -74,39 +87,15 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="views.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/vio_sch/views.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-4405">
-              <caret line="169" column="29" selection-start-line="169" selection-start-column="29" selection-end-line="169" selection-end-column="29" />
-              <folding>
-                <element signature="e#0#50#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="utils.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="utils.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/vio_sch/utils.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1069">
-              <caret line="428" column="3" lean-forward="true" selection-start-line="428" selection-start-column="3" selection-end-line="442" selection-end-column="57" />
+            <state relative-caret-position="199">
+              <caret line="469" column="4" lean-forward="true" selection-start-line="469" selection-start-column="4" selection-end-line="469" selection-end-column="49" />
               <folding>
-                <element signature="e#0#11#0" expanded="true" />
-                <element signature="e#2474#3367#0" />
-                <element signature="e#3451#4635#0" />
-                <element signature="e#9183#10194#0" />
-                <element signature="e#12155#12573#0" />
+                <element signature="e#9695#10706#0" />
+                <element signature="e#10804#12618#0" />
               </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="forms.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/vio_sch/forms.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="442">
-              <caret line="17" lean-forward="true" selection-start-line="17" selection-end-line="17" />
             </state>
           </provider>
         </entry>
@@ -114,8 +103,8 @@
       <file leaf-file-name="tests.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/vio_sch/tests.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="445">
-              <caret line="182" column="6" lean-forward="true" selection-start-line="182" selection-start-column="6" selection-end-line="182" selection-end-column="6" />
+            <state relative-caret-position="770">
+              <caret line="109" column="12" lean-forward="true" selection-start-line="109" selection-start-column="12" selection-end-line="109" selection-end-column="12" />
               <folding>
                 <element signature="e#218#959#0" />
                 <element signature="e#1032#2404#0" />
@@ -141,6 +130,7 @@
       <find>get_violations</find>
       <find>print</find>
       <find>url_id</find>
+      <find>save_log_old</find>
     </findStrings>
   </component>
   <component name="IdeDocumentHistory">
@@ -155,11 +145,11 @@
         <option value="$PROJECT_DIR$/conf/nginx.conf" />
         <option value="$PROJECT_DIR$/vio_sch/urls.py" />
         <option value="$PROJECT_DIR$/vio_sch/tests.py" />
-        <option value="$PROJECT_DIR$/vio_sch/views_old.py" />
         <option value="$PROJECT_DIR$/che_vio/settings.py" />
-        <option value="$PROJECT_DIR$/vio_sch/views.py" />
         <option value="$PROJECT_DIR$/vio_sch/models.py" />
         <option value="$PROJECT_DIR$/vio_sch/utils.py" />
+        <option value="$PROJECT_DIR$/vio_sch/views.py" />
+        <option value="$PROJECT_DIR$/vio_sch/views_old.py" />
       </list>
     </option>
   </component>
@@ -172,11 +162,10 @@
   <component name="NodePackageJsonFileManager">
     <packageJsonPaths />
   </component>
-  <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="2132" />
-    <option name="y" value="51" />
-    <option name="width" value="1855" />
-    <option name="height" value="1176" />
+  <component name="ProjectFrameBounds">
+    <option name="x" value="652" />
+    <option name="width" value="1915" />
+    <option name="height" value="1047" />
   </component>
   <component name="ProjectView">
     <navigator proportions="" version="1">
@@ -377,28 +366,29 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="1985" y="-4" width="1855" height="1204" extended-state="6" />
+    <frame x="652" y="0" width="1915" height="1047" extended-state="0" />
+    <editor active="true" />
     <layout>
       <window_info anchor="bottom" id="TODO" order="9" weight="0.3286908" />
       <window_info anchor="bottom" id="Event Log" order="11" sideWeight="0.5019326" side_tool="true" weight="0.34064785" />
       <window_info anchor="bottom" id="Database Changes" order="8" show_stripe_button="false" />
       <window_info anchor="bottom" id="Version Control" order="7" show_stripe_button="false" />
       <window_info anchor="bottom" id="Python Console" order="10" weight="0.31034482" />
-      <window_info anchor="bottom" id="Run" order="2" weight="0.27483752" />
-      <window_info anchor="bottom" id="Terminal" order="12" sideWeight="0.49806738" weight="0.27669454" />
-      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.49848944" visible="true" weight="0.17669795" />
+      <window_info anchor="bottom" id="Run" order="2" weight="0.33223322" />
+      <window_info anchor="bottom" id="Terminal" order="12" sideWeight="0.49806738" weight="0.32563257" />
+      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.49848944" visible="true" weight="0.15040432" />
       <window_info anchor="bottom" id="Docker" order="6" show_stripe_button="false" />
       <window_info anchor="right" id="Database" order="6" />
       <window_info anchor="right" id="SciView" order="3" />
       <window_info id="Structure" order="1" sideWeight="0.50151056" side_tool="true" weight="0.18277195" />
       <window_info id="Favorites" order="2" sideWeight="0.50151056" side_tool="true" weight="0.18277195" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.32961932" />
-      <window_info anchor="right" id="R Packages" order="5" />
+      <window_info anchor="right" id="R Graphics" order="4" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
-      <window_info anchor="right" id="R Graphics" order="4" />
+      <window_info anchor="right" id="R Packages" order="5" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Find" order="1" />
@@ -660,7 +650,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/vio_sch/urls.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="156">
+        <state relative-caret-position="132">
           <caret line="8" column="18" selection-start-line="8" selection-start-column="11" selection-end-line="8" selection-end-column="18" />
           <folding>
             <element signature="e#0#32#0" expanded="true" />
@@ -669,23 +659,9 @@
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/venv/Lib/base64.py" />
-    <entry file="file://$PROJECT_DIR$/vio_sch/views_old.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="157">
-          <caret line="593" column="13" selection-start-line="593" selection-start-column="13" selection-end-line="593" selection-end-column="13" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/che_vio/settings.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="31">
-          <caret line="38" column="1" lean-forward="true" selection-start-line="38" selection-start-column="1" selection-end-line="38" selection-end-column="1" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/che_vio/wsgi.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="677">
+        <state relative-caret-position="726">
           <caret line="35" selection-start-line="35" selection-end-line="35" />
           <folding>
             <element signature="e#223#232#0" expanded="true" />
@@ -693,24 +669,24 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/vio_sch/forms.py">
+    <entry file="file://$PROJECT_DIR$/vio_sch/models.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="442">
-          <caret line="17" lean-forward="true" selection-start-line="17" selection-end-line="17" />
+        <state relative-caret-position="1364">
+          <caret line="65" selection-start-line="65" selection-end-line="65" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/vio_sch/models.py">
+    <entry file="file://$PROJECT_DIR$/vio_sch/forms.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="601">
-          <caret line="63" column="96" selection-start-line="63" selection-start-column="96" selection-end-line="63" selection-end-column="96" />
+        <state relative-caret-position="374">
+          <caret line="17" selection-start-line="17" selection-end-line="17" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/vio_sch/tests.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="445">
-          <caret line="182" column="6" lean-forward="true" selection-start-line="182" selection-start-column="6" selection-end-line="182" selection-end-column="6" />
+        <state relative-caret-position="770">
+          <caret line="109" column="12" lean-forward="true" selection-start-line="109" selection-start-column="12" selection-end-line="109" selection-end-column="12" />
           <folding>
             <element signature="e#218#959#0" />
             <element signature="e#1032#2404#0" />
@@ -719,10 +695,17 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/che_vio/settings.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="22">
+          <caret line="38" column="1" selection-start-line="38" selection-start-column="1" selection-end-line="38" selection-end-column="1" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/vio_sch/views.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-4405">
-          <caret line="169" column="29" selection-start-line="169" selection-start-column="29" selection-end-line="169" selection-end-column="29" />
+        <state relative-caret-position="418">
+          <caret line="178" column="16" selection-start-line="178" selection-start-column="8" selection-end-line="178" selection-end-column="16" />
           <folding>
             <element signature="e#0#50#0" expanded="true" />
           </folding>
@@ -731,14 +714,28 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/vio_sch/utils.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1069">
-          <caret line="428" column="3" lean-forward="true" selection-start-line="428" selection-start-column="3" selection-end-line="442" selection-end-column="57" />
+        <state relative-caret-position="199">
+          <caret line="469" column="4" lean-forward="true" selection-start-line="469" selection-start-column="4" selection-end-line="469" selection-end-column="49" />
           <folding>
-            <element signature="e#0#11#0" expanded="true" />
-            <element signature="e#2474#3367#0" />
-            <element signature="e#3451#4635#0" />
-            <element signature="e#9183#10194#0" />
-            <element signature="e#12155#12573#0" />
+            <element signature="e#9695#10706#0" />
+            <element signature="e#10804#12618#0" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/vio_sch/views_old.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-2404">
+          <caret line="73" column="67" lean-forward="true" selection-start-line="73" selection-start-column="67" selection-end-line="73" selection-end-column="67" />
+          <folding>
+            <element signature="e#14#50#0" expanded="true" />
+            <element signature="e#6021#8036#0" />
+            <element signature="e#8109#9328#0" />
+            <element signature="e#9403#11966#0" />
+            <element signature="e#12044#14328#0" />
+            <element signature="e#14404#16639#0" />
+            <element signature="e#16726#17690#0" />
+            <element signature="e#17585#19446#0" />
           </folding>
         </state>
       </provider>

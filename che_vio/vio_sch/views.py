@@ -2,7 +2,7 @@ from django.http import JsonResponse, HttpResponse
 from .forms import SearchForm
 from .models import UserInfo, LocInfo, VioInfo, VehicleInfo, LogInfo
 from .utils import get_vio_from_tj, get_vio_from_chelun, get_vio_from_ddyc, vio_dic_for_ddyc, vio_dic_for_chelun,\
-    save_to_loc_db, save_log, get_vio_from_loc, get_url_id, save_error_log
+    save_to_loc_db, save_log, get_vio_from_loc, get_url_id, save_error_log, vio_dic_for_tj
 from multiprocessing import Queue
 from threading import Thread
 import time
@@ -75,7 +75,7 @@ def violation(request):
     # 判断时间戳是否超时, 默认5分钟
     if int(time.time()) - timestamp_user > 60 * 5 or int(time.time()) < timestamp_user:
         result = {'status': 16, 'msg': '时间戳超时'}
-        save_error_log(16, '时间戳格式错误', user.id, user_ip)
+        save_error_log(16, '时间戳超时', user.id, user_ip)
         return JsonResponse(result)
 
     # 校验sign
@@ -144,15 +144,15 @@ def get_violations(v_number, v_type=2, v_code='', e_code='', city='', user_id=99
     v_type = int(v_type)
 
     # 先从本地数据库查询, 如果本地数据库没有该违章数据, 再通过接口查询
-    result = get_vio_from_loc(v_number, v_type)
+    vio_data = get_vio_from_loc(v_number, v_type)
 
     # 如果查询成功, 保存日志, 并返回查询结果
-    if result is not None:
+    if vio_data is not None:
 
         # 保存日志
-        save_log(v_number, '', user_id, 99, user_ip)
+        save_log(v_number, '', '', user_id, 99, user_ip)
 
-        return result
+        return vio_data
 
     # 获取查询城市和查询url_id
     # 目前看来这个功能没啥用, 暂时先把它省略了吧, 只判断车牌开头的城市简称, 根据这个确定调用哪个查询接口, 现在只查询天津的车
@@ -167,44 +167,34 @@ def get_violations(v_number, v_type=2, v_code='', e_code='', city='', user_id=99
 
     # 如果url_id是None就返回查询城市错误
     if url_id is None:
-        save_log(v_number, '', user_id, url_id, user_ip)
+        save_log(v_number, '', '', user_id, url_id, user_ip)
         return {'status': 17, 'msg': '查询城市错误'}  # 查询城市错误
 
     # 根据url_id调用不同接口, 1-天津接口, 2-典典接口, 3-车轮接口
     if url_id == 1:
+        # 从天津接口查询违章数据
+        origin_data = get_vio_from_tj(v_number, v_type, e_code)
 
-        data = get_vio_from_tj(v_number, v_type, e_code)
-        # print('%s -- tj api' % v_number)
-
-        # 保存日志
-        save_log(v_number, data, user_id, url_id, user_ip)
-
+        # 将接口返回的原始数据标准化
+        vio_data = vio_dic_for_tj(origin_data)
     elif url_id == 2:
-
-        data = get_vio_from_ddyc(v_number, v_type, v_code, e_code, city)
-        # print(data)
-        # 保存日志
-        save_log(v_number, data, user_id, url_id, user_ip)
-        data = vio_dic_for_ddyc(v_number, data)
-        # print('%s -- ddyc api' % v_number)
-
+        # 从典典接口查询违章数据, 并标准化
+        origin_data = get_vio_from_ddyc(v_number, v_type, v_code, e_code, city)
+        vio_data = vio_dic_for_ddyc(v_number, origin_data)
     else:
+        # 从车轮接口查询违章数据, 并标准化
+        origin_data = get_vio_from_chelun(v_number, v_type, v_code, e_code)
+        vio_data = vio_dic_for_chelun(v_number, origin_data)
 
-        data = get_vio_from_chelun(v_number, v_type, v_code, e_code)
-        # print(data)
-        # 保存日志
-        save_log(v_number, data, user_id, url_id, user_ip)
-        data = vio_dic_for_chelun(v_number, data)
-
-        # print('%s -- chelun api' % v_number)
-    # print(data['status'])
+    # 保存日志
+    save_log(v_number, origin_data, vio_data, user_id, url_id, user_ip)
 
     # 如果查询成功, 保存数据到本地数据库
-    if data['status'] == 0:
-        save_to_loc_db(data, v_number, int(v_type))
+    if vio_data['status'] == 0:
+        save_to_loc_db(vio_data, v_number, int(v_type))
 
     # 不能直接返回data, 应该把data再次封装后再返回
-    return data
+    return vio_data
 
 
 # 车辆读取线程
