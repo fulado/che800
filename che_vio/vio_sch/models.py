@@ -58,5 +58,8 @@ class LogInfo(models.Model):
     url = models.ForeignKey(UrlInfo, on_delete=models.CASCADE, blank=True, null=True)           # 查询接口url
     query_time = models.DateTimeField(blank=True, null=True)                                    # 查询时间
     status = models.IntegerField(default=-1, blank=True, null=True)                             # 状态码
-    comments = models.CharField(max_length=200, blank=True, null=True)                          # 备注信息
+    msg = models.CharField(max_length=200, blank=True, null=True)                               # 备注信息
     ip = models.CharField(max_length=20, blank=True, null=True)                                 # ip地址
+    city = models.CharField(max_length=20, blank=True, null=True)                               # 查询城市
+    origin_status = models.IntegerField(default=0, blank=True, null=True)                       # 状态码
+    origin_msg = models.CharField(max_length=200, blank=True, null=True)                        # 备注信息

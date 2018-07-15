@@ -2,7 +2,7 @@ from django.http import JsonResponse, HttpResponse
 from .forms import SearchForm
 from .models import UserInfo, LocInfo, VioInfo, VehicleInfo, LogInfo
 from .utils import get_vio_from_tj, get_vio_from_chelun, get_vio_from_ddyc, vio_dic_for_ddyc, vio_dic_for_chelun,\
-    save_to_loc_db, save_log, get_vio_from_loc, get_url_id
+    save_to_loc_db, save_log, get_vio_from_loc, get_url_id, save_error_log
 from multiprocessing import Queue
 from threading import Thread
 import time
@@ -22,14 +22,15 @@ def violation(request):
     current_hour = time.localtime().tm_hour
     current_min = time.localtime().tm_min
 
-    if current_hour == 0 and current_min in range(10, 30):
-        return JsonResponse({'status': 19})
-
     # 判断请求ip是否在白名单中
     if 'HTTP_X_FORWARDED_FOR' in request.META.keys():
         user_ip = request.META['HTTP e_code=ecode_X_FORWARDED_FOR']
     else:
         user_ip = request.META['REMOTE_ADDR']
+
+    if current_hour == 0 and current_min in range(10, 30):
+        save_error_log(19, '系统维护中, 请稍后访问', '', user_ip)
+        return JsonResponse({'status': 19, 'msg': '系统维护中, 请稍后访问'})
 
     # print(ip_addr)
 
@@ -46,7 +47,8 @@ def violation(request):
 
     # 表单数据无效
     if not form_obj.is_valid():
-        result = {'status': 99}
+        result = {'status': 99, 'msg': '请求数据无效'}
+        save_error_log(99, '请求数据无效', '', user_ip)
         return JsonResponse(result)
 
     # 获取请求数据
@@ -57,7 +59,8 @@ def violation(request):
         user = UserInfo.objects.get(username=data['username'])
     except Exception as e:
         print(e)
-        result = {'status': 11}
+        result = {'status': 11, 'msg': '用户不存在'}
+        save_error_log(11, '用户不存在', '', user_ip)
         return JsonResponse(result)
 
     # 判断用户传入的时间戳是否可以转化为int类型
@@ -65,12 +68,14 @@ def violation(request):
         timestamp_user = int(data['timestamp'])
     except Exception as e:
         print(e)
-        result = {'status': 15}
+        result = {'status': 15, 'msg': '时间戳格式错误'}
+        save_error_log(15, '时间戳格式错误', user.id, user_ip)
         return JsonResponse(result)
 
     # 判断时间戳是否超时, 默认5分钟
-    if int(time.time()) - timestamp_user > 60 * 5:
-        result = {'status': 15}
+    if int(time.time()) - timestamp_user > 60 * 5 or int(time.time()) < timestamp_user:
+        result = {'status': 16, 'msg': '时间戳超时'}
+        save_error_log(16, '时间戳格式错误', user.id, user_ip)
         return JsonResponse(result)
 
     # 校验sign
@@ -79,7 +84,8 @@ def violation(request):
     sign = hashlib.sha1(sign.encode('utf-8')).hexdigest().upper()
 
     if sign != data['sign']:
-        result = {'status': 12}
+        result = {'status': 12, 'msg': 'sign签名错误'}
+        save_error_log(12, 'sign签名错误', user.id, user_ip)
         return JsonResponse(result)
 
     # 查询违章信息
@@ -161,8 +167,8 @@ def get_violations(v_number, v_type=2, v_code='', e_code='', city='', user_id=99
 
     # 如果url_id是None就返回查询城市错误
     if url_id is None:
-        save_log(v_number, '', user_id, 99, user_ip)
-        return {'status': 16}  # 查询城市错误
+        save_log(v_number, '', user_id, url_id, user_ip)
+        return {'status': 17, 'msg': '查询城市错误'}  # 查询城市错误
 
     # 根据url_id调用不同接口, 1-天津接口, 2-典典接口, 3-车轮接口
     if url_id == 1:
@@ -257,10 +263,10 @@ def query_vio_auto():
 def backup_log():
 
     # 数据库连接信息
-    # host = '127.0.0.1'
-    # password = 'xiaobai'
-    host = '172.21.0.2'
-    password = 'Init1234'
+    host = '127.0.0.1'
+    password = 'xiaobai'
+    # host = '172.21.0.2'
+    # password = 'Init1234'
     port = 3306
     user = 'root'
     database = 'violation'
