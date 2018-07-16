@@ -130,20 +130,25 @@ def create_sign(username, password):
 
 
 if __name__ == '__main__':
-    cars = [{'engineNumber': 'H1SF5210072',
-             'platNumber': '沪AYC967',
-             'carType': '02',
-             'vinNumber': 'LSKG4AC1XFA413599'}]
+    # cars = [{'engineNumber': '171531132',
+    #          'platNumber': '川A2P73T',
+    #          'carType': '02',
+    #          'vinNumber': 'LSGBL5440HF090533'}]
+
+    # cars = [{'engineNumber': 'H1SF5210072',
+    #          'platNumber': '沪AYC967',
+    #          'carType': '02',
+    #          'vinNumber': 'LSKG4AC1XFA413599'}]
 
     # cars = [{'engineNumber': '751757V',
     #          'platNumber': '京HD9596',
     #          'carType': '02',
     #          'vinNumber': 'LGBF5AE00HR276883'}]
 
-    # cars = [{'engineNumber': 'H07967',
-    #          'platNumber': '津NWX388',
-    #          'carType': '02',
-    #          'vinNumber': 'LSKG4AC1XFA413599'}]
+    cars = [{'engineNumber': 'H17079',
+             'platNumber': '津CC825学',
+             'carType': '02',
+             'vinNumber': '564847'}]
 
     try:
         violation_data = get_violation(cars)
