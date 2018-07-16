@@ -2,7 +2,7 @@ from django.http import JsonResponse, HttpResponse
 from .forms import SearchForm
 from .models import UserInfo, LocInfo, VioInfo, VehicleInfo, LogInfo
 from .utils import get_vio_from_tj, get_vio_from_chelun, get_vio_from_ddyc, vio_dic_for_ddyc, vio_dic_for_chelun,\
-    save_to_loc_db, save_log, get_vio_from_loc, get_url_id, save_error_log, vio_dic_for_tj
+    save_to_loc_db, save_log, get_vio_from_loc, get_url_id, save_error_log, vio_dic_for_tj, save_vehicle
 from multiprocessing import Queue
 from threading import Thread
 import time
@@ -94,38 +94,6 @@ def violation(request):
                               v_code=data['vehicleCode'], e_code=data['engineCode'], city=data['city'],
                               user_id=user.id, user_ip=user_ip)
 
-    # 根据查询结果记录车辆信息
-    # 将车辆信息保存都本地数据库
-    # 判断本地数据库中是否已经存在该车辆信息
-    # 车辆信息在第一次保存到数据库中时, 默认无效, 无效车辆在下次查询同一车辆时, 需要更新车辆信息,
-    # 车辆信息在完成一次正确查询后, 后变为有效, 有效车辆信息应该每天更新一次
-    # try:
-    #     vehicle = VehicleInfo.objects.filter(vehicle_number=data['vehicleNumber']).filter(vehicle_type=
-    #                                                                                       data['vehicleType'])
-    #     if vehicle.exists():
-    #         vehicle = vehicle[0]
-    #         vehicle.query_counter += 1
-    #         if not vehicle.status:
-    #             vehicle.vehicle_code = data['vehicleCode']
-    #             vehicle.engine_code = data['engineCode']
-    #             vehicle.city = data['city']
-    #             if not vio_data['status']:
-    #                 vehicle.status = 1
-    #     else:
-    #         vehicle = VehicleInfo()
-    #         vehicle.vehicle_number = data['vehicleNumber']
-    #         vehicle.vehicle_type = data['vehicleType']
-    #         vehicle.vehicle_code = data['vehicleCode']
-    #         vehicle.engine_code = data['engineCode']
-    #         vehicle.city = data['city']
-    #         vehicle.create_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-    #
-    #     vehicle.save()
-    # except Exception as e:
-    #     print(e)
-
-    # 记录查询日志
-
     return JsonResponse(vio_data)
 
 
@@ -189,9 +157,14 @@ def get_violations(v_number, v_type=2, v_code='', e_code='', city='', user_id=99
     # 保存日志
     save_log(v_number, origin_data, vio_data, user_id, url_id, user_ip)
 
-    # 如果查询成功, 保存数据到本地数据库
+    # 如果查询成功
     if vio_data['status'] == 0:
+
+        # 保存违章数据到本地数据库
         save_to_loc_db(vio_data, v_number, int(v_type))
+
+        # 保存车辆数据到本地数据库
+        save_vehicle(v_number, v_type, v_code, e_code)
 
     # 不能直接返回data, 应该把data再次封装后再返回
     return vio_data
@@ -253,10 +226,10 @@ def query_vio_auto():
 def backup_log():
 
     # 数据库连接信息
-    host = '127.0.0.1'
-    password = 'xiaobai'
-    # host = '172.21.0.2'
-    # password = 'Init1234'
+    # host = '127.0.0.1'
+    # password = 'xiaobai'
+    host = '172.21.0.2'
+    password = 'Init1234'
     port = 3306
     user = 'root'
     database = 'violation'

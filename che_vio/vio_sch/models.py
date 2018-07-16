@@ -38,6 +38,7 @@ class VehicleInfo(models.Model):
     city = models.CharField(max_length=20, blank=True, null=True)               # 运营地
     create_time = models.DateTimeField(blank=True, null=True)                   # 创建时间
     query_counter = models.IntegerField(default=1)                              # 近7天查询违章次数
+    user = models.ForeignKey(UserInfo, on_delete=models.CASCADE, blank=True, null=True)  # 所属用户
 
 
 class VioInfo(models.Model):
@@ -63,3 +64,11 @@ class LogInfo(models.Model):
     city = models.CharField(max_length=20, blank=True, null=True)                               # 查询城市
     origin_status = models.IntegerField(default=0, blank=True, null=True)                       # 状态码
     origin_msg = models.CharField(max_length=200, blank=True, null=True)                        # 备注信息
+
+
+class VehicleBackup(models.Model):
+    vehicle_number = models.CharField(max_length=20, blank=True, null=True)                 # 号牌号码
+    vehicle_type = models.IntegerField(default=2, blank=True, null=True)                    # 车辆类型
+    vehicle_code = models.CharField(max_length=50, blank=True, null=True)                   # 车架号
+    engine_code = models.CharField(max_length=50, blank=True, null=True)                    # 发动机号
+    update_time = models.DateTimeField(auto_now=True)                                       # 更新时间

@@ -3,7 +3,7 @@ import hashlib
 import json
 import urllib.request
 import urllib.parse
-from .models import VioInfo, LogInfo, LocInfo
+from .models import VioInfo, LogInfo, LocInfo, VehicleBackup
 
 
 # 判断查询城市是否正确
@@ -194,7 +194,7 @@ def vio_dic_for_ddyc(v_number, data):
     :param data: 车轮接口返回数据, dict
     :return: 车八佰违章数据, dict
     """
-    print(data)
+
     if 'success' in data and data['success']:
         status = 0
 
@@ -575,7 +575,7 @@ def create_status_from_chelun(origin_status, origin_msg):
 
 # 根据不同接口的返回状态码构造本地平台返回给用户的状态码
 def get_status(origin_status, url_id, origin_msg=''):
-    print(origin_status)
+
     # 天津接口
     if url_id == 1:
         return create_status_from_tj(int(origin_status))
@@ -590,6 +590,35 @@ def get_status(origin_status, url_id, origin_msg=''):
 
     else:
         return {'status': 52, 'msg': '违章查询接口异常'}
+
+
+# 根据查询结果记录车辆信息
+# 将车辆信息保存都本地数据库
+# 判断本地数据库中是否已经存在该车辆信息, 如果已经存在, 判断车辆信息是否需要更新
+def save_vehicle(v_number, v_type, v_code, e_code):
+    try:
+        vehicle_bakup = VehicleBackup.objects.filter(vehicle_number=v_number).filter(vehicle_type=v_type)
+
+        # 如果车辆已经存在
+        if vehicle_bakup.exists():
+
+            # 判断是否需要更新车辆信息
+            if not vehicle_bakup.filter(vehicle_code=v_code).filter(engine_code=e_code).exists():
+                vehicle_bakup.update(vehicle_code=v_code, engine_code=e_code,
+                                     update_time=time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()))
+
+        # 如果不存在, 创建新的车辆信息, 并保存
+        else:
+
+            vehicle = VehicleBackup()
+            vehicle.vehicle_number = v_number
+            vehicle.vehicle_type = v_type
+            vehicle.vehicle_code = v_code
+            vehicle.engine_code = e_code
+
+            vehicle.save()
+    except Exception as e:
+        print(e)
 
 
 if __name__ == '__main__':

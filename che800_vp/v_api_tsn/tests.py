@@ -5,6 +5,7 @@ import json
 # import pymongo
 import time
 import hashlib
+import pymysql
 
 
 class ViolationException(Exception):
@@ -15,8 +16,8 @@ class ViolationException(Exception):
 def get_token():
     data = str({"username": 'test_old', 'password': 'test_old'})
     # url = 'http://47.94.18.47/IllegalData-search/login'
-    url = 'http://127.0.0.1:8000/login'
-    # url = 'http://vio.che800.cc/login'
+    # url = 'http://127.0.0.1:8000/login'
+    url = 'http://vio.che800.cc/login'
     data = get_json(get_response_encoded_data(url, data))
     print(data)
     return data['token']
@@ -129,6 +130,60 @@ def create_sign(username, password):
     print(sign)
 
 
+# 从mysql数据中读取车辆信息
+def test_vio_query():
+
+    token = get_token()
+
+    # 创建数据库连接
+    host = '127.0.0.1'
+    password = 'xiaobai'
+    port = 3306
+    user = 'root'
+    database = 'test'
+    charset = 'utf8mb4'
+
+    conn = pymysql.connect(host=host, port=port, user=user, password=password, database=database, charset=charset)
+
+    # 获取Cursor对象
+    cs = conn.cursor()
+
+    # 执行sql语句
+    count = cs.execute('select * from vehicle')
+
+    for i in range(count):
+        result = cs.fetchone()
+        cars = create_car_list(result)
+
+        vio_data = get_violation_2(cars, token)
+        print(i)
+        print(vio_data)
+
+    cs.close()
+    conn.close()
+
+
+def create_car_list(car_info):
+    cars = [{'engineNumber': car_info[4],
+             'platNumber': car_info[1],
+             'carType': car_info[2],
+             'vinNumber': car_info[3]}]
+
+    return cars
+
+
+def get_violation_2(car_list, token):
+    # url = 'http://47.94.18.47/IllegalData-search/vehicle'
+    # url = 'http://127.0.0.1:8000/illegal'
+    url = 'http://vio.che800.cc/illegal'
+
+    data = json.dumps({'userId': 'test_old', 'token': token, 'cars': car_list})
+    # print(data)
+    data = get_response_encoded_data(url, data)
+
+    return get_json(data)
+
+
 if __name__ == '__main__':
     # cars = [{'engineNumber': '171531132',
     #          'platNumber': '川A2P73T',
@@ -145,16 +200,16 @@ if __name__ == '__main__':
     #          'carType': '02',
     #          'vinNumber': 'LGBF5AE00HR276883'}]
 
-    cars = [{'engineNumber': 'H17079',
-             'platNumber': '津CC825学',
-             'carType': '02',
-             'vinNumber': '564847'}]
-
-    try:
-        violation_data = get_violation(cars)
-        print(violation_data)
-    except Exception as e:
-        print(e)
+    # cars = [{'engineNumber': 'H17079',
+    #          'platNumber': '津CC825',
+    #          'carType': '16',
+    #          'vinNumber': '564847'}]
+    #
+    # try:
+    #     violation_data = get_violation(cars)
+    #     print(violation_data)
+    # except Exception as e:
+    #     print(e)
 
     # get_violation_from_mongo()
     # vehicle_number = '津NWX388'
@@ -172,6 +227,8 @@ if __name__ == '__main__':
     # create_sign('test', 'test')
 
     # get_token()
+
+    test_vio_query()
 
     """
     {'feedback': {'cars': '沪AYC967', 'requestIp': '47.94.18.47', 'responseTime': '2018-07-11 19:31:39'}, 'result': {'platNumber': '沪AYC967', 'punishs': [{'reason': '驾驶中型以上载客载货汽车、危险物品运输车辆以外的其他机动车行驶超过规定时速10%未达20%的', 'paystat': '1', 'viocjjg': '和静县公安局交警大队', 'punishPoint': '3', 'location': '国道218线575公里300米', 'state': '1', 'time': '2017-07-29 12:44:00', 'punishMoney': '200'}, {'reason': '驾驶中型以上载客载货汽车、校车、危险物品运输车辆以外的其他机动车行驶超过规定时速20%以上未达到50%的', 'paystat': '1', 'viocjjg': '吉木乃县交通警察大队', 'punishPoint': '6', 'location': '国道217线173公里', 'state': '1', 'time': '2018-07-03 15:28:00', 'punishMoney': '200'}], 'status': '0'}}

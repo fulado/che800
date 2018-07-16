@@ -3,7 +3,7 @@
 """
 from django.http import HttpResponse
 from .models import UserInfo, VioInfo, LogInfo
-from .utils import get_vio_from_tj, get_vio_from_ddyc, get_vio_from_chelun, get_url_id, save_error_log
+from .utils import get_vio_from_tj, get_vio_from_ddyc, get_vio_from_chelun, get_url_id, save_error_log, save_vehicle
 import base64
 import json
 import time
@@ -250,7 +250,12 @@ def get_violations_old(v_number, v_type, v_code='', e_code='', city='', user_id=
 
     # 如果查询成功, 保存数据到本地数据库
     if 'result' in vio_data:
+
+        # 保存违章数据到本地数据库
         save_to_loc_db_old(vio_data, v_number, int(v_type))
+
+        # 保存车辆数据到本地数据库
+        save_vehicle(v_number, v_type, v_code, e_code)
 
     # 不能直接返回data, 应该把data再次封装后再返回
     return vio_data
