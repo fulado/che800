@@ -18,7 +18,7 @@ def violation(request):
     :return: 违章数据, json格式
     """
 
-    # 判断当前时间, 每天00:10 ~ 00.30禁止查询, 系统自动日志
+    # 判断当前时间, 每天00:10 ~ 00:30禁止查询, 系统自动日志
     current_hour = time.localtime().tm_hour
     current_min = time.localtime().tm_min
 
@@ -106,6 +106,8 @@ def get_violations(v_number, v_type=2, v_code='', e_code='', city='', user_id=99
     :param v_code: 车架号
     :param e_code: 发动机号
     :param city: 查询城市
+    :param user_id: 用户id
+    :param user_ip: 用户ip
     :return: 违章数据, json格式
     """
     # 将车辆类型转为int型
@@ -118,12 +120,10 @@ def get_violations(v_number, v_type=2, v_code='', e_code='', city='', user_id=99
     if vio_data is not None:
 
         # 保存日志
-        save_log(v_number, '', '', user_id, 99, user_ip)
+        save_log(v_number, '', '', user_id, 99, user_ip, city)
 
         return vio_data
 
-    # 获取查询城市和查询url_id
-    # 目前看来这个功能没啥用, 暂时先把它省略了吧, 只判断车牌开头的城市简称, 根据这个确定调用哪个查询接口, 现在只查询天津的车
     # 将车牌类型转为字符串'02'
     if v_type < 10:
         v_type = '0%d' % v_type
@@ -131,11 +131,11 @@ def get_violations(v_number, v_type=2, v_code='', e_code='', city='', user_id=99
         v_type = str(v_type)
 
     # 根据城市选择确定查询端口的url_id
-    url_id = get_url_id(v_number, city)
+    url_id, city = get_url_id(v_number, city)
 
     # 如果url_id是None就返回查询城市错误
     if url_id is None:
-        save_log(v_number, '', '', user_id, url_id, user_ip)
+        save_log(v_number, '', '', user_id, url_id, user_ip, city)
         return {'status': 17, 'msg': '查询城市错误'}  # 查询城市错误
 
     # 根据url_id调用不同接口, 1-天津接口, 2-典典接口, 3-车轮接口
@@ -145,17 +145,20 @@ def get_violations(v_number, v_type=2, v_code='', e_code='', city='', user_id=99
 
         # 将接口返回的原始数据标准化
         vio_data = vio_dic_for_tj(origin_data)
-    elif url_id == 2:
-        # 从典典接口查询违章数据, 并标准化
-        origin_data = get_vio_from_ddyc(v_number, v_type, v_code, e_code, city)
-        vio_data = vio_dic_for_ddyc(v_number, origin_data)
-    else:
+    elif url_id == 3:
         # 从车轮接口查询违章数据, 并标准化
         origin_data = get_vio_from_chelun(v_number, v_type, v_code, e_code)
         vio_data = vio_dic_for_chelun(v_number, origin_data)
+    elif url_id == 4:
+        # 从盔甲接口查询违章数据
+        pass
+    else:
+        # 从典典接口查询违章数据, 并标准化
+        origin_data = get_vio_from_ddyc(v_number, v_type, v_code, e_code, city)
+        vio_data = vio_dic_for_ddyc(v_number, origin_data)
 
     # 保存日志
-    save_log(v_number, origin_data, vio_data, user_id, url_id, user_ip)
+    save_log(v_number, origin_data, vio_data, user_id, url_id, user_ip, city)
 
     # 如果查询成功
     if vio_data['status'] == 0:

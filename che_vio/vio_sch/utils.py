@@ -8,23 +8,20 @@ from .models import VioInfo, LogInfo, LocInfo, VehicleBackup
 
 # 判断查询城市是否正确
 def get_url_id(v_number, city):
-    if city not in ['天津市', '天津', '津']:
-        city = ''  # 未来如有需要在修改次功能
+
+    if city not in ['津', '天津', '天津市']:  # 目前除天津市外, 均不提供外地车查询, 如果以后开通, 可以去掉这行
+        city = ''                            # 和这一行
 
     try:
-        if city != '':
-            loc_info = LocInfo.objects.get(loc_name__contains=city)
+        if city == '':
+            loc_info = LocInfo.objects.get(plate_name__contains=v_number[0])
         else:
-            plate_name = v_number[0]
-            loc_info = LocInfo.objects.get(plate_name=plate_name)
+            loc_info = LocInfo.objects.get(loc_name__contains=city)
     except Exception as e:
         print(e)
-        return None
-    else:
-        # city = loc_info.loc_name
-        url_id = loc_info.url.id
+        return None, city
 
-    return url_id
+    return loc_info.url.id, loc_info.loc_name
 
 
 # 从本地数据库查询违章
@@ -538,6 +535,9 @@ def create_status_from_ddyc(origin_status):
     elif origin_status == 1016:
         status = 42
         msg = '该城市不支持外地车牌查询'
+    elif origin_status == 1010:
+        status = 43
+        msg = '无权限查询'
     else:
         status = 51
         msg = '数据源异常'

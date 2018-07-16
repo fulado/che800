@@ -25,8 +25,8 @@ def get_token():
 
 def get_violation(car_list):
     # url = 'http://47.94.18.47/IllegalData-search/vehicle'
-    url = 'http://127.0.0.1:8000/illegal'
-    # url = 'http://vio.che800.cc/illegal'
+    # url = 'http://127.0.0.1:8000/illegal'
+    url = 'http://vio.che800.cc/illegal'
 
     token = get_token()
     data = json.dumps({'userId': 'test_old', 'token': token, 'cars': car_list})
@@ -42,7 +42,7 @@ def get_violation(car_list):
 def get_response_encoded_data(url, data):
     # base64加密
     data = base64.b64encode(data.encode('utf-8'))
-    data = 'param=%s' % data.decode( 'utf-8')
+    data = 'param=%s' % data.decode('utf-8')
     # print(data)
 
     request = urllib.request.Request(url, data.encode('utf-8'))
@@ -195,21 +195,22 @@ if __name__ == '__main__':
     #          'carType': '02',
     #          'vinNumber': 'LSKG4AC1XFA413599'}]
 
-    # cars = [{'engineNumber': '751757V',
-    #          'platNumber': '京HD9596',
-    #          'carType': '02',
-    #          'vinNumber': 'LGBF5AE00HR276883'}]
+    cars = [{'engineNumber': '751757V',
+             'platNumber': '京HD9596',
+             'carType': '02',
+             'vinNumber': 'LGBF5AE00HR276883',
+             'workCity': '上海'}]
 
     # cars = [{'engineNumber': 'H17079',
     #          'platNumber': '津CC825',
     #          'carType': '16',
     #          'vinNumber': '564847'}]
-    #
-    # try:
-    #     violation_data = get_violation(cars)
-    #     print(violation_data)
-    # except Exception as e:
-    #     print(e)
+
+    try:
+        violation_data = get_violation(cars)
+        print(violation_data)
+    except Exception as e:
+        print(e)
 
     # get_violation_from_mongo()
     # vehicle_number = '津NWX388'
@@ -228,7 +229,7 @@ if __name__ == '__main__':
 
     # get_token()
 
-    test_vio_query()
+    # test_vio_query()
 
     """
     {'feedback': {'cars': '沪AYC967', 'requestIp': '47.94.18.47', 'responseTime': '2018-07-11 19:31:39'}, 'result': {'platNumber': '沪AYC967', 'punishs': [{'reason': '驾驶中型以上载客载货汽车、危险物品运输车辆以外的其他机动车行驶超过规定时速10%未达20%的', 'paystat': '1', 'viocjjg': '和静县公安局交警大队', 'punishPoint': '3', 'location': '国道218线575公里300米', 'state': '1', 'time': '2017-07-29 12:44:00', 'punishMoney': '200'}, {'reason': '驾驶中型以上载客载货汽车、校车、危险物品运输车辆以外的其他机动车行驶超过规定时速20%以上未达到50%的', 'paystat': '1', 'viocjjg': '吉木乃县交通警察大队', 'punishPoint': '6', 'location': '国道217线173公里', 'state': '1', 'time': '2018-07-03 15:28:00', 'punishMoney': '200'}], 'status': '0'}}

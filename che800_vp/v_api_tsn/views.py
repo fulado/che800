@@ -65,7 +65,7 @@ def violation(request):
     sign = '%s%d%s' % (user.username, timestamp_user, user.password)
     # print(sign)
     sign = hashlib.sha1(sign.encode('utf-8')).hexdigest()
-    print(sign)
+
     if sign != data['sign']:
         result = {'status': 12, 'msg': '签名错误'}
         return JsonResponse(result)

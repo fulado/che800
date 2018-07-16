@@ -12,10 +12,21 @@ import hashlib
 
 # 用户登录
 def login_service(request):
+
+    # 判断当前时间, 每天00:10 ~ 00:30禁止查询, 系统自动日志
+    current_hour = time.localtime().tm_hour
+    current_min = time.localtime().tm_min
+
     if 'HTTP_X_FORWARDED_FOR' in request.META.keys():
         user_ip = request.META['HTTP e_code=ecode_X_FORWARDED_FOR']
     else:
         user_ip = request.META['REMOTE_ADDR']
+
+    if current_hour == 0 and current_min in range(10, 30):
+        response_data = {'status': 19, 'message': '系统维护中, 请稍后访问'}
+        response_data = base64.b64encode(json.dumps(response_data).encode('utf-8'))
+        save_error_log(19, '系统维护中, 请稍后访问', '', user_ip)
+        return HttpResponse(response_data)
 
     # 不接收get方式请求
     if request.method == 'GET':
@@ -175,8 +186,8 @@ def violation_service(request):
         save_error_log(-12, 'vin or engine code error', user.id, user_ip)
         return HttpResponse(response_data)
 
-    if 'city' in param:
-        city = v_data['workcity']
+    if 'workCity' in v_data:
+        city = v_data['workCity']
     else:
         city = ''
 
@@ -199,6 +210,7 @@ def get_violations_old(v_number, v_type, v_code='', e_code='', city='', user_id=
     :param user_ip: 查询ip地址
     :return: 违章数据, json格式
     """
+
     # 将车辆类型转为int型
     v_type = int(v_type)
 
@@ -209,7 +221,7 @@ def get_violations_old(v_number, v_type, v_code='', e_code='', city='', user_id=
     if vio_data is not None:
 
         # 保存日志
-        save_log_old(v_number, '', '', user_id, 99, user_ip)
+        save_log_old(v_number, '', '', user_id, 99, user_ip, city)
 
         return vio_data
 
@@ -222,11 +234,11 @@ def get_violations_old(v_number, v_type, v_code='', e_code='', city='', user_id=
         v_type = str(v_type)
 
     # 根据城市选择确定查询端口的url_id
-    url_id = get_url_id(v_number, city)
+    url_id, city = get_url_id(v_number, city)
 
     # 如果url_id是None就返回查询城市错误
     if url_id is None:
-        save_log_old(v_number, '', '', user_id, url_id, user_ip)
+        save_log_old(v_number, '', '', user_id, url_id, user_ip, city)
         return {'status': 17, 'message': 'city error'}  # 查询城市错误
 
     # 根据url_id调用不同接口, 1-天津接口, 2-典典接口, 3-车轮接口
@@ -235,18 +247,20 @@ def get_violations_old(v_number, v_type, v_code='', e_code='', city='', user_id=
         origin_data = get_vio_from_tj(v_number, v_type, e_code)
         vio_data = vio_dic_for_tj_old(v_number, origin_data, user_ip)
 
-    elif url_id == 2:
-
+    elif url_id == 3:
+        # 从车轮接口查询违章数据, 并标准化
+        origin_data = get_vio_from_chelun(v_number, v_type, v_code, e_code)
+        vio_data = vio_dic_for_chelun_old(v_number, origin_data, user_ip)
+    elif url_id == 4:
+        # 从盔甲接口查询违章数据
+        pass
+    else:
+        # 从典典接口查询违章数据, 并标准化
         origin_data = get_vio_from_ddyc(v_number, v_type, v_code, e_code, city)
         vio_data = vio_dic_for_ddyc_old(v_number, origin_data, user_ip)
 
-    else:
-
-        origin_data = get_vio_from_chelun(v_number, v_type, v_code, e_code)
-        vio_data = vio_dic_for_chelun_old(v_number, origin_data, user_ip)
-
     # 保存日志
-    save_log_old(v_number, origin_data, vio_data, user_id, url_id, user_ip)
+    save_log_old(v_number, origin_data, vio_data, user_id, url_id, user_ip, city)
 
     # 如果查询成功, 保存数据到本地数据库
     if 'result' in vio_data:
