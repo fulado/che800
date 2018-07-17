@@ -193,10 +193,11 @@ def query_thread(v_queue):
         try:
             # print('query thread %d start' % t_id)
             vehicle = v_queue.get(True, 5)
+            # print(vehicle.vehicle_number)
             data = get_violations(vehicle.vehicle_number, vehicle.vehicle_type, vehicle.vehicle_code,
                                   vehicle.engine_code, vehicle.city)
 
-            # 如果查询成功, 将讲车辆查询状态置为1
+            # 如果查询成功, 将车辆查询状态置为1
             if data['status'] == 0:
                 vehicle.status = 1
                 vehicle.save()

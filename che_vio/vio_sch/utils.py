@@ -14,14 +14,14 @@ def get_url_id(v_number, city):
 
     try:
         if city == '':
-            loc_info = LocInfo.objects.get(plate_name__contains=v_number[0])
+            loc_info = LocInfo.objects.get(plate_name=v_number[0])
         else:
             loc_info = LocInfo.objects.get(loc_name__contains=city)
     except Exception as e:
         print(e)
         return None, city
 
-    return loc_info.url.id, loc_info.loc_name
+    return loc_info.url.id, city
 
 
 # 从本地数据库查询违章
@@ -280,65 +280,65 @@ def vio_dic_for_chelun(v_number, data):
     :param data: 车轮接口返回数据, dict
     :return: 车八佰违章数据, dict
     """
-    if 'code' in data and data['code'] == 0:
+    if 'code' in data and data['code'] == 0 and 'data' in data and data['data'] is not None:
         status = 0
 
         vio_list = []
-        if 'data' in data:
-            for vio in data['data']:
-                # 违法时间
-                if 'date' in vio:
-                    vio_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(int(vio['date'])))
-                else:
-                    vio_time = ''
 
-                # 违法地点
-                if 'address' in vio:
-                    vio_address = vio['address']
-                else:
-                    vio_address = ''
+        for vio in data['data']:
+            # 违法时间
+            if 'date' in vio:
+                vio_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(int(vio['date'])))
+            else:
+                vio_time = ''
 
-                # 违法行为
-                if 'detail' in vio:
-                    vio_activity = vio['detail']
-                else:
-                    vio_activity = ''
+            # 违法地点
+            if 'address' in vio:
+                vio_address = vio['address']
+            else:
+                vio_address = ''
 
-                # 扣分
-                if 'point' in vio:
-                    vio_point = vio['point']
-                else:
-                    vio_point = ''
+            # 违法行为
+            if 'detail' in vio:
+                vio_activity = vio['detail']
+            else:
+                vio_activity = ''
 
-                # 罚款
-                if 'money' in vio:
-                    vio_money = vio['money']
-                else:
-                    vio_money = ''
+            # 扣分
+            if 'point' in vio:
+                vio_point = vio['point']
+            else:
+                vio_point = ''
 
-                # 违法代码
-                if 'code' in vio:
-                    vio_code = vio['code']
-                else:
-                    vio_code = ''
+            # 罚款
+            if 'money' in vio:
+                vio_money = vio['money']
+            else:
+                vio_money = ''
 
-                # 处理机关
-                if 'office_name' in vio:
-                    vio_loc = vio['office_name']
-                else:
-                    vio_loc = ''
+            # 违法代码
+            if 'code' in vio:
+                vio_code = vio['code']
+            else:
+                vio_code = ''
 
-                vio_data = {
-                    'time': vio_time,
-                    'position': vio_address,
-                    'activity': vio_activity,
-                    'point': vio_point,
-                    'money': vio_money,
-                    'code': vio_code,
-                    'location': vio_loc
-                }
+            # 处理机关
+            if 'office_name' in vio:
+                vio_loc = vio['office_name']
+            else:
+                vio_loc = ''
 
-                vio_list.append(vio_data)
+            vio_data = {
+                'time': vio_time,
+                'position': vio_address,
+                'activity': vio_activity,
+                'point': vio_point,
+                'money': vio_money,
+                'code': vio_code,
+                'location': vio_loc
+            }
+
+            vio_list.append(vio_data)
 
         vio_dict = {'vehicleNumber': v_number, 'status': status, 'data': vio_list}
     else:
@@ -566,6 +566,9 @@ def create_status_from_chelun(origin_status, origin_msg):
     elif origin_status == -2:
         status = 39
         msg = '数据源不稳定, 请稍后再查'
+    elif origin_status == 0 and origin_msg == '接口升级中，开放时间待定':
+        status = 36
+        msg = '数据源维护中, 暂不支持查询'
     else:
         status = 51
         msg = '数据源异常'

@@ -186,8 +186,8 @@ def violation_service(request):
         save_error_log(-12, 'vin or engine code error', user.id, user_ip)
         return HttpResponse(response_data)
 
-    if 'workCity' in v_data:
-        city = v_data['workCity']
+    if 'workcity' in v_data:
+        city = v_data['workcity']
     else:
         city = ''
 
