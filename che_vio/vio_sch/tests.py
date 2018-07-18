@@ -262,6 +262,28 @@ def backup():
         conn.close()
 
 
+# 从盔甲获取违章数据
+def get_vio_from_kuijia(v_number, v_code, e_code):
+
+    # 构造查询数据
+    data = {'plate': v_number, 'vin': v_code, 'engine': e_code}
+    data = json.dumps(data)
+
+    # 构造完整查询url
+    url = 'http://git.ikuijia.com:8380/che800-api/api/peccancy/get.do'
+
+    # 请求头
+    headers = {'Content-type': 'application/json'}
+
+    # 创建request请求
+    request = urllib.request.Request(url, headers=headers, data=data.encode('utf-8'))
+
+    # 获得response
+    response_data = urllib.request.urlopen(request)
+
+    return json.loads(response_data.read().decode('utf-8'))
+
+
 if __name__ == '__main__':
     # car1 = {'v_number': '京HD9596', 'v_type': '02', 'v_code': 'LGBF5AE00HR276883', 'e_code': '751757V'}
     # car2 = {'v_number': '苏AQ6R59', 'v_type': '02', 'v_code': 'LSGUD84X3FE009951', 'e_code': '150330725'}

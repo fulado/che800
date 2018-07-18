@@ -190,16 +190,16 @@ if __name__ == '__main__':
     #          'carType': '02',
     #          'vinNumber': 'LSGBL5440HF090533'}]
 
-    # cars = [{'engineNumber': 'H1SF5210072',
-    #          'platNumber': '沪AYC967',
-    #          'carType': '02',
-    #          'vinNumber': 'LSKG4AC1XFA413599'}]
-
-    cars = [{'engineNumber': '751757V',
-             'platNumber': '京HD9596',
+    cars = [{'engineNumber': 'H1SF5210072',
+             'platNumber': '沪AYC967',
              'carType': '02',
-             'vinNumber': 'LGBF5AE00HR276883',
-             'workCity': '上海'}]
+                 'vinNumber': 'LSKG4AC1XFA413599'}]
+
+    # cars = [{'engineNumber': '751757V',
+    #          'platNumber': '京HD9596',
+    #          'carType': '02',
+    #          'vinNumber': 'LGBF5AE00HR276883',
+    #          'workCity': '上海'}]
 
     # cars = [{'engineNumber': 'H17079',
     #          'platNumber': '津CC825',

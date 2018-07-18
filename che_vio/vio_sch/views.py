@@ -2,7 +2,8 @@ from django.http import JsonResponse, HttpResponse
 from .forms import SearchForm
 from .models import UserInfo, LocInfo, VioInfo, VehicleInfo, LogInfo
 from .utils import get_vio_from_tj, get_vio_from_chelun, get_vio_from_ddyc, vio_dic_for_ddyc, vio_dic_for_chelun,\
-    save_to_loc_db, save_log, get_vio_from_loc, get_url_id, save_error_log, vio_dic_for_tj, save_vehicle
+    save_to_loc_db, save_log, get_vio_from_loc, get_url_id, save_error_log, vio_dic_for_tj, save_vehicle,\
+    get_vio_from_kuijia, vio_dic_for_kuijia
 from multiprocessing import Queue
 from threading import Thread
 import time
@@ -151,7 +152,8 @@ def get_violations(v_number, v_type=2, v_code='', e_code='', city='', user_id=99
         vio_data = vio_dic_for_chelun(v_number, origin_data)
     elif url_id == 4:
         # 从盔甲接口查询违章数据
-        pass
+        origin_data = get_vio_from_kuijia(v_number, v_code, e_code)
+        vio_data = vio_dic_for_kuijia(v_number, origin_data)
     else:
         # 从典典接口查询违章数据, 并标准化
         origin_data = get_vio_from_ddyc(v_number, v_type, v_code, e_code, city)

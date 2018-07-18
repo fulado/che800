@@ -3,7 +3,8 @@
 """
 from django.http import HttpResponse
 from .models import UserInfo, VioInfo, LogInfo
-from .utils import get_vio_from_tj, get_vio_from_ddyc, get_vio_from_chelun, get_url_id, save_error_log, save_vehicle
+from .utils import get_vio_from_tj, get_vio_from_ddyc, get_vio_from_chelun, get_url_id, save_error_log, save_vehicle, \
+    get_vio_from_kuijia
 import base64
 import json
 import time
@@ -253,7 +254,8 @@ def get_violations_old(v_number, v_type, v_code='', e_code='', city='', user_id=
         vio_data = vio_dic_for_chelun_old(v_number, origin_data, user_ip)
     elif url_id == 4:
         # 从盔甲接口查询违章数据
-        pass
+        origin_data = get_vio_from_kuijia(v_number, v_code, e_code)
+        vio_data = vio_dic_for_kuijia_old(v_number, origin_data, user_ip)
     else:
         # 从典典接口查询违章数据, 并标准化
         origin_data = get_vio_from_ddyc(v_number, v_type, v_code, e_code, city)
@@ -589,6 +591,104 @@ def vio_dic_for_tj_old(v_number, data, user_ip):
 
         if 'msg' in data:
             message = data['msg']
+        else:
+            message = 'query error'
+
+        vio_dict = {'status': status, 'message': message}
+
+    return vio_dict
+
+
+# 根据盔甲接口返回数据构造违章数据
+def vio_dic_for_kuijia_old(v_number, data, user_ip):
+    if data.get('success', False):
+        status = '0'
+
+        vio_list = []
+        if 'data' in data and 'peccancy' in data['data'] and len(data['data']['peccancy']) > 0 and 'peccancies' in \
+                data['data']['peccancy'][0]:
+            for vio in data['data']['peccancy'][0]['peccancies']:
+                # 缴费状态, 是否换成status, 需要和盔甲确认
+                if 'paymentStatus' in vio:
+                    vio_pay = int(vio['paymentStatus'])
+                else:
+                    vio_pay = 1
+
+                # 已经缴费的违章数据不再返回
+                if vio_pay == 2:
+                    continue
+
+                # 违法时间
+                if 'peccancyTime' in vio:
+                    vio_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(int(vio['peccancyTime']) / 1000))
+                else:
+                    vio_time = ''
+
+                # 违法地点
+                if 'location' in vio:
+                    vio_address = vio['location']
+                else:
+                    vio_address = ''
+
+                # 违法行为
+                if 'peccancyInfo' in vio:
+                    vio_activity = vio['peccancyInfo']
+                else:
+                    vio_activity = ''
+
+                # 扣分
+                if 'point' in vio:
+                    vio_point = vio['point']
+                else:
+                    vio_point = ''
+
+                # 罚款
+                if 'fee' in vio:
+                    vio_money = vio['fee']
+                else:
+                    vio_money = ''
+
+                # 处理机关
+                if 'department' in vio:
+                    vio_loc = vio['department']
+                else:
+                    vio_loc = ''
+
+                vio_data = {
+                    'reason': vio_activity,
+                    'viocjjg': vio_loc,
+                    'punishPoint': vio_point,
+                    'location': vio_address,
+                    'time': vio_time,
+                    'punishMoney': vio_money,
+                    'paystat': '',
+                    'state': ''
+                }
+
+                vio_list.append(vio_data)
+
+        feedback = {
+            'cars': v_number,
+            'requestIp': user_ip,
+            'responseTime': time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+        }
+
+        result = {
+            'platNumber': v_number,
+            'punishs': vio_list,
+            'status': status
+        }
+
+        vio_dict = {'feedback': feedback, 'result': result}
+    else:
+        # 查询失败
+        if 'status' in data:
+            status = data['status']
+        else:
+            status = 99
+
+        if 'message' in data:
+            message = data['message']
         else:
             message = 'query error'
 

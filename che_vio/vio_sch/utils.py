@@ -173,6 +173,28 @@ def get_vio_from_ddyc(v_number, v_type, v_code, e_code, city):
     return json.loads(response.read().decode('utf-8'))
 
 
+# 从盔甲接口查询违章数据
+def get_vio_from_kuijia(v_number, v_code, e_code):
+
+    # 查询url
+    url = 'http://git.ikuijia.com:8380/che800-api/api/peccancy/get.do'
+
+    # 构造查询数据
+    data = {'plate': v_number, 'vin': v_code, 'engine': e_code}
+    data = json.dumps(data)
+
+    # 请求头
+    headers = {'Content-type': 'application/json'}
+
+    # 创建request请求
+    request = urllib.request.Request(url, headers=headers, data=data.encode('utf-8'))
+
+    # 获得response
+    response_data = urllib.request.urlopen(request)
+
+    return json.loads(response_data.read().decode('utf-8'))
+
+
 # 通过天津接口查询结果构造标准返回数据
 def vio_dic_for_tj(data):
     if 'status' in data and data['status'] == 0:
@@ -352,6 +374,87 @@ def vio_dic_for_chelun(v_number, data):
     return vio_dict
 
 
+# 通过盔甲接口查询结果构造标准返回数据
+def vio_dic_for_kuijia(v_number, data):
+    """
+        通过盔甲接口查询结构构造标准返回数据
+        :param v_number: 车牌
+        :param data: 盔甲接口返回数据, dict
+        :return: 车八佰违章数据, dict
+        """
+    if data.get('success', False):
+        status = 0
+
+        vio_list = []
+        if 'data' in data and 'peccancy' in data['data'] and len(data['data']['peccancy']) > 0 and 'peccancies' in \
+                data['data']['peccancy'][0]:
+            for vio in data['data']['peccancy'][0]['peccancies']:
+                # 违法时间
+                if 'peccancyTime' in vio:
+                    vio_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(int(vio['peccancyTime']) / 1000))
+                else:
+                    vio_time = ''
+
+                # 违法地点
+                if 'location' in vio:
+                    vio_address = vio['location']
+                else:
+                    vio_address = ''
+
+                # 违法行为
+                if 'peccancyInfo' in vio:
+                    vio_activity = vio['peccancyInfo']
+                else:
+                    vio_activity = ''
+
+                # 扣分
+                if 'point' in vio:
+                    vio_point = vio['point']
+                else:
+                    vio_point = ''
+
+                # 罚款
+                if 'fee' in vio:
+                    vio_money = vio['fee']
+                else:
+                    vio_money = ''
+
+                # 违法代码
+                if 'code' in vio:
+                    vio_code = vio['code']
+                else:
+                    vio_code = ''
+
+                # 处理机关
+                if 'department' in vio:
+                    vio_loc = vio['department']
+                else:
+                    vio_loc = ''
+
+                vio_data = {
+                    'time': vio_time,
+                    'position': vio_address,
+                    'activity': vio_activity,
+                    'point': vio_point,
+                    'money': vio_money,
+                    'code': vio_code,
+                    'location': vio_loc
+                }
+
+                vio_list.append(vio_data)
+
+        vio_dict = {'vehicleNumber': v_number, 'status': status, 'data': vio_list}
+    else:
+        if 'status' in data and 'message' in data:
+            return get_status(data['status'], 4, data['message'])
+        elif 'status' in data:
+            return get_status(data['status'], 4)
+        else:
+            return {'status': 53, 'msg': '查询失败'}
+
+    return vio_dict
+
+
 # 查询结果保存到本地数据库
 def save_to_loc_db(vio_data, vehicle_number, vehicle_type):
 
@@ -455,6 +558,15 @@ def save_log(v_number, origin_data, vio_data, user_id, url_id, user_ip, city='')
 
             if 'msg' in origin_data:
                 log_info.origin_msg = origin_data['msg']
+
+        elif url_id == 4:
+
+            # 车轮接口
+            if 'status' in origin_data:
+                log_info.origin_status = origin_data['status']
+
+            if 'message' in origin_data:
+                log_info.origin_msg = origin_data['message']
 
     # 保存日志到数据库
     try:
@@ -576,6 +688,15 @@ def create_status_from_chelun(origin_status, origin_msg):
     return {'status': status, 'msg': msg}
 
 
+# 盔甲接口状态码
+def create_status_from_kuijia(origin_status, origin_msg):
+
+    status = 52
+    msg = origin_msg
+
+    return {'status': status, 'msg': msg}
+
+
 # 根据不同接口的返回状态码构造本地平台返回给用户的状态码
 def get_status(origin_status, url_id, origin_msg=''):
 
@@ -590,6 +711,10 @@ def get_status(origin_status, url_id, origin_msg=''):
     # 车轮接口
     elif url_id == 3:
         return create_status_from_chelun(int(origin_status), origin_msg)
+
+    # 盔甲接口
+    elif url_id == 4:
+        return create_status_from_kuijia(int(origin_status), origin_msg)
 
     else:
         return {'status': 52, 'msg': '违章查询接口异常'}
