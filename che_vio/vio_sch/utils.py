@@ -561,7 +561,7 @@ def save_log(v_number, origin_data, vio_data, user_id, url_id, user_ip, city='')
 
         elif url_id == 4:
 
-            # 车轮接口
+            # 盔甲接口
             if 'status' in origin_data:
                 log_info.origin_status = origin_data['status']
 
@@ -679,8 +679,8 @@ def create_status_from_chelun(origin_status, origin_msg):
         status = 39
         msg = '数据源不稳定, 请稍后再查'
     elif origin_status == 0 and origin_msg == '接口升级中，开放时间待定':
-        status = 36
-        msg = '数据源维护中, 暂不支持查询'
+        status = 39
+        msg = '数据源不稳定, 请稍后再查'
     else:
         status = 51
         msg = '数据源异常'
@@ -689,10 +689,32 @@ def create_status_from_chelun(origin_status, origin_msg):
 
 
 # 盔甲接口状态码
-def create_status_from_kuijia(origin_status, origin_msg):
+def create_status_from_kuijia(origin_status):
 
-    status = 52
-    msg = origin_msg
+    if origin_status in [-1, -41, -6]:
+        status = 36
+        msg = '车辆信息不正确'
+    elif origin_status == -3:
+        status = 41
+        msg = '该城市不支持查询'
+    elif origin_status in [-5, -42]:
+        status = 39
+        msg = '数据源不稳定, 请稍后再查'
+    elif origin_status in [-61, -66]:
+        status = 32
+        msg = '车牌号或车辆类型错误'
+    elif origin_status == -62:
+        status = 34
+        msg = '车架号错误'
+    elif origin_status == -63:
+        status = 33
+        msg = '发动机号错误'
+    elif origin_status == -67:
+        status = 42
+        msg = '该城市不支持外地车牌查询'
+    else:
+        status = 51
+        msg = '数据源异常'
 
     return {'status': status, 'msg': msg}
 
@@ -714,7 +736,7 @@ def get_status(origin_status, url_id, origin_msg=''):
 
     # 盔甲接口
     elif url_id == 4:
-        return create_status_from_kuijia(int(origin_status), origin_msg)
+        return create_status_from_kuijia(int(origin_status))
 
     else:
         return {'status': 52, 'msg': '违章查询接口异常'}

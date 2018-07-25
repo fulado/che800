@@ -6,6 +6,7 @@ import json
 import time
 import hashlib
 import pymysql
+from pprint import pprint
 
 
 class ViolationException(Exception):
@@ -35,6 +36,19 @@ def get_violation(car_list):
     # print(data)
     if b'\xef\xbf\xbd' in data:
         raise ViolationException()
+
+    return get_json(data)
+
+
+def register_vehicle(car_list):
+    # url = 'http://47.94.18.47/IllegalData-search/vehicle'
+    # url = 'http://127.0.0.1:8000/register'
+    url = 'http://vio.che800.cc/register'
+
+    token = get_token()
+    data = json.dumps({'userId': 'test_old', 'token': token, 'cars': car_list, 'worktype': '2'})
+    # print(data)
+    data = get_response_encoded_data(url, data)
 
     return get_json(data)
 
@@ -190,10 +204,10 @@ if __name__ == '__main__':
     #          'carType': '02',
     #          'vinNumber': 'LSGBL5440HF090533'}]
 
-    cars = [{'engineNumber': 'H1SF5210072',
-             'platNumber': '沪AYC967',
-             'carType': '02',
-                 'vinNumber': 'LSKG4AC1XFA413599'}]
+    # cars = [{'engineNumber': 'H1SF5210072',
+    #          'platNumber': '沪AYC967',
+    #          'carType': '02',
+    #          'vinNumber': 'LSKG4AC1XFA413599'}]
 
     # cars = [{'engineNumber': '751757V',
     #          'platNumber': '京HD9596',
@@ -206,9 +220,15 @@ if __name__ == '__main__':
     #          'carType': '16',
     #          'vinNumber': '564847'}]
 
+    cars = [{'engineNumber': '12345678901',
+             'platNumber': '国A88888',
+             'carType': '02',
+             'vinNumber': 'ABCDEFG1232'}]
+
     try:
-        violation_data = get_violation(cars)
-        print(violation_data)
+        # violation_data = get_violation(cars)
+        violation_data = register_vehicle(cars)
+        pprint(violation_data)
     except Exception as e:
         print(e)
 

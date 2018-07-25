@@ -11,7 +11,7 @@
   </component>
   <component name="CoverageDataManager">
     <SUITE FILE_PATH="coverage/che800_vp$settings.coverage" NAME="settings Coverage Results" MODIFIED="1531322302398" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/che800_vp" />
-    <SUITE FILE_PATH="coverage/che800_vp$tests.coverage" NAME="tests Coverage Results" MODIFIED="1531935981771" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/v_api_tsn" />
+    <SUITE FILE_PATH="coverage/che800_vp$tests.coverage" NAME="tests Coverage Results" MODIFIED="1532504304376" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/v_api_tsn" />
     <SUITE FILE_PATH="coverage/che800_vp$views.coverage" NAME="views Coverage Results" MODIFIED="1531757722135" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/v_api_tsn" />
   </component>
   <component name="FileEditorManager">
@@ -40,7 +40,7 @@
       <file leaf-file-name="views.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/v_api_tsn/views.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-211">
+            <state relative-caret-position="1001">
               <caret line="191" column="70" selection-start-line="191" selection-start-column="66" selection-end-line="191" selection-end-column="70" />
               <folding>
                 <element signature="e#26#75#0" expanded="true" />
@@ -61,8 +61,11 @@
       <file leaf-file-name="tests.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/v_api_tsn/tests.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="269">
-              <caret line="197" column="41" lean-forward="true" selection-start-line="195" selection-start-column="31" selection-end-line="195" selection-end-column="48" />
+            <state relative-caret-position="-4246">
+              <caret line="35" column="17" selection-start-line="35" selection-start-column="17" selection-end-line="35" selection-end-column="17" />
+              <folding>
+                <element signature="e#0#32#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -85,6 +88,7 @@
       <find>7</find>
       <find>'hphm':</find>
       <find>print</find>
+      <find>register_vehicle</find>
     </findStrings>
   </component>
   <component name="IdeDocumentHistory">
@@ -113,16 +117,17 @@
     <packageJsonPaths />
   </component>
   <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="64" />
-    <option name="y" value="-11" />
-    <option name="width" value="1857" />
-    <option name="height" value="1092" />
+    <option name="x" value="1985" />
+    <option name="y" value="-4" />
+    <option name="width" value="1855" />
+    <option name="height" value="1204" />
   </component>
   <component name="ProjectView">
     <navigator proportions="" version="1">
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -140,15 +145,10 @@
               <item name="che800_vp" type="462c0819:PsiDirectoryNode" />
               <item name="v_api_tsn" type="462c0819:PsiDirectoryNode" />
             </path>
-            <path>
-              <item name="che800_vp" type="b2602c69:ProjectViewProjectNode" />
-              <item name="External Libraries" type="cb654da1:ExternalLibrariesNode" />
-            </path>
           </expand>
           <select />
         </subPane>
       </pane>
-      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -267,23 +267,22 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="65" y="-4" width="1855" height="1084" extended-state="6" />
-    <editor active="true" />
+    <frame x="1985" y="-4" width="1855" height="1204" extended-state="6" />
     <layout>
       <window_info anchor="bottom" id="TODO" order="6" />
       <window_info anchor="bottom" id="Event Log" order="7" side_tool="true" />
       <window_info anchor="bottom" id="Database Changes" order="8" show_stripe_button="false" />
-      <window_info anchor="bottom" id="Run" order="2" weight="0.24451411" />
       <window_info anchor="bottom" id="Version Control" order="7" show_stripe_button="false" />
-      <window_info anchor="bottom" id="Python Console" order="7" weight="0.2181987" />
+      <window_info anchor="bottom" id="Python Console" order="7" weight="0.21734588" />
+      <window_info anchor="bottom" id="Run" order="2" weight="0.31940576" />
       <window_info anchor="bottom" id="Terminal" order="7" weight="0.3286908" />
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.1551629" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.1722805" />
       <window_info anchor="bottom" id="Docker" order="8" show_stripe_button="false" />
       <window_info anchor="right" id="Database" order="3" />
       <window_info anchor="right" id="SciView" order="3" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
-      <window_info anchor="bottom" id="Debug" order="3" weight="0.39925718" />
       <window_info id="Favorites" order="2" side_tool="true" />
+      <window_info anchor="bottom" id="Debug" order="3" weight="0.39925718" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="right" id="Commander" order="0" weight="0.4" />
@@ -630,16 +629,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/v_api_tsn/urls.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="78">
-          <caret line="4" column="20" selection-start-line="4" selection-start-column="11" selection-end-line="4" selection-end-column="20" />
-          <folding>
-            <element signature="e#0#32#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/../che_vio/venv/Lib/base64.py" />
     <entry file="file://$PROJECT_DIR$/uwsgi.ini">
       <provider selected="true" editor-type-id="text-editor">
@@ -670,9 +659,19 @@
       </provider>
     </entry>
     <entry file="file:///opt/python3/lib/python3.6/base64.py" />
+    <entry file="file://$PROJECT_DIR$/v_api_tsn/urls.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="78">
+          <caret line="4" column="20" selection-start-line="4" selection-start-column="11" selection-end-line="4" selection-end-column="20" />
+          <folding>
+            <element signature="e#0#32#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/v_api_tsn/views.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-211">
+        <state relative-caret-position="1001">
           <caret line="191" column="70" selection-start-line="191" selection-start-column="66" selection-end-line="191" selection-end-column="70" />
           <folding>
             <element signature="e#26#75#0" expanded="true" />
@@ -682,8 +681,11 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/v_api_tsn/tests.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="269">
-          <caret line="197" column="41" lean-forward="true" selection-start-line="195" selection-start-column="31" selection-end-line="195" selection-end-column="48" />
+        <state relative-caret-position="-4246">
+          <caret line="35" column="17" selection-start-line="35" selection-start-column="17" selection-end-line="35" selection-end-column="17" />
+          <folding>
+            <element signature="e#0#32#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>

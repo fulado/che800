@@ -36,7 +36,7 @@ class VehicleInfo(models.Model):
     engine_code = models.CharField(max_length=50, blank=True, null=True)        # 发动机号
     status = models.IntegerField(default=0)                                     # 状态: 0-失败, 1-成功
     city = models.CharField(max_length=20, blank=True, null=True)               # 运营地
-    create_time = models.DateTimeField(blank=True, null=True)                   # 创建时间
+    update_time = models.DateTimeField(auto_now=True)                           # 更新时间
     query_counter = models.IntegerField(default=1)                              # 近7天查询违章次数
     user = models.ForeignKey(UserInfo, on_delete=models.CASCADE, blank=True, null=True)  # 所属用户
 

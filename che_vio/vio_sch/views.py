@@ -19,7 +19,7 @@ def violation(request):
     :return: 违章数据, json格式
     """
 
-    # 判断当前时间, 每天00:10 ~ 00:30禁止查询, 系统自动日志
+    # 判断当前时间, 每天02:00 ~ 02:20禁止查询, 系统自动日志
     current_hour = time.localtime().tm_hour
     current_min = time.localtime().tm_min
 
@@ -29,7 +29,7 @@ def violation(request):
     else:
         user_ip = request.META['REMOTE_ADDR']
 
-    if current_hour == 0 and current_min in range(10, 30):
+    if current_hour == 2 and current_min in range(0, 20):
         save_error_log(19, '系统维护中, 请稍后访问', '', user_ip)
         return JsonResponse({'status': 19, 'msg': '系统维护中, 请稍后访问'})
 
@@ -329,4 +329,4 @@ def test_task():
 
 # 负载均衡测试
 def nginx_test(request):
-    return HttpResponse('<h1>server 03</h1>')
+    return HttpResponse('<h1>server 01</h1>')
