@@ -17,8 +17,8 @@ class ViolationException(Exception):
 def get_token():
     data = str({"username": 'test_old', 'password': 'test_old'})
     # url = 'http://47.94.18.47/IllegalData-search/login'
-    # url = 'http://127.0.0.1:8000/login'
-    url = 'http://vio.che800.cc/login'
+    url = 'http://127.0.0.1:8000/login'
+    # url = 'http://vio.che800.cc/login'
     data = get_json(get_response_encoded_data(url, data))
     print(data)
     return data['token']
@@ -26,8 +26,8 @@ def get_token():
 
 def get_violation(car_list):
     # url = 'http://47.94.18.47/IllegalData-search/vehicle'
-    # url = 'http://127.0.0.1:8000/illegal'
-    url = 'http://vio.che800.cc/illegal'
+    url = 'http://127.0.0.1:8000/illegal'
+    # url = 'http://vio.che800.cc/illegal'
 
     token = get_token()
     data = json.dumps({'userId': 'test_old', 'token': token, 'cars': car_list})
@@ -46,7 +46,7 @@ def register_vehicle(car_list):
     url = 'http://vio.che800.cc/register'
 
     token = get_token()
-    data = json.dumps({'userId': 'test_old', 'token': token, 'cars': car_list, 'worktype': '2'})
+    data = json.dumps({'userId': 'test0011', 'token': token, 'cars': car_list, 'worktype': '2'})
     # print(data)
     data = get_response_encoded_data(url, data)
 
@@ -189,7 +189,7 @@ def create_car_list(car_info):
 def get_violation_2(car_list, token):
     # url = 'http://47.94.18.47/IllegalData-search/vehicle'
     # url = 'http://127.0.0.1:8000/illegal'
-    url = 'http://vio.che800.cc/illegal'
+    # url = 'http://vio.che800.cc/illegal'
 
     data = json.dumps({'userId': 'test_old', 'token': token, 'cars': car_list})
     # print(data)
@@ -209,25 +209,36 @@ if __name__ == '__main__':
     #          'carType': '02',
     #          'vinNumber': 'LSKG4AC1XFA413599'}]
 
-    # cars = [{'engineNumber': '751757V',
-    #          'platNumber': '京HD9596',
-    #          'carType': '02',
-    #          'vinNumber': 'LGBF5AE00HR276883',
-    #          'workCity': '上海'}]
+    cars = [{'engineNumber': '751757V',
+             'platNumber': '京HD9596',
+             'carType': '02',
+             'vinNumber': 'LGBF5AE00HR276883',
+             # 'workCity': '上海',
+             }]
 
     # cars = [{'engineNumber': 'H17079',
     #          'platNumber': '津CC825',
     #          'carType': '16',
     #          'vinNumber': '564847'}]
 
-    cars = [{'engineNumber': '12345678901',
-             'platNumber': '国A88888',
-             'carType': '02',
-             'vinNumber': 'ABCDEFG1232'}]
+    # cars = [{'engineNumber': '12345678901',
+    #          'platNumber': '国A88888',
+    #          'carType': '02',
+    #          'vinNumber': 'ABCDEFG1232'}]
+
+    # cars = [{'engineNumber': '7A3484',
+    #          'platNumber': '浙A3MF93',
+    #          'carType': '02',
+    #          'vinNumber': 'LSVXZ25N2G2144262'}]
+
+    # cars = [{'engineNumber': '27682130045069',
+    #          'platNumber': '津DXV189',
+    #          'carType': '02',
+    #          'vinNumber': 'LSGLP83X5HF027899'}]
 
     try:
-        # violation_data = get_violation(cars)
-        violation_data = register_vehicle(cars)
+        violation_data = get_violation(cars)
+        # violation_data = register_vehicle(cars)
         pprint(violation_data)
     except Exception as e:
         print(e)
@@ -245,7 +256,7 @@ if __name__ == '__main__':
     # print(json.loads(response_data.decode('utf-8')))
     # print(end_time - start_time)
 
-    # create_sign('test', 'test')
+    create_sign('test', 'test')
 
     # get_token()
 

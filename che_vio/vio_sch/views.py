@@ -1,6 +1,6 @@
 from django.http import JsonResponse, HttpResponse
 from .forms import SearchForm
-from .models import UserInfo, LocInfo, VioInfo, VehicleInfo, LogInfo
+from .models import UserInfo, VehicleInfo, LogInfo
 from .utils import get_vio_from_tj, get_vio_from_chelun, get_vio_from_ddyc, vio_dic_for_ddyc, vio_dic_for_chelun,\
     save_to_loc_db, save_log, get_vio_from_loc, get_url_id, save_error_log, vio_dic_for_tj, save_vehicle,\
     get_vio_from_kuijia, vio_dic_for_kuijia
@@ -292,6 +292,8 @@ def backup_log():
                     `vio_money` int(11) DEFAULT NULL,
                     `vio_code` varchar(20) DEFAULT NULL,
                     `vio_loc` varchar(50) DEFAULT NULL,
+                    `deal_status` int(11),
+                    `pay_status` int(11),
                     PRIMARY KEY (`id`)
                 ) ENGINE=InnoDB AUTO_INCREMENT=6238 DEFAULT CHARSET=utf8mb4"""
         cs.execute(sql)
@@ -329,4 +331,4 @@ def test_task():
 
 # 负载均衡测试
 def nginx_test(request):
-    return HttpResponse('<h1>server 01</h1>')
+    return HttpResponse('<h1>server 03</h1>')

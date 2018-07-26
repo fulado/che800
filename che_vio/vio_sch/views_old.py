@@ -294,15 +294,30 @@ def get_vio_from_loc_old(v_number, v_type, user_ip):
             if vio.vio_code == '999999':
                 continue
 
+            if vio.deal_status == 1:
+                deal_status = 3
+            elif vio.deal_status == 0:
+                deal_status = 1
+            else:
+                deal_status = -1
+
+            if vio.pay_status == 1:
+                pay_status = 2
+            elif vio.pay_status == 0:
+                pay_status = 1
+            else:
+                pay_status = -1
+
             vio_data = {
                 'reason': vio.vio_activity,
                 'viocjjg': vio.vio_loc,
-                'punishPoint': vio.vio_point,
+                'punishPoint': str(vio.vio_point),
                 'location': vio.vio_position,
                 'time': vio.vio_time,
-                'punishMoney': vio.vio_money,
-                'paystat': '',
-                'state': ''
+                'punishMoney': str(vio.vio_money),
+                'paystat': str(pay_status),
+                'state': str(deal_status),
+                'viocode': vio.vio_code
             }
 
             vio_list.append(vio_data)
@@ -336,10 +351,14 @@ def vio_dic_for_ddyc_old(v_number, data, user_ip):
         if 'data' in data and 'violations' in data['data']:
             for vio in data['data']['violations']:
                 # 缴费状态
-                if 'paymentStatus' in vio:
-                    vio_pay = int(vio['paymentStatus'])
-                else:
-                    vio_pay = 1
+                try:
+                    if 'paymentStatus' in vio:
+                        vio_pay = int(vio['paymentStatus'])
+                    else:
+                        vio_pay = -1
+                except Exception as e:
+                    print(e)
+                    vio_pay = -1
 
                 # 已经缴费的违章数据不再返回
                 if vio_pay == 2:
@@ -381,15 +400,32 @@ def vio_dic_for_ddyc_old(v_number, data, user_ip):
                 else:
                     vio_loc = ''
 
+                # 违法代码
+                if 'violationNum' in vio:
+                    vio_code = vio['violationNum']
+                else:
+                    vio_code = ''
+
+                # 违法处理状态
+                try:
+                    if 'processStatus' in vio:
+                        vio_status = vio['processStatus']
+                    else:
+                        vio_status = -1
+                except Exception as e:
+                    print(e)
+                    vio_status = -1
+
                 vio_data = {
                     'reason': vio_activity,
                     'viocjjg': vio_loc,
-                    'punishPoint': vio_point,
-                    'location': vio_address,
+                    'punishPoint': str(vio_point),
+                    'location': str(vio_address),
                     'time': vio_time,
                     'punishMoney': vio_money,
-                    'paystat': '',
-                    'state': ''
+                    'paystat': str(vio_pay),
+                    'state': str(vio_status),
+                    'viocode': vio_code
                 }
 
                 vio_list.append(vio_data)
@@ -496,6 +532,12 @@ def vio_dic_for_chelun_old(v_number, data, user_ip):
                 else:
                     vio_loc = ''
 
+                # 违法代码
+                if 'code' in vio:
+                    vio_code = vio['code']
+                else:
+                    vio_code = ''
+
                 vio_data = {
                     'reason': vio_activity,
                     'viocjjg': vio_loc,
@@ -503,8 +545,9 @@ def vio_dic_for_chelun_old(v_number, data, user_ip):
                     'location': vio_address,
                     'time': vio_time,
                     'punishMoney': vio_money,
-                    'paystat': '',
-                    'state': ''
+                    'paystat': '-1',
+                    'state': '-1',
+                    'viocode': vio_code
                 }
 
                 vio_list.append(vio_data)
@@ -584,6 +627,23 @@ def vio_dic_for_tj_old(v_number, data, user_ip):
                 else:
                     vio_loc = ''
 
+                # 违法代码
+                if 'code' in vio:
+                    vio_code = vio['code']
+                else:
+                    vio_code = ''
+
+                # 违法处理状态
+                if 'deal' in vio:
+                    vio_status = int(vio['deal'])
+                else:
+                    vio_status = -1
+
+                if vio_status == 0:
+                    vio_status = 1
+                elif vio_status == 1:
+                    vio_status = 3
+
                 vio_data = {
                     'reason': vio_activity,
                     'viocjjg': vio_loc,
@@ -591,8 +651,9 @@ def vio_dic_for_tj_old(v_number, data, user_ip):
                     'location': vio_address,
                     'time': vio_time,
                     'punishMoney': vio_money,
-                    'paystat': '',
-                    'state': ''
+                    'paystat': '1',
+                    'state': str(vio_status),
+                    'viocode': vio_code
                 }
 
                 vio_list.append(vio_data)
@@ -643,10 +704,15 @@ def vio_dic_for_kuijia_old(v_number, data, user_ip):
                 data['data']['peccancy'][0]:
             for vio in data['data']['peccancy'][0]['peccancies']:
                 # 缴费状态, 是否换成status, 需要和盔甲确认
-                if 'paymentStatus' in vio:
-                    vio_pay = int(vio['paymentStatus'])
-                else:
-                    vio_pay = 1
+                # 缴费状态
+                try:
+                    if 'paystat' in vio:
+                        vio_pay = int(vio['paystat'])
+                    else:
+                        vio_pay = -1
+                except Exception as e:
+                    print(e)
+                    vio_pay = -1
 
                 # 已经缴费的违章数据不再返回
                 if vio_pay == 2:
@@ -688,15 +754,29 @@ def vio_dic_for_kuijia_old(v_number, data, user_ip):
                 else:
                     vio_loc = ''
 
+                # 违法代码
+                vio_code = ''  # 盔甲不返回违法代码
+
+                # 违法处理状态
+                try:
+                    if 'state' in vio:
+                        vio_status = vio['state']
+                    else:
+                        vio_status = -1
+                except Exception as e:
+                    print(e)
+                    vio_status = -1
+
                 vio_data = {
                     'reason': vio_activity,
                     'viocjjg': vio_loc,
-                    'punishPoint': vio_point,
+                    'punishPoint': str(vio_point),
                     'location': vio_address,
                     'time': vio_time,
-                    'punishMoney': vio_money,
-                    'paystat': '',
-                    'state': ''
+                    'punishMoney': str(vio_money),
+                    'paystat': str(vio_pay),
+                    'state': str(vio_status),
+                    'viocode': vio_code
                 }
 
                 vio_list.append(vio_data)
@@ -773,9 +853,46 @@ def save_to_loc_db_old(vio_data, vehicle_number, vehicle_type):
                 vio_info.vio_time = vio['time']
                 vio_info.vio_position = vio['location']
                 vio_info.vio_activity = vio['reason']
-                vio_info.vio_point = vio['punishPoint']
-                vio_info.vio_money = vio['punishMoney']
+
+                try:
+                    vio_info.vio_point = int(vio['punishPoint'])
+                except Exception as e:
+                    print(e)
+                try:
+                    vio_info.vio_money = int(vio['punishMoney'])
+                except Exception as e:
+                    print(e)
+
                 vio_info.vio_loc = vio['viocjjg']
+                vio_info.vio_code = vio['viocode']
+
+                try:
+                    deal_status = int(vio['state'])
+                    if deal_status == 3:
+                        deal_status = 1
+                    elif deal_status == -1:
+                        deal_status = -1
+                    else:
+                        deal_status = 0
+                except Exception as e:
+                    print(e)
+                    deal_status = -1
+
+                vio_info.deal_status = deal_status
+
+                try:
+                    pay_status = int(vio['paystat'])
+                    if pay_status == 2:
+                        pay_status = 1
+                    elif pay_status == -1:
+                        pay_status = -1
+                    else:
+                        pay_status = 0
+                except Exception as e:
+                    print(e)
+                    pay_status = -1
+
+                vio_info.pay_status = pay_status
 
                 vio_info.save()
     except Exception as e:

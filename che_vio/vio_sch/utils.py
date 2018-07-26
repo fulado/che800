@@ -44,10 +44,12 @@ def get_vio_from_loc(v_number, v_type=2):
                 'time': vio.vio_time,
                 'position': vio.vio_position,
                 'activity': vio.vio_activity,
-                'point': vio.vio_point,
-                'money': vio.vio_money,
+                'point': str(vio.vio_point),
+                'money': str(vio.vio_money),
                 'code': vio.vio_code,
-                'location': vio.vio_loc
+                'location': vio.vio_loc,
+                'deal': str(vio.deal_status),
+                'pay': str(vio.pay_status)
             }
 
             vio_list.append(vio_data)
@@ -221,10 +223,14 @@ def vio_dic_for_ddyc(v_number, data):
         if 'data' in data and 'violations' in data['data']:
             for vio in data['data']['violations']:
                 # 缴费状态
-                if 'paymentStatus' in vio:
-                    vio_pay = int(vio['paymentStatus'])
-                else:
-                    vio_pay = 1
+                try:
+                    if 'paymentStatus' in vio:
+                        vio_pay = int(vio['paymentStatus'])
+                    else:
+                        vio_pay = -1
+                except Exception as e:
+                    print(e)
+                    vio_pay = -1
 
                 # 已经缴费的违章数据不再返回
                 if vio_pay == 2:
@@ -250,13 +256,13 @@ def vio_dic_for_ddyc(v_number, data):
 
                 # 扣分
                 if 'point' in vio:
-                    vio_point = vio['point']
+                    vio_point = str(vio['point'])
                 else:
                     vio_point = ''
 
                 # 罚款
                 if 'fine' in vio:
-                    vio_money = vio['fine']
+                    vio_money = str(vio['fine'])
                 else:
                     vio_money = ''
 
@@ -272,6 +278,30 @@ def vio_dic_for_ddyc(v_number, data):
                 else:
                     vio_loc = ''
 
+                # 处理状态
+                try:
+                    if 'processStatus' in vio:
+                        vio_deal = int(vio['processStatus'])
+                    else:
+                        vio_deal = -1
+                except Exception as e:
+                    print(e)
+                    vio_deal = -1
+
+                if vio_deal == 3:
+                    vio_deal = '1'
+                elif vio_deal == -1:
+                    vio_deal = '-1'
+                else:
+                    vio_deal = '0'
+
+                if vio_pay == 2:
+                    vio_pay = '1'
+                elif vio_pay == -1:
+                    vio_pay = '-1'
+                else:
+                    vio_pay = '0'
+
                 vio_data = {
                     'time': vio_time,
                     'position': vio_address,
@@ -279,7 +309,9 @@ def vio_dic_for_ddyc(v_number, data):
                     'point': vio_point,
                     'money': vio_money,
                     'code': vio_code,
-                    'location': vio_loc
+                    'location': vio_loc,
+                    'deal': vio_deal,
+                    'pay': vio_pay
                 }
 
                 vio_list.append(vio_data)
@@ -328,13 +360,13 @@ def vio_dic_for_chelun(v_number, data):
 
             # 扣分
             if 'point' in vio:
-                vio_point = vio['point']
+                vio_point = str(vio['point'])
             else:
                 vio_point = ''
 
             # 罚款
             if 'money' in vio:
-                vio_money = vio['money']
+                vio_money = str(vio['money'])
             else:
                 vio_money = ''
 
@@ -350,6 +382,12 @@ def vio_dic_for_chelun(v_number, data):
             else:
                 vio_loc = ''
 
+            # 缴费状态
+            vio_pay = '-1'
+
+            # 处理状态
+            vio_deal = '-1'
+
             vio_data = {
                 'time': vio_time,
                 'position': vio_address,
@@ -357,7 +395,9 @@ def vio_dic_for_chelun(v_number, data):
                 'point': vio_point,
                 'money': vio_money,
                 'code': vio_code,
-                'location': vio_loc
+                'location': vio_loc,
+                'deal': vio_deal,
+                'pay': vio_pay
             }
 
             vio_list.append(vio_data)
@@ -389,6 +429,44 @@ def vio_dic_for_kuijia(v_number, data):
         if 'data' in data and 'peccancy' in data['data'] and len(data['data']['peccancy']) > 0 and 'peccancies' in \
                 data['data']['peccancy'][0]:
             for vio in data['data']['peccancy'][0]['peccancies']:
+                # 缴费状态
+                try:
+                    if 'paystat' in vio:
+                        vio_pay = int(vio['paystat'])
+                    else:
+                        vio_pay = -1
+                except Exception as e:
+                    print(e)
+                    vio_pay = -1
+
+                # 已经缴费的违章数据不再返回
+                if vio_pay == 2:
+                    continue
+
+                # 处理状态
+                try:
+                    if 'status' in vio:
+                        vio_deal = int(vio['status'])
+                    else:
+                        vio_deal = -1
+                except Exception as e:
+                    print(e)
+                    vio_deal = -1
+
+                if vio_deal == 3:
+                    vio_deal = '1'
+                elif vio_deal == -1:
+                    vio_deal = '-1'
+                else:
+                    vio_deal = '0'
+
+                if vio_pay == 2:
+                    vio_pay = '1'
+                elif vio_pay == -1:
+                    vio_pay = '-1'
+                else:
+                    vio_pay = '0'
+
                 # 违法时间
                 if 'peccancyTime' in vio:
                     vio_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(int(vio['peccancyTime']) / 1000))
@@ -409,13 +487,13 @@ def vio_dic_for_kuijia(v_number, data):
 
                 # 扣分
                 if 'point' in vio:
-                    vio_point = vio['point']
+                    vio_point = str(vio['point'])
                 else:
                     vio_point = ''
 
                 # 罚款
                 if 'fee' in vio:
-                    vio_money = vio['fee']
+                    vio_money = str(vio['fee'])
                 else:
                     vio_money = ''
 
@@ -438,7 +516,9 @@ def vio_dic_for_kuijia(v_number, data):
                     'point': vio_point,
                     'money': vio_money,
                     'code': vio_code,
-                    'location': vio_loc
+                    'location': vio_loc,
+                    'deal': vio_deal,
+                    'pay': vio_pay
                 }
 
                 vio_list.append(vio_data)
@@ -476,10 +556,21 @@ def save_to_loc_db(vio_data, vehicle_number, vehicle_type):
                 vio_info.vio_time = vio['time']
                 vio_info.vio_position = vio['position']
                 vio_info.vio_activity = vio['activity']
-                vio_info.vio_point = vio['point']
-                vio_info.vio_money = vio['money']
+
+                try:
+                    vio_info.vio_point = int(vio['point'])
+                except Exception as e:
+                    print(e)
+
+                try:
+                    vio_info.vio_money = int(vio['money'])
+                except Exception as e:
+                    print(e)
+
                 vio_info.vio_code = vio['code']
                 vio_info.vio_loc = vio['location']
+                vio_info.deal_status = int(vio['deal'])
+                vio_info.pay_status = int(vio['pay'])
 
                 vio_info.save()
     except Exception as e:

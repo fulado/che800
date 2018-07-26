@@ -173,21 +173,26 @@ def check_vehicle(v_number, v_type, e_code, db):
 # 根据车牌查询违章
 def get_violation_from_mongodb(v_number, v_type, db):
     try:
-        # 在现场处罚表中查询违章
-        cursor = db.ViolationUp.find({'hphm': v_number, 'hpzl': v_type})
+        # 在现场处罚表中查询违章, violation并非现场处罚表, 而是所有已处理车辆均会进入该表, 但目前表中数据非常乱, 甚至有很多重复数据
+        # 因此暂时不从该表中查询
+        # cursor = db.ViolationUp.find({'hphm': v_number, 'hpzl': v_type})
 
         # 构造返回数据
         vio_list = []
-        for item in cursor:
-            vio_info = {'code': item['wfxw'], 'time': item['wfsj'], 'position': item['wfdz'],
-                        'location': item['cljgmc'], 'deal': '', 'pay': item['jkbj']}
-            vio_list.append(vio_info)
+        # for item in cursor:
+        #     vio_info = {'code': item['wfxw'], 'time': item['wfsj'], 'position': item['wfdz'],
+        #                 'location': item['cljgmc'], 'deal': '', 'pay': item['jkbj']}
+        #     vio_list.append(vio_info)
 
         # 在非现场处罚表中查询违章
         cursor = db.SurveilUp.find({'hphm': v_number, 'hpzl': v_type})
 
         # 构造返回数据
         for item in cursor:
+            # 已交款或这无需交款数据不返回
+            if item['jkbj'] in ['1', '9']:
+                continue
+
             vio_info = {'code': item['wfxw'], 'time': item['wfsj'], 'position': item['wfdz'],
                         'location': item['cjjgmc'], 'deal': item['clbj'], 'pay': item['jkbj']}
             vio_list.append(vio_info)
