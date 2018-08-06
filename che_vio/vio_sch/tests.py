@@ -61,7 +61,7 @@ def get_vio_from_ddyc(carno, cartype, vcode, ecode):
     # param = {'plateNumber': carno, 'phone': '', 'vin': vcode, 'city': '', 'engineNo': ecode}
     param = json.dumps(param).replace(' ', '')
 
-    sign = "%s%sapp_key=%s&timestamp=%d%s" % (app_key, app_secret, app_key, timestamp, param)
+    sign = "%s%sapp_key=%s津RCZ178&timestamp=%d%s" % (app_key, app_secret, app_key, timestamp, param)
     sign = sign[::-1]
     sign = hashlib.md5(sign.encode('utf-8')).hexdigest().upper()
     print(sign)
@@ -298,6 +298,7 @@ if __name__ == '__main__':
     # pprint(response_data)
 
     create_sign('test', 'test')
+    # create_sign('pingan3', 'pingan3_init')
 
     # q = queue.Queue(maxsize=5)
     # for i in range(10):

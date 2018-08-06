@@ -17,12 +17,14 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "che_vio.settings")
 application = get_wsgi_application()
 
 
-# from apscheduler.schedulers.background import BackgroundScheduler
+from apscheduler.schedulers.background import BackgroundScheduler
 # from vio_sch.views import query_vio_auto, backup_log, reset_status
 
+from vio_sch.spider import main
+
 # 定时任务
-# scheduler = BackgroundScheduler()
-#
+scheduler = BackgroundScheduler()
+
 # 每天02:00开始, 备份并清空违章表和日志表
 # scheduler.add_job(backup_log, 'cron', hour=2, minute=0, second=0)
 #
@@ -37,5 +39,8 @@ application = get_wsgi_application()
 
 # 每天15:00, 再查一遍
 # scheduler.add_job(query_vio_auto, 'cron', hour=12, minute=23, second=0)
-#
-# scheduler.start()
+
+# 每天7:00, 爬取重庆高速违章
+scheduler.add_job(main, 'cron', hour=20, minute=32, second=0)
+
+scheduler.start()

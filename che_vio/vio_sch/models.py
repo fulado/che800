@@ -35,6 +35,7 @@ class VehicleInfo(models.Model):
     vehicle_code = models.CharField(max_length=50, blank=True, null=True)       # 车架号
     engine_code = models.CharField(max_length=50, blank=True, null=True)        # 发动机号
     status = models.IntegerField(default=0)                                     # 状态: 0-失败, 1-成功
+    spider_status = models.BooleanField(default=False)  # 爬虫状态: 0-未爬取数据, 1-已爬取重庆高速数据
     city = models.CharField(max_length=20, blank=True, null=True)               # 运营地
     update_time = models.DateTimeField(auto_now=True)                           # 更新时间
     query_counter = models.IntegerField(default=1)                              # 近7天查询违章次数

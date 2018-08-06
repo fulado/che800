@@ -59,7 +59,7 @@ DATABASES = {
 # DATABASES = {
 #     'default': {
 #         'ENGINE': 'django.db.backends.mysql',
-#         'NAME': 'violation',
+#         'NAME': 'violation',values
 #         'HOST': 'bj-cdb-gq8xi5ya.sql.tencentcdb.com',
 #         'PORT': 63226,
 #         'USER': 'root',

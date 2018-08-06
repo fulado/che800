@@ -18,6 +18,13 @@ def violation(request):
     :param request: post或get方式
     :return: 违章数据, json格式
     """
+    # 打印请求头中的所有内容
+    # hearders = request.META.items()
+    #
+    # for k, v in hearders:
+    #     print(k, v)
+    #
+    # print('*' * 50)
 
     # 判断当前时间, 每天02:00 ~ 02:20禁止查询, 系统自动日志
     current_hour = time.localtime().tm_hour
@@ -25,7 +32,7 @@ def violation(request):
 
     # 判断请求ip是否在白名单中
     if 'HTTP_X_FORWARDED_FOR' in request.META.keys():
-        user_ip = request.META['HTTP e_code=ecode_X_FORWARDED_FOR']
+        user_ip = request.META['HTTP_X_FORWARDED_FOR']
     else:
         user_ip = request.META['REMOTE_ADDR']
 
@@ -111,6 +118,7 @@ def get_violations(v_number, v_type=2, v_code='', e_code='', city='', user_id=99
     :param user_ip: 用户ip
     :return: 违章数据, json格式
     """
+
     # 将车辆类型转为int型
     v_type = int(v_type)
 
@@ -312,7 +320,7 @@ def backup_log():
 
 # 定时任务, 重置车辆违章查询状态status为0
 def reset_status():
-    VehicleInfo.objects.all().update(status=0)
+    VehicleInfo.objects.all().update(status=0, spider_status=False)
 
 
 # 定时任务, 测试
@@ -331,4 +339,4 @@ def test_task():
 
 # 负载均衡测试
 def nginx_test(request):
-    return HttpResponse('<h1>server 03</h1>')
+    return HttpResponse('<h1>server 01</h1>')
