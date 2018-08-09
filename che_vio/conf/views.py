@@ -315,10 +315,12 @@ def backup_log():
         # 关闭连接
         conn.close()
 
+        print('Initial complete')
+
 
 # 定时任务, 重置车辆违章查询状态status为0
 def reset_status():
-    VehicleInfo.objects.all().update(status=0, spider_status=False)
+    VehicleInfo.objects.all().update(status=0)
 
 
 # 定时任务, 测试

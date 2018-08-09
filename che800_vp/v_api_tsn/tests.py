@@ -209,12 +209,12 @@ if __name__ == '__main__':
     #          'carType': '02',
     #          'vinNumber': 'LSKG4AC1XFA413599'}]
 
-    cars = [{'engineNumber': '751757V',
-             'platNumber': '京HD9596',
-             'carType': '02',
-             'vinNumber': 'LGBF5AE00HR276883',
-             # 'workCity': '上海',
-             }]
+    # cars = [{'engineNumber': '751757V',
+    #          'platNumber': '京HD9596',
+    #          'carType': '02',
+    #          'vinNumber': 'LGBF5AE00HR276883',
+    #          # 'workCity': '上海',
+    #          }]
 
     # cars = [{'engineNumber': 'H17079',
     #          'platNumber': '津CC825',
@@ -231,10 +231,10 @@ if __name__ == '__main__':
     #          'carType': '02',
     #          'vinNumber': 'LSVXZ25N2G2144262'}]
 
-    # cars = [{'engineNumber': '27682130045069',
-    #          'platNumber': '津DXV189',
-    #          'carType': '02',
-    #          'vinNumber': 'LSGLP83X5HF027899'}]
+    cars = [{'engineNumber': '27682130045069',
+             'platNumber': '津DXV189',
+             'carType': '02',
+             'vinNumber': 'LSGLP83X5HF027899'}]
 
     try:
         violation_data = get_violation(cars)
@@ -256,7 +256,7 @@ if __name__ == '__main__':
     # print(json.loads(response_data.decode('utf-8')))
     # print(end_time - start_time)
 
-    create_sign('test', 'test')
+    # create_sign('test', 'test')
 
     # get_token()
 

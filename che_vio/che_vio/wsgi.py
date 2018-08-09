@@ -41,6 +41,6 @@ scheduler = BackgroundScheduler()
 # scheduler.add_job(query_vio_auto, 'cron', hour=12, minute=23, second=0)
 
 # 每天7:00, 爬取重庆高速违章
-scheduler.add_job(main, 'cron', hour=20, minute=32, second=0)
+scheduler.add_job(main, 'cron', hour=16, minute=42, second=0)
 
 scheduler.start()
