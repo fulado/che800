@@ -81,7 +81,7 @@ def violation(request):
         return JsonResponse(result)
 
     # 判断时间戳是否超时, 默认5分钟
-    if int(time.time()) - timestamp_user > 60 * 5 or int(time.time()) < timestamp_user:
+    if int(time.time()) - timestamp_user > 60 * 5 or int(time.time()) < timestamp_user - 120:
         result = {'status': 16, 'msg': '时间戳超时'}
         save_error_log(16, '时间戳超时', user.id, user_ip)
         return JsonResponse(result)
@@ -233,8 +233,6 @@ def query_vio_auto():
         t_query_thread = Thread(target=query_thread, args=(vehicle_queue,))
         t_query_thread.start()
 
-    # print('auto query complete')
-
 
 # 定时任务, 备份并初始化违章表和日志表
 def backup_log():
@@ -314,11 +312,6 @@ def backup_log():
 
         # 关闭连接
         conn.close()
-
-
-# 定时任务, 重置车辆违章查询状态status为0
-def reset_status():
-    VehicleInfo.objects.all().update(status=0, spider_status=False)
 
 
 # 定时任务, 测试

@@ -231,17 +231,17 @@ if __name__ == '__main__':
     #          'carType': '02',
     #          'vinNumber': 'LSVXZ25N2G2144262'}]
 
-    cars = [{'engineNumber': '27682130045069',
-             'platNumber': '津DXV189',
-             'carType': '02',
-             'vinNumber': 'LSGLP83X5HF027899'}]
-
-    try:
-        violation_data = get_violation(cars)
-        # violation_data = register_vehicle(cars)
-        pprint(violation_data)
-    except Exception as e:
-        print(e)
+    # cars = [{'engineNumber': '27682130045069',
+    #          'platNumber': '津DXV189',
+    #          'carType': '02',
+    #          'vinNumber': 'LSGLP83X5HF027899'}]
+    #
+    # try:
+    #     violation_data = get_violation(cars)
+    #     # violation_data = register_vehicle(cars)
+    #     pprint(violation_data)
+    # except Exception as e:
+    #     print(e)
 
     # get_violation_from_mongo()
     # vehicle_number = '津NWX388'
@@ -256,7 +256,7 @@ if __name__ == '__main__':
     # print(json.loads(response_data.decode('utf-8')))
     # print(end_time - start_time)
 
-    # create_sign('test', 'test')
+    create_sign('test', 'test')
 
     # get_token()
 

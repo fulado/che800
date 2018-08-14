@@ -64,7 +64,17 @@ def get_std_vio_data(raw_vio_data):
 
 # 保存违章结果到数据库
 def save_vio_to_db(v_number, std_vio_list):
+
     for vio_data in std_vio_list:
+
+        # 先从违章库中查询该车辆违章代码为999999的违章
+        vio_info = VioInfo.objects.filter(vehicle_number=v_number).filter(vio_code='999999')
+
+        # 如果已经存在则删除该违章数据
+        if vio_info:
+            vio_info.delete()
+
+        # 创建新的违章
         vio_info = VioInfo()
 
         try:
