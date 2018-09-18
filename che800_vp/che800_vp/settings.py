@@ -65,6 +65,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'v_api_tsn',
+    'v_data_tsn',
 ]
 
 MIDDLEWARE = [

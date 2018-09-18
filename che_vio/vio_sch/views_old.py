@@ -1120,7 +1120,10 @@ def register_service(request):
         response_data = base64.b64encode(json.dumps(response_data).encode('utf-8'))
         return HttpResponse(response_data)
 
-    response_data = vehicle_register(v_number, v_type, vin, e_code, status)
+    # 获取运营城市
+    city = v_data.get('city', '')
+
+    response_data = vehicle_register(v_number, v_type, vin, e_code, status, city)
 
     # 保存车辆注册/注销日志
     save_log_old(v_number, '', response_data, user.id, 98, user_ip)
@@ -1130,7 +1133,7 @@ def register_service(request):
 
 
 # 车辆注册/注销
-def vehicle_register(v_number, v_type, v_code, e_code, status):
+def vehicle_register(v_number, v_type, v_code, e_code, status, city):
     """
     接受用户发送的车辆信息, 根据status选择注册或注销, 1-注册, 2-注销
     :param v_number: 车牌号
@@ -1138,6 +1141,7 @@ def vehicle_register(v_number, v_type, v_code, e_code, status):
     :param v_code: 车架号
     :param e_code: 发动机号
     :param status: 注册/注销
+    :param city: 运营城市
     :return: 注册是否成功, json格式
     """
     if status not in [1, 2]:
@@ -1168,7 +1172,7 @@ def vehicle_register(v_number, v_type, v_code, e_code, status):
         # 如果车辆已经存在, 更新车辆信息
         if vehicle_set.exists():
             if not vehicle_set.filter(vehicle_code=v_code).filter(engine_code=e_code).exists():
-                vehicle_set.update(vehicle_code=v_code, engine_code=e_code,
+                vehicle_set.update(vehicle_code=v_code, engine_code=e_code, city=city,
                                    update_time=time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()))
 
                 return {'status': 21, 'message': 'register success'}
@@ -1182,6 +1186,7 @@ def vehicle_register(v_number, v_type, v_code, e_code, status):
             vehicle_info.vehicle_type = v_type
             vehicle_info.vehicle_code = v_code
             vehicle_info.engine_code = e_code
+            vehicle_info.city = city
 
             vehicle_info.save()
 
