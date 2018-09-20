@@ -41,13 +41,13 @@ def get_vio_from_loc(v_number, v_type=2):
                 continue
 
             vio_data = {
-                'time': vio.vio_time,
-                'position': vio.vio_position,
-                'activity': vio.vio_activity,
+                'time': vio.vio_time if vio.vio_time else '',
+                'position': vio.vio_position if vio.vio_position else '',
+                'activity': vio.vio_activity if vio.vio_activity else '',
                 'point': str(vio.vio_point),
                 'money': str(vio.vio_money),
-                'code': vio.vio_code,
-                'location': vio.vio_loc,
+                'code': vio.vio_code if vio.vio_code else '',
+                'location': vio.vio_loc if vio.vio_loc else '',
                 'deal': str(vio.deal_status),
                 'pay': str(vio.pay_status)
             }

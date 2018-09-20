@@ -18,7 +18,9 @@ def get_token():
     data = str({"username": 'test_old', 'password': 'test_old'})
     # url = 'http://47.94.18.47/IllegalData-search/login'
     url = 'http://127.0.0.1:8000/login'
+    # url = 'http://127.0.0.1:8000/IllegalData-search/login'
     # url = 'http://vio.che800.cc/login'
+    # url = 'http://vio.che800.cc/IllegalData-search/login'
     data = get_json(get_response_encoded_data(url, data))
     print(data)
     return data['token']
@@ -26,8 +28,10 @@ def get_token():
 
 def get_violation(car_list):
     # url = 'http://47.94.18.47/IllegalData-search/vehicle'
-    url = 'http://127.0.0.1:8000/illegal'
-    # url = 'http://vio.che800.cc/illegal'
+    # url = 'http://127.0.0.1:8000/illegal'
+    # url = 'http://127.0.0.1:8000/IllegalData-search/vehicle'
+    url = 'http://vio.che800.cc/illegal'
+    # url = 'http://vio.che800.cc/IllegalData-search/vehicle'
 
     token = get_token()
     data = json.dumps({'userId': 'test_old', 'token': token, 'cars': car_list})
@@ -42,11 +46,11 @@ def get_violation(car_list):
 
 def register_vehicle(car_list):
     # url = 'http://47.94.18.47/IllegalData-search/vehicle'
-    # url = 'http://127.0.0.1:8000/register'
-    url = 'http://vio.che800.cc/register'
+    url = 'http://127.0.0.1:8000/register'
+    # url = 'http://vio.che800.cc/register'
 
     token = get_token()
-    data = json.dumps({'userId': 'test0011', 'token': token, 'cars': car_list, 'worktype': '2'})
+    data = json.dumps({'userId': 'test_old', 'token': token, 'cars': car_list, 'worktype': '1'})
     # print(data)
     data = get_response_encoded_data(url, data)
 
@@ -204,16 +208,15 @@ if __name__ == '__main__':
     #          'carType': '02',
     #          'vinNumber': 'LSGBL5440HF090533'}]
 
-    # cars = [{'engineNumber': 'H1SF5210072',
-    #          'platNumber': '沪AYC967',
+    # cars = [{'engineNumber': '30701708',
+    #          'platNumber': '沪D26737',
     #          'carType': '02',
-    #          'vinNumber': 'LSKG4AC1XFA413599'}]
+    #          'vinNumber': 'LB1RF4491D8001380'}]
 
     # cars = [{'engineNumber': '751757V',
     #          'platNumber': '京HD9596',
     #          'carType': '02',
     #          'vinNumber': 'LGBF5AE00HR276883',
-    #          # 'workCity': '上海',
     #          }]
 
     # cars = [{'engineNumber': 'H17079',
@@ -231,17 +234,18 @@ if __name__ == '__main__':
     #          'carType': '02',
     #          'vinNumber': 'LSVXZ25N2G2144262'}]
 
-    # cars = [{'engineNumber': '27682130045069',
-    #          'platNumber': '津DXV189',
-    #          'carType': '02',
-    #          'vinNumber': 'LSGLP83X5HF027899'}]
-    #
-    # try:
-    #     violation_data = get_violation(cars)
-    #     # violation_data = register_vehicle(cars)
-    #     pprint(violation_data)
-    # except Exception as e:
-    #     print(e)
+    cars = [{'engineNumber': '915021493',
+             'platNumber': '沪FZ7166',
+             'carType': '02',
+             'vinNumber': 'LGXC76C34F0116962',
+             'city': 'da廊坊市'}]
+
+    try:
+        # violation_data = get_violation(cars)
+        violation_data = register_vehicle(cars)
+        pprint(violation_data)
+    except Exception as e:
+        print(e)
 
     # get_violation_from_mongo()
     # vehicle_number = '津NWX388'

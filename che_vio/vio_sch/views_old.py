@@ -309,15 +309,15 @@ def get_vio_from_loc_old(v_number, v_type, user_ip):
                 pay_status = -1
 
             vio_data = {
-                'reason': vio.vio_activity,
-                'viocjjg': vio.vio_loc,
+                'reason': vio.vio_activity if vio.vio_activity else '',
+                'viocjjg': vio.vio_loc if vio.vio_loc else '',
                 'punishPoint': str(vio.vio_point),
-                'location': vio.vio_position,
-                'time': vio.vio_time,
+                'location': vio.vio_position if vio.vio_position else '',
+                'time': vio.vio_time if vio.vio_time else '',
                 'punishMoney': str(vio.vio_money),
                 'paystat': str(pay_status),
                 'state': str(deal_status),
-                'viocode': vio.vio_code
+                'viocode': vio.vio_code if vio.vio_code else ''
             }
 
             vio_list.append(vio_data)
@@ -1120,7 +1120,10 @@ def register_service(request):
         response_data = base64.b64encode(json.dumps(response_data).encode('utf-8'))
         return HttpResponse(response_data)
 
-    response_data = vehicle_register(v_number, v_type, vin, e_code, status)
+    # 获取运营城市
+    city = v_data.get('city', '')
+
+    response_data = vehicle_register(v_number, v_type, vin, e_code, status, city)
 
     # 保存车辆注册/注销日志
     save_log_old(v_number, '', response_data, user.id, 98, user_ip)
@@ -1130,7 +1133,7 @@ def register_service(request):
 
 
 # 车辆注册/注销
-def vehicle_register(v_number, v_type, v_code, e_code, status):
+def vehicle_register(v_number, v_type, v_code, e_code, status, city):
     """
     接受用户发送的车辆信息, 根据status选择注册或注销, 1-注册, 2-注销
     :param v_number: 车牌号
@@ -1138,6 +1141,7 @@ def vehicle_register(v_number, v_type, v_code, e_code, status):
     :param v_code: 车架号
     :param e_code: 发动机号
     :param status: 注册/注销
+    :param city: 运营城市
     :return: 注册是否成功, json格式
     """
     if status not in [1, 2]:
@@ -1182,6 +1186,7 @@ def vehicle_register(v_number, v_type, v_code, e_code, status):
             vehicle_info.vehicle_type = v_type
             vehicle_info.vehicle_code = v_code
             vehicle_info.engine_code = e_code
+            vehicle_info.city = city
 
             vehicle_info.save()
 

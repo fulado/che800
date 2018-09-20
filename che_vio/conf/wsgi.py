@@ -19,8 +19,9 @@ application = get_wsgi_application()
 
 from apscheduler.schedulers.background import BackgroundScheduler
 from vio_sch.views import query_vio_auto, backup_log
-from vio_sch.spider import main
 from vio_sch.task import reset_status
+from vio_sch.spider import main
+
 
 # 定时任务
 scheduler = BackgroundScheduler()
@@ -32,7 +33,7 @@ scheduler.add_job(backup_log, 'cron', hour=2, minute=0, second=0)
 scheduler.add_job(reset_status, 'cron', hour=21, minute=0, second=0)
 
 # 每天02:10, 重置车辆违章查询状态status为0
-scheduler.add_job(reset_status, 'cron', hour=18, minute=48, second=0)
+scheduler.add_job(reset_status, 'cron', hour=2, minute=30, second=0)
 
 # 每天03:00, 开始查询违章数据
 scheduler.add_job(query_vio_auto, 'cron', hour=3, minute=0, second=0)
