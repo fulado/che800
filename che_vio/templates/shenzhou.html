@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>神州车辆违章相关查询</title>
+    <link rel="stylesheet" type="text/css" href="/static/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="/static/css/bootstrap-datetimepicker.min.css">
+    <script type="text/javascript" src="/static/js/jquery-1.12.4.min.js"></script>
+    <script type="text/javascript" src="/static/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="/static/js/bootstrap-datetimepicker.min.js"></script>
+    <script type="text/javascript" src="/static/js/bootstrap-datetimepicker.zh-CN.js"></script>
+    <script type="text/javascript">
+        $(function() {
+            // 日期组件初始化
+            $('.datetime-picker').datetimepicker({
+                language: 'zh-CN',          //显示中文
+                format: 'yyyy-mm-dd',       //显示格式
+                minView: 2,                 //设置只显示到月份
+                initialDate: new Date(),    //初始化当前日期
+                autoclose: true,            //选中自动关闭
+                todayBtn: true              //显示今日按钮
+            });
+        });
+    </script>
+    <style type="text/css">
+        body{
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <h1>神州违章相关查询</h1>
+    <form action="/web/shenzhou" method="get">
+        <input type="text" class="datetime-picker" name="query_time" value="{% now 'Y-m-d' %}" />
+        <input type="submit" value="查询"/>
+    </form>
+</body>
+</html>

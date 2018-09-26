@@ -1172,7 +1172,7 @@ def vehicle_register(v_number, v_type, v_code, e_code, status, city):
         # 如果车辆已经存在, 更新车辆信息
         if vehicle_set.exists():
             if not vehicle_set.filter(vehicle_code=v_code).filter(engine_code=e_code).exists():
-                vehicle_set.update(vehicle_code=v_code, engine_code=e_code,
+                vehicle_set.update(vehicle_code=v_code, engine_code=e_code, city=city,
                                    update_time=time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()))
 
                 return {'status': 21, 'message': 'register success'}
