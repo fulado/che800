@@ -1,4 +1,4 @@
-import re
+import json
 from multiprocessing import Queue
 from threading import Thread
 
@@ -33,39 +33,48 @@ PUNISH_DIC = {
 # 查询违章, 返回html
 def get_raw_vio_data(v_number, p_color=1):
 
-    url = 'http://jtzf.cq.gov.cn/jeecms/illegal.jspx'
+    url = 'http://218.70.37.217:8090/zfzd-portal/portalPayFine/searchIllegal.do'
 
     params = {
-        'plateNumber': v_number,
-        'plateColor': p_color
+        'queryType': 3,
+        'vlpNo': v_number,
+        'vlpColor': p_color
     }
 
-    response_data = requests.get(url=url, params=params)
+    response_data = requests.post(url=url, data=params)
 
     return response_data
 
 
 # 使用正则, 从html中获取违章数据
-def get_std_vio_data(raw_vio_data):
+# def get_std_vio_data(raw_vio_data):
+#
+#     p = re.compile(r'<td align="center">(.*)</td>')
+#
+#     # 获取违章数据列表
+#     vio_list = p.findall(raw_vio_data)
+#
+#     # 构造违章数据列表
+#     std_vio_list = []
+#
+#     for i in range(0, len(vio_list), 3):
+#         std_vio_list.append(vio_list[i: i+3])
+#
+#     return std_vio_list
 
-    p = re.compile(r'<td align="center">(.*)</td>')
 
-    # 获取违章数据列表
-    vio_list = p.findall(raw_vio_data)
+def get_std_vio_data(vio_json_data):
 
-    # 构造违章数据列表
-    std_vio_list = []
+    # 获取违章数据字典列表
+    vio_dic = json.loads(vio_json_data)
 
-    for i in range(0, len(vio_list), 3):
-        std_vio_list.append(vio_list[i: i+3])
-
-    return std_vio_list
+    return vio_dic.get('list')
 
 
 # 保存违章结果到数据库
-def save_vio_to_db(v_number, std_vio_list):
+def save_vio_to_db(v_number, vio_list):
 
-    for vio_data in std_vio_list:
+    for vio_data in vio_list:
 
         # 先从违章库中查询该车辆违章代码为999999的违章
         vio_info = VioInfo.objects.filter(vehicle_number=v_number).filter(vio_code='999999')
@@ -79,13 +88,17 @@ def save_vio_to_db(v_number, std_vio_list):
 
         try:
             vio_info.vehicle_number = v_number
-            vio_info.vio_time = vio_data[0]
-            vio_info.vio_position = vio_data[1]
-            vio_info.vio_activity = vio_data[2]
+            vio_info.vio_time = vio_data.get('CASE_TIME')
+            vio_info.vio_position = vio_data.get('HIGHT_WAY')
+            vio_info.vio_activity = vio_data.get('PRY_CONT')
             vio_info.vio_point = 0
             vio_money = PUNISH_DIC.get(vio_info.vio_activity, 0)
-            vio_info.vio_money = vio_money
-            vio_info.vio_loc = '重庆高速'
+
+            vio_money_query = vio_data.get('PUNISH_AMT')
+            vio_info.vio_money = vio_money_query if vio_money_query else vio_money
+
+            vio_loc = vio_data.get('PD_NO')
+            vio_info.vio_loc = vio_loc if vio_loc else '重庆高速'
 
             vio_info.save()
         except Exception as e:
@@ -123,7 +136,7 @@ def query_thread(v_queue):
                 vehicle.save()
                 # print(vio_list)
 
-            if len(vio_list) != 0:
+            if vio_list is not None:
                 save_vio_to_db(vehicle.vehicle_number, vio_list)
 
         except Exception as e:
@@ -149,4 +162,6 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    # main()
+    data = get_raw_vio_data('渝D51E90')
+    print(data)

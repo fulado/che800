@@ -17,9 +17,9 @@ class ViolationException(Exception):
 def get_token():
     data = str({"username": 'test_old', 'password': 'test_old'})
     # url = 'http://47.94.18.47/IllegalData-search/login'
-    url = 'http://127.0.0.1:8000/login'
+    # url = 'http://127.0.0.1:8000/login'
     # url = 'http://127.0.0.1:8000/IllegalData-search/login'
-    # url = 'http://vio.che800.cc/login'
+    url = 'http://vio.che800.cc/login'
     # url = 'http://vio.che800.cc/IllegalData-search/login'
     data = get_json(get_response_encoded_data(url, data))
     print(data)
@@ -234,15 +234,14 @@ if __name__ == '__main__':
     #          'carType': '02',
     #          'vinNumber': 'LSVXZ25N2G2144262'}]
 
-    cars = [{'engineNumber': '915021493',
-             'platNumber': '沪FZ7166',
+    cars = [{'engineNumber': '150570280',
+             'platNumber': '辽BD8R53',
              'carType': '02',
-             'vinNumber': 'LGXC76C34F0116962',
-             'city': 'da廊坊市'}]
+             'vinNumber': 'LSGUD84XXFE013334'}]
 
     try:
-        # violation_data = get_violation(cars)
-        violation_data = register_vehicle(cars)
+        violation_data = get_violation(cars)
+        # violation_data = register_vehicle(cars)
         pprint(violation_data)
     except Exception as e:
         print(e)
@@ -260,7 +259,7 @@ if __name__ == '__main__':
     # print(json.loads(response_data.decode('utf-8')))
     # print(end_time - start_time)
 
-    create_sign('test', 'test')
+    # create_sign('test', 'test')
 
     # get_token()
 
