@@ -23,20 +23,20 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = '_c_nkqad*5jqhc4v2%pippkzd$s7v-n52qtr#tczdh+rax9!g7'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-ALLOWED_HOSTS = []
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'violation',
-        'HOST': 'localhost',
-        'PORT': 3306,
-        'USER': 'root',
-        'PASSWORD': 'xiaobai',
-    }
-}
+# DEBUG = True
+#
+# ALLOWED_HOSTS = []
+#
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.mysql',
+#         'NAME': 'violation',
+#         'HOST': 'localhost',
+#         'PORT': 3306,
+#         'USER': 'root',
+#         'PASSWORD': 'xiaobai',
+#     }
+# }
 
 # Settings for production!
 # DEBUG = False
@@ -54,18 +54,22 @@ DATABASES = {
 #     }
 # }
 
-# Database setting for configuration
+# Database setting for configuration and test
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.mysql',
-#         'NAME': 'violation',
-#         'HOST': 'bj-cdb-gq8xi5ya.sql.tencentcdb.com',
-#         'PORT': 63226,
-#         'USER': 'root',
-#         'PASSWORD': 'Init1234',
-#     }
-# }
+DEBUG = True
+
+ALLOWED_HOSTS = []
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'violation',
+        'HOST': 'bj-cdb-gq8xi5ya.sql.tencentcdb.com',
+        'PORT': 63226,
+        'USER': 'root',
+        'PASSWORD': 'Init1234',
+    }
+}
 
 # Application definition
 

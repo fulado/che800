@@ -192,9 +192,39 @@ def get_vio_from_kuijia(v_number, v_code, e_code):
     request = urllib.request.Request(url, headers=headers, data=data.encode('utf-8'))
 
     # 获得response
-    response_data = urllib.request.urlopen(request)
+    response = urllib.request.urlopen(request)
 
-    return json.loads(response_data.read().decode('utf-8'))
+    return json.loads(response.read().decode('utf-8'))
+
+
+# 从zfb接口查询违章数据
+def get_vio_from_zfb(v_number, v_type, v_code, e_code):
+
+    # 查询url
+    url = 'https://zfbservice.xmxing.net/data_ralay_country/api_for_third/get_car_wf.php'
+
+    # 构造查询数据
+    prefix = v_number[:1]  # 车牌前缀
+    cph = v_number[1:]  # 车牌号
+    name = 'third'
+    key = hashlib.md5((cph + name + 'third123').encode()).hexdigest()
+
+    data = {'prefix': prefix, 'cph': cph, 'cjh': v_code, 'fdj': e_code, 'cx': v_type, 'name': name, 'key': key}
+
+    # url转码
+    data = urllib.parse.urlencode(data)
+
+    # 创建request请求
+    request = urllib.request.Request(url, data.encode())
+
+    try:
+        # 获得response
+        response = urllib.request.urlopen(request)
+        response = json.loads(response.read().decode('utf-8'))
+    except Exception as e:
+        print(e)
+        response = {"state": 2, "msg": "查询异常"}
+    return response
 
 
 # 通过天津接口查询结果构造标准返回数据
@@ -535,6 +565,71 @@ def vio_dic_for_kuijia(v_number, data):
     return vio_dict
 
 
+# 通过zfb接口查询结果构造标准返回数据
+def vio_dic_for_zfb(v_number, data):
+    """
+    通过车轮接口查询结构构造标准返回数据
+    :param v_number: 车牌
+    :param data: 车轮接口返回数据, dict
+    :return: 车八佰违章数据, dict
+    """
+    if data.get('state') == 0:
+        status = 0
+
+        vio_list = []
+
+        for vio in data.get('data'):
+            # 违法时间
+            vio_time = vio.get('wfsj', '')
+
+            # 违法地点
+            vio_address = vio.get('wfdz', '')
+
+            # 违法行为
+            vio_activity = vio.get('wfnr', '')
+
+            # 扣分
+            vio_point = str(vio.get('score', ''))
+
+            # 罚款
+            vio_money = str(vio.get('fkje', ''))
+
+            # 违法代码
+            vio_code = str(vio.get('wfxw', ''))
+
+            # 处理机关
+            vio_loc = ''
+
+            # 缴费状态
+            vio_pay = '-1'
+
+            # 处理状态
+            vio_deal = '-1'
+
+            vio_data = {
+                'time': vio_time,
+                'position': vio_address,
+                'activity': vio_activity,
+                'point': vio_point,
+                'money': vio_money,
+                'code': vio_code,
+                'location': vio_loc,
+                'deal': vio_deal,
+                'pay': vio_pay
+            }
+
+            vio_list.append(vio_data)
+
+        vio_dict = {'vehicleNumber': v_number, 'status': status, 'data': vio_list}
+    else:
+        if 'state' in data and 'msg' in data:
+            return get_status(data['code'], 3, data['msg'])
+        else:
+            return {'status': 53, 'msg': '查询失败'}
+
+    return vio_dict
+
+
 # 查询结果保存到本地数据库
 def save_to_loc_db(vio_data, vehicle_number, vehicle_type):
 
@@ -810,6 +905,22 @@ def create_status_from_kuijia(origin_status):
     return {'status': status, 'msg': msg}
 
 
+# zfb接口状态码
+def create_status_from_zfb(origin_msg):
+
+    if origin_msg == '发动机号错误':
+        status = 33
+        msg = '发动机号错误'
+    elif origin_msg == '发动机号错误':
+        status = 33
+        msg = '发动机号长度不足6位！'
+    else:
+        status = 51
+        msg = '数据源异常'
+
+    return {'status': status, 'msg': msg}
+
+
 # 根据不同接口的返回状态码构造本地平台返回给用户的状态码
 def get_status(origin_status, url_id, origin_msg=''):
 
@@ -828,6 +939,10 @@ def get_status(origin_status, url_id, origin_msg=''):
     # 盔甲接口
     elif url_id == 4:
         return create_status_from_kuijia(int(origin_status))
+
+    # zfb接口
+    elif url_id == 5:
+        return create_status_from_zfb(origin_msg)
 
     else:
         return {'status': 52, 'msg': '违章查询接口异常'}
@@ -867,13 +982,13 @@ if __name__ == '__main__':
     cartype = '02'
     vcode = 'LGBF5AE00HR276883'
     ecode = '751757V'
-    car2 = {'v_number': '沪AUT71', 'v_type': '02', 'v_code': 'LSKG4AC12FA411099', 'e_code': 'H1SF1220128'}
-    # response_data = get_vio_from_chelun(car2['v_number'], car2['v_type'], car2['v_code'], car2['e_code'])
+    car2 = {'v_number': '浙B78KG7', 'v_type': '02', 'v_code': 'LSVCJ2BM1HN043778', 'e_code': '415650'}
+    response_data = get_vio_from_chelun(car2['v_number'], car2['v_type'], car2['v_code'], car2['e_code'])
 
-    # response_data = get_vio_from_ddyc(v_number=carno, v_type=cartype, v_code=vcode, e_code=ecode, city='杭州市')
+    # response_data = get_vio_from_zfb(v_number=carno, v_type=cartype, v_code=vcode, e_code=ecode)
 
     # response_data = get_vio_from_tj('津N02070', '02')
-    # print(response_data)
+    print(response_data)
 
     # v_data = vio_dic_for_ddyc(carno, response_data)
     # v_data = vio_dic_for_chelun(car2['v_number'], response_data)

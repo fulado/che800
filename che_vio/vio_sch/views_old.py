@@ -4,7 +4,7 @@
 from django.http import HttpResponse
 from .models import UserInfo, VioInfo, LogInfo, VehicleInfo
 from .utils import get_vio_from_tj, get_vio_from_ddyc, get_vio_from_chelun, get_url_id, save_error_log, save_vehicle, \
-    get_vio_from_kuijia
+    get_vio_from_kuijia, get_vio_from_zfb
 import base64
 import json
 import time
@@ -248,19 +248,29 @@ def get_violations_old(v_number, v_type, v_code='', e_code='', city='', user_id=
 
         origin_data = get_vio_from_tj(v_number, v_type, e_code)
         vio_data = vio_dic_for_tj_old(v_number, origin_data, user_ip)
-
+    elif url_id == 2:
+        # 从典典接口查询违章数据, 并标准化
+        origin_data = get_vio_from_ddyc(v_number, v_type, v_code, e_code, city)
+        vio_data = vio_dic_for_ddyc_old(v_number, origin_data, user_ip)
     elif url_id == 3:
         # 从车轮接口查询违章数据, 并标准化
-        origin_data = get_vio_from_chelun(v_number, v_type, v_code, e_code)
-        vio_data = vio_dic_for_chelun_old(v_number, origin_data, user_ip)
+        # origin_data = get_vio_from_chelun(v_number, v_type, v_code, e_code)
+        # vio_data = vio_dic_for_chelun_old(v_number, origin_data, user_ip)
+        # 返回该地区不支持查询
+        origin_data = ''
+        vio_data = {'status': 41, 'message': '该城市不支持查询'}
     elif url_id == 4:
         # 从盔甲接口查询违章数据
         origin_data = get_vio_from_kuijia(v_number, v_code, e_code)
         vio_data = vio_dic_for_kuijia_old(v_number, origin_data, user_ip)
+    elif url_id == 5:
+        # 从zfb接口查询违章数据
+        origin_data = get_vio_from_zfb(v_number, v_type, v_code, e_code)
+        vio_data = vio_dic_for_zfb_old(v_number, origin_data, user_ip)
     else:
-        # 从典典接口查询违章数据, 并标准化
-        origin_data = get_vio_from_ddyc(v_number, v_type, v_code, e_code, city)
-        vio_data = vio_dic_for_ddyc_old(v_number, origin_data, user_ip)
+        # 返回该地区不支持查询
+        origin_data = ''
+        vio_data = {'status': 41, 'message': '该城市不支持查询'}
 
     # 保存日志
     save_log_old(v_number, origin_data, vio_data, user_id, url_id, user_ip, city)
@@ -832,6 +842,73 @@ def vio_dic_for_kuijia_old(v_number, data, user_ip):
     return vio_dict
 
 
+# 根据zfb返回数据构造违章数据
+def vio_dic_for_zfb_old(v_number, data, user_ip):
+
+    if data.get('state') == 0:
+        status = '0'
+
+        vio_list = []
+
+        for vio in data.get('data'):
+            # 违法时间
+            vio_time = vio.get('wfsj', '')
+
+            # 违法地点
+            vio_address = vio.get('wfdz', '')
+
+            # 违法行为
+            vio_activity = vio.get('wfnr', '')
+
+            # 扣分
+            vio_point = str(vio.get('score', ''))
+
+            # 罚款
+            vio_money = str(vio.get('fkje', ''))
+
+            # 违法代码
+            vio_code = str(vio.get('wfxw', ''))
+
+            # 处理机关
+            vio_loc = ''
+
+            vio_data = {
+                'reason': vio_activity,
+                'viocjjg': vio_loc,
+                'punishPoint': vio_point,
+                'location': vio_address,
+                'time': vio_time,
+                'punishMoney': vio_money,
+                'paystat': '-1',
+                'state': '-1',
+                'viocode': vio_code
+            }
+
+            vio_list.append(vio_data)
+
+        feedback = {
+            'cars': v_number,
+            'requestIp': user_ip,
+            'responseTime': time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+        }
+
+        result = {
+            'platNumber': v_number,
+            'punishs': vio_list,
+            'status': status
+        }
+
+        vio_dict = {'feedback': feedback, 'result': result}
+    else:
+        # 查询失败
+        status = data.get('code', 99)
+        message = data.get('msg', 'query error')
+
+        vio_dict = {'status': status, 'message': message}
+
+    return vio_dict
+
+
 # 查询结果保存到本地数据库
 def save_to_loc_db_old(vio_data, vehicle_number, vehicle_type):
 
@@ -1123,7 +1200,7 @@ def register_service(request):
     # 获取运营城市
     city = v_data.get('city', '')
 
-    response_data = vehicle_register(v_number, v_type, vin, e_code, status, city)
+    response_data = vehicle_register(v_number, v_type, vin, e_code, status, city, user.id)
 
     # 保存车辆注册/注销日志
     save_log_old(v_number, '', response_data, user.id, 98, user_ip)
@@ -1133,7 +1210,7 @@ def register_service(request):
 
 
 # 车辆注册/注销
-def vehicle_register(v_number, v_type, v_code, e_code, status, city):
+def vehicle_register(v_number, v_type, v_code, e_code, status, city, user_id):
     """
     接受用户发送的车辆信息, 根据status选择注册或注销, 1-注册, 2-注销
     :param v_number: 车牌号
@@ -1142,6 +1219,7 @@ def vehicle_register(v_number, v_type, v_code, e_code, status, city):
     :param e_code: 发动机号
     :param status: 注册/注销
     :param city: 运营城市
+    :param user_id: 用户id
     :return: 注册是否成功, json格式
     """
     if status not in [1, 2]:
@@ -1187,6 +1265,7 @@ def vehicle_register(v_number, v_type, v_code, e_code, status, city):
             vehicle_info.vehicle_code = v_code
             vehicle_info.engine_code = e_code
             vehicle_info.city = city
+            vehicle_info.user_id = user_id
 
             vehicle_info.save()
 

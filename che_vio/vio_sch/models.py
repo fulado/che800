@@ -75,3 +75,31 @@ class VehicleBackup(models.Model):
     vehicle_code = models.CharField(max_length=50, blank=True, null=True)                   # 车架号
     engine_code = models.CharField(max_length=50, blank=True, null=True)                    # 发动机号
     update_time = models.DateTimeField(auto_now=True)                                       # 更新时间
+
+
+class VehicleInfoSz(models.Model):
+    vehicle_number = models.CharField(max_length=20, blank=True, null=True)  # 号牌号码
+    vehicle_type = models.IntegerField(default=2, blank=True, null=True)  # 车辆类型
+    vehicle_code = models.CharField(max_length=50, blank=True, null=True)  # 车架号
+    engine_code = models.CharField(max_length=50, blank=True, null=True)  # 发动机号
+    status = models.IntegerField(default=99)  # 状态码: 99表示未查询，或未知问题导致的查询失败；0-查询成功
+    msg = models.CharField(max_length=50, blank=True, null=True)  # 错误信息
+    spider_status = models.BooleanField(default=False)  # 爬虫状态: 0-未爬取数据, 1-已爬取重庆高速数据
+    city = models.CharField(max_length=20, blank=True, null=True)  # 运营地
+    update_time = models.DateTimeField(auto_now=True)  # 更新时间
+    query_counter = models.IntegerField(default=1)  # 近7天查询违章次数
+    user = models.ForeignKey(UserInfo, on_delete=models.CASCADE, blank=True, null=True)  # 所属用户
+
+
+class VioInfoSz(models.Model):
+    vehicle_number = models.CharField(max_length=20, blank=True, null=True)     # 号牌号码
+    vehicle_type = models.IntegerField(default=2, blank=True, null=True)        # 车辆类型
+    vio_time = models.CharField(max_length=30, blank=True, null=True)           # 违法时间
+    vio_position = models.CharField(max_length=100, blank=True, null=True)      # 违法地点
+    vio_activity = models.CharField(max_length=100, blank=True, null=True)      # 违法行为
+    vio_point = models.IntegerField(default=0, blank=True, null=True)           # 扣分
+    vio_money = models.IntegerField(default=0, blank=True, null=True)           # 罚款
+    vio_code = models.CharField(max_length=20, blank=True, null=True)           # 违法代码
+    vio_loc = models.CharField(max_length=50, blank=True, null=True)            # 处理机关
+    deal_status = models.IntegerField(default=-1, blank=True, null=True)    # 是否已处理, 0-否, 1-是, -1-未知
+    pay_status = models.IntegerField(default=-1, blank=True, null=True)     # 是否已缴费, 0-否, 1-是, -1-未知

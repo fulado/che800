@@ -3,9 +3,10 @@ from .forms import SearchForm
 from .models import UserInfo, VehicleInfo, LogInfo
 from .utils import get_vio_from_tj, get_vio_from_chelun, get_vio_from_ddyc, vio_dic_for_ddyc, vio_dic_for_chelun,\
     save_to_loc_db, save_log, get_vio_from_loc, get_url_id, save_error_log, vio_dic_for_tj, save_vehicle,\
-    get_vio_from_kuijia, vio_dic_for_kuijia
+    get_vio_from_kuijia, vio_dic_for_kuijia, get_vio_from_zfb, vio_dic_for_zfb
 from multiprocessing import Queue
 from threading import Thread
+from django.db import connection
 import time
 import hashlib
 import pymysql
@@ -154,6 +155,9 @@ def get_violations(v_number, v_type=2, v_code='', e_code='', city='', user_id=99
 
         # 将接口返回的原始数据标准化
         vio_data = vio_dic_for_tj(origin_data)
+    elif url_id == 2:
+        origin_data = get_vio_from_ddyc(v_number, v_type, v_code, e_code, city)
+        vio_data = vio_dic_for_ddyc(v_number, origin_data)
     elif url_id == 3:
         # 从车轮接口查询违章数据, 并标准化
         origin_data = get_vio_from_chelun(v_number, v_type, v_code, e_code)
@@ -162,10 +166,14 @@ def get_violations(v_number, v_type=2, v_code='', e_code='', city='', user_id=99
         # 从盔甲接口查询违章数据
         origin_data = get_vio_from_kuijia(v_number, v_code, e_code)
         vio_data = vio_dic_for_kuijia(v_number, origin_data)
+    elif url_id == 5:
+        # 从zfb接口查询违章数据
+        origin_data = get_vio_from_zfb(v_number, v_code, e_code)
+        vio_data = vio_dic_for_zfb(v_number, origin_data)
     else:
-        # 从典典接口查询违章数据, 并标准化
-        origin_data = get_vio_from_ddyc(v_number, v_type, v_code, e_code, city)
-        vio_data = vio_dic_for_ddyc(v_number, origin_data)
+        # 返回该地区不支持查询
+        origin_data = ''
+        vio_data = {'status': 41, 'msg': '该城市不支持查询'}
 
     # 保存日志
     save_log(v_number, origin_data, vio_data, user_id, url_id, user_ip, city)
@@ -189,9 +197,26 @@ def get_vehicle_thread(v_queue):
     # 循环3次, 每次只查询之前查询失败的车辆
     for i in range(3):
         # 查询数据库中的车辆数据, 已经查询成功的不再查询
-        vehicle_list = VehicleInfo.objects.filter(status=0)
+        try:
+            connection.connection.ping()
+        except:
+            connection.close()
+        finally:
+            vehicle_list = VehicleInfo.objects.filter(status=0).exclude(vehicle_number__contains='浙')
 
         # 查询违章
+        for vehicle in vehicle_list:
+            # 将车辆信息放入队列
+            v_queue.put(vehicle, True)
+
+    for i in range(3):
+        try:
+            connection.connection.ping()
+        except:
+            connection.close()
+        finally:
+            vehicle_list = VehicleInfo.objects.filter(status=0).filter(vehicle_number__contains='浙')
+
         for vehicle in vehicle_list:
             # 将车辆信息放入队列
             v_queue.put(vehicle, True)
