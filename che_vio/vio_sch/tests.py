@@ -285,19 +285,69 @@ def get_vio_from_kuijia(v_number, v_code, e_code):
     return json.loads(response_data.read().decode('utf-8'))
 
 
+# 从少帅接口获取违章数据
+def get_vio_from_shaoshuai(v_number, v_type, v_code, e_code):
+
+    # 构造查询数据
+    username = 'HC'
+    password = 'HC'
+    timestamp = int(time.time())
+    # 0707f5a313c02f9962dfc5ee76dca41a
+    # timestamp = 1547453000
+    car_type = v_type
+    area = v_number[0]
+
+    cypo_password = hashlib.md5(password.encode()).hexdigest().upper()
+
+    sign = username + cypo_password + v_number + e_code + v_code + car_type + area + str(timestamp)
+
+    sign = hashlib.md5(sign.encode()).hexdigest()
+
+    print(timestamp)
+    print(sign)
+
+    data = {'username': username,
+            'carNum': v_number,
+            'engineNumber': e_code,
+            'vin': v_code,
+            'carType': car_type,
+            'area': area,
+            'time': timestamp,
+            'sign': sign
+            }
+
+    data = urllib.parse.urlencode(data)
+
+    # 构造完整查询url
+    url = 'http://119.23.239.229/IllegalQuery/user/userApi'
+
+    # 请求头
+    headers = {'Content-type': 'application/x-www-form-urlencoded; charset=UTF-8'}
+
+    # 创建request请求
+    request = urllib.request.Request(url, headers=headers, data=data.encode())
+
+    # 获得response
+    response_data = urllib.request.urlopen(request)
+
+    return json.loads(response_data.read().decode('utf-8'))
+
+
 if __name__ == '__main__':
     # car2 = {'v_number': '京HD9596', 'v_type': '02', 'v_code': 'LGBF5AE00HR276883', 'e_code': '751757V'}
     # car2 = {'v_number': '苏AQ6R59', 'v_type': '02', 'v_code': 'LSGUD84X3FE009951', 'e_code': '150330725'}
     # car2 = {'v_number': '沪E59583', 'v_type': '02', 'v_code': 'LTVBJ874960003131', 'e_code': '5GRC044604'}
     # car2 = {'v_number': '沪AYC335', 'v_type': '02', 'v_code': 'LSKG4AC11FA413877', 'e_code': 'H1SF5250141'}
+    # car2 = {'v_number': '沪ABT031', 'v_type': '02', 'v_code': '', 'e_code': '132111162'}
+    car2 = {'v_number': '沪AWG702', 'v_type': '02', 'v_code': '', 'e_code': '150480531'}
     #
     # response_data = get_vio_from_chelun(car2['v_number'], car2['v_type'], car2['v_code'], car2['e_code'])
     #
-    # response_data = get_vio_from_ddyc2(car2['v_number'], car2['v_type'], car2['v_code'], car2['e_code'])
+    response_data = get_vio_from_shaoshuai(car2['v_number'], car2['v_type'], car2['v_code'], car2['e_code'])
     #
-    # pprint(response_data)
+    pprint(response_data)
 
-    create_sign('test', 'test')
+    # create_sign('test', 'test')
     # create_sign('pingan3', 'pingan3_init')
 
     # q = queue.Queue(maxsize=5)

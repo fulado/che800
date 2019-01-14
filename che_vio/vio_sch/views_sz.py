@@ -16,7 +16,7 @@ from django.db import connection
 from .models import UserInfo, VehicleInfoSz, VioInfoSz
 from .utils import save_error_log, save_log, get_url_id, get_vio_from_loc, get_vio_from_tj, get_vio_from_ddyc, \
     get_vio_from_chelun, get_vio_from_kuijia, get_vio_from_zfb, vio_dic_for_tj, vio_dic_for_ddyc, vio_dic_for_chelun, \
-    vio_dic_for_kuijia, vio_dic_for_zfb
+    vio_dic_for_kuijia, vio_dic_for_zfb, save_to_loc_db
 from .views_old import save_log_old
 
 
@@ -254,7 +254,7 @@ def get_vio_from_loc_sz(v_number, v_type, user_ip):
         vio_info_list = VioInfoSz.objects.filter(vehicle_number=v_number).filter(vehicle_type=v_type)
     except Exception as e:
         print(e)
-        return {'status': '99', 'message': '其它错误'}
+        return {'status': '82', 'message': '其它错误'}
 
     # 如果有数据, 构造违章信息
     if vio_info_list:
@@ -549,6 +549,7 @@ def get_violations(v_number, v_type=2, v_code='', e_code='', city='', user_id=99
 
         # 保存日志
         save_log(v_number, '', '', user_id, 99, user_ip, city)
+        save_to_loc_db_sz(vio_data, v_number, int(v_type))
 
         return vio_data
 
@@ -595,19 +596,18 @@ def get_violations(v_number, v_type=2, v_code='', e_code='', city='', user_id=99
 
     # 保存日志
     save_log(v_number, origin_data, vio_data, user_id, url_id, user_ip, city)
-
     # 如果查询成功
     if vio_data['status'] == 0:
-
         # 保存违章数据到本地数据库
         save_to_loc_db(vio_data, v_number, int(v_type))
+        save_to_loc_db_sz(vio_data, v_number, int(v_type))
 
     # 不能直接返回data, 应该把data再次封装后再返回
     return vio_data
 
 
 # 查询结果保存到本地数据库
-def save_to_loc_db(vio_data, vehicle_number, vehicle_type):
+def save_to_loc_db_sz(vio_data, vehicle_number, vehicle_type):
 
     try:
         # 如果没有违章, 创建一条只包含车牌和车辆类型的数据
@@ -654,6 +654,7 @@ def get_vehicle_thread(v_queue):
     # 循环3次, 每次只查询之前查询失败的车辆
     for i in range(3):
         # 查询数据库中的车辆数据, 已经查询成功的不再查询
+        # print("非浙牌%d" % i)
         try:
             connection.connection.ping()
         except:
@@ -665,11 +666,13 @@ def get_vehicle_thread(v_queue):
         # 查询违章
         for vehicle in vehicle_list:
             # 将车辆信息放入队列
+            # print("装入: %s" % vehicle.vehicle_number)
             v_queue.put(vehicle, True)
 
-        time.sleep(600)
+        time.sleep(20)
 
     for i in range(3):
+        # print("浙牌%d" % i)
         try:
             connection.connection.ping()
         except:
@@ -680,9 +683,10 @@ def get_vehicle_thread(v_queue):
 
         for vehicle in vehicle_list:
             # 将车辆信息放入队列
+            # print("装入: %s" % vehicle.vehicle_number)
             v_queue.put(vehicle, True)
 
-        time.sleep(600)
+        time.sleep(20)
 
 
 # 违章查询线程
@@ -690,14 +694,14 @@ def query_thread(v_queue):
     while True:
         try:
             # print('query thread %d start' % t_id)
-            vehicle = v_queue.get(True, 5)
-            # print(vehicle.vehicle_number)
+            vehicle = v_queue.get(True, 70)
+
             data = get_violations(vehicle.vehicle_number, vehicle.vehicle_type, vehicle.vehicle_code,
                                   vehicle.engine_code, vehicle.city)
 
-            # 如果查询成功, 将车辆查询状态置为1
+            # 如果查询成功, 将车辆查询状态置为0
             vehicle.status = data.get('status', 99)
-            vehicle.msg = data.get('message', '')
+            vehicle.msg = data.get('msg', '')
             vehicle.save()
         except Exception as e:
             print(e)
