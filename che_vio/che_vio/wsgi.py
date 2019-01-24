@@ -42,7 +42,7 @@ scheduler.add_job(query_vio_auto, 'cron', hour=3, minute=0, second=0)
 scheduler.add_job(query_vio_auto, 'cron', hour=10, minute=0, second=0)
 
 # 每天15:00, 再查一遍
-scheduler.add_job(query_vio_auto, 'cron', hour=15, minute=0, second=0)
+scheduler.add_job(query_vio_auto, 'cron', hour=16, minute=39, second=0)
 
 # 每天18:00, 爬取重庆高速违章
 scheduler.add_job(main, 'cron', hour=18, minute=0, second=0)
@@ -50,6 +50,14 @@ scheduler.add_job(main, 'cron', hour=18, minute=0, second=0)
 # 每周日、周三2:30开启自动任务
 scheduler.add_job(query_vio_auto_sz, 'cron', day_of_week='wed', hour=2, minute=30, second=0)
 scheduler.add_job(query_vio_auto_sz, 'cron', day_of_week='sun', hour=2, minute=30, second=0)
+
+# 每周日、周三12:30开启自动任务
+scheduler.add_job(query_vio_auto_sz, 'cron', day_of_week='wed', hour=12, minute=30, second=0)
+scheduler.add_job(query_vio_auto_sz, 'cron', day_of_week='sun', hour=12, minute=30, second=0)
+
+# 每周日、周三19:30开启自动任务
+scheduler.add_job(query_vio_auto_sz, 'cron', day_of_week='wed', hour=19, minute=30, second=0)
+scheduler.add_job(query_vio_auto_sz, 'cron', day_of_week='sun', hour=19, minute=30, second=0)
 
 # scheduler.add_job(query_vio_auto_sz, 'cron', hour=17, minute=24, second=0)
 

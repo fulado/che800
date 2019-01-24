@@ -333,19 +333,152 @@ def get_vio_from_shaoshuai(v_number, v_type, v_code, e_code):
     return json.loads(response_data.read().decode('utf-8'))
 
 
+# 通过少帅接口查询结果构造标准返回数据
+def vio_dic_for_shaoshuai(v_number, data):
+    """
+    通过少帅接口查询结构构造标准返回数据
+    :param v_number: 车牌
+    :param data: 少帅接口返回数据, dict
+    :return: 车八佰违章数据, dict
+    """
+
+    if 'state' in data and 'success' in data['state']:
+        status = 0
+
+        vio_list = []
+        if 'result' in data and 'historys' in data['result']:
+            for vio in data['result']['historys']:
+                # 缴费状态
+                try:
+                    if 'fine_status' in vio:
+                        if '未缴款' in vio['fine_status']:
+                            vio_pay = 0
+                        elif '已缴款' in vio['fine_status']:
+                            vio_pay = 1
+                        else:
+                            vio_pay = -1
+                    else:
+                        vio_pay = -1
+                except Exception as e:
+                    print(e)
+                    vio_pay = -1
+
+                # 已经缴费的违章数据不再返回
+                if vio_pay == 1:
+                    continue
+
+                # 违法时间
+                if 'occur_date' in vio:
+                    vio_time = vio['occur_date']
+                else:
+                    vio_time = ''
+
+                # 违法地点
+                if 'occur_area' in vio:
+                    vio_address = vio['occur_area']
+                else:
+                    vio_address = ''
+
+                # 违法行为
+                if 'info' in vio:
+                    vio_activity = vio['info']
+                else:
+                    vio_activity = ''
+
+                # 扣分
+                if 'fen' in vio:
+                    vio_point = str(vio['fen'])
+                else:
+                    vio_point = ''
+
+                # 罚款
+                if 'money' in vio:
+                    vio_money = str(vio['money'])
+                else:
+                    vio_money = ''
+
+                # 违法代码
+                if 'illegal_code' in vio:
+                    vio_code = vio['illegal_code']
+                else:
+                    vio_code = ''
+
+                # 处理机关
+                if 'officer' in vio:
+                    vio_loc = vio['officer']
+                else:
+                    vio_loc = ''
+
+                # 处理状态
+                try:
+                    if 'fine_status' in vio:
+                        if '未处理' in vio['fine_status']:
+                            vio_deal = 0
+                        elif '已处理' in vio['fine_status']:
+                            vio_deal = 1
+                        else:
+                            vio_deal = -1
+                    else:
+                        vio_deal = -1
+                except Exception as e:
+                    print(e)
+                    vio_deal = -1
+
+                vio_data = {
+                    'time': vio_time,
+                    'position': vio_address,
+                    'activity': vio_activity,
+                    'point': vio_point,
+                    'money': vio_money,
+                    'code': vio_code,
+                    'location': vio_loc,
+                    'deal': vio_deal,
+                    'pay': vio_pay
+                }
+
+                vio_list.append(vio_data)
+
+        vio_dict = {'vehicleNumber': v_number, 'status': status, 'data': vio_list}
+    else:
+        if 'error_code' in data and 'error_message' in data:
+            return get_status(data['error_code'], 6)
+        else:
+            return {'status': 53, 'msg': '查询失败'}
+
+    return vio_dict
+
+
+# 根据少帅接口的返回状态码构造本地平台返回给用户的状态码
+def create_status_from_shaoshuai(origin_status):
+    if origin_status == 50016:
+        status = 32
+        msg = '车牌号或车辆类型错误'
+    elif origin_status == 50200:
+        status = 36
+        msg = '车辆信息不正确'
+    else:
+        status = 51
+        msg = '数据源异常'
+
+    return {'status': status, 'msg': msg}
+
+
 if __name__ == '__main__':
     # car2 = {'v_number': '京HD9596', 'v_type': '02', 'v_code': 'LGBF5AE00HR276883', 'e_code': '751757V'}
     # car2 = {'v_number': '苏AQ6R59', 'v_type': '02', 'v_code': 'LSGUD84X3FE009951', 'e_code': '150330725'}
     # car2 = {'v_number': '沪E59583', 'v_type': '02', 'v_code': 'LTVBJ874960003131', 'e_code': '5GRC044604'}
     # car2 = {'v_number': '沪AYC335', 'v_type': '02', 'v_code': 'LSKG4AC11FA413877', 'e_code': 'H1SF5250141'}
+    # car2 = {'v_number': '陕AS71N5', 'v_type': '02', 'v_code': 'LSVNB418XGN043525', 'e_code': '480843'}
     # car2 = {'v_number': '沪ABT031', 'v_type': '02', 'v_code': '', 'e_code': '132111162'}
-    car2 = {'v_number': '沪AWG702', 'v_type': '02', 'v_code': '', 'e_code': '150480531'}
+    car2 = {'v_number': '冀A173SZ', 'v_type': '02', 'v_code': 'LJDLAA293D0223021', 'e_code': 'D5566502'}
     #
-    # response_data = get_vio_from_chelun(car2['v_number'], car2['v_type'], car2['v_code'], car2['e_code'])
+    response_data = get_vio_from_chelun(car2['v_number'], car2['v_type'], car2['v_code'], car2['e_code'])
     #
-    response_data = get_vio_from_shaoshuai(car2['v_number'], car2['v_type'], car2['v_code'], car2['e_code'])
-    #
+    # response_data = get_vio_from_ddyc2(car2['v_number'], car2['v_type'], car2['v_code'], car2['e_code'])
     pprint(response_data)
+    #
+    # response_data = vio_dic_for_shaoshuai(car2['v_number'], response_data)
+    # pprint(response_data)
 
     # create_sign('test', 'test')
     # create_sign('pingan3', 'pingan3_init')

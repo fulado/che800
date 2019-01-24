@@ -4,7 +4,7 @@
 from django.http import HttpResponse
 from .models import UserInfo, VioInfo, LogInfo, VehicleInfo
 from .utils import get_vio_from_tj, get_vio_from_ddyc, get_vio_from_chelun, get_url_id, save_error_log, save_vehicle, \
-    get_vio_from_kuijia, get_vio_from_zfb
+    get_vio_from_kuijia, get_vio_from_zfb, get_vio_from_shaoshuai
 import base64
 import json
 import time
@@ -258,7 +258,7 @@ def get_violations_old(v_number, v_type, v_code='', e_code='', city='', user_id=
         # vio_data = vio_dic_for_chelun_old(v_number, origin_data, user_ip)
         # 返回该地区不支持查询
         origin_data = ''
-        vio_data = {'status': 41, 'message': '该城市不支持查询'}
+        vio_data = {'status': 51, 'message': '数据源异常'}  # 因为浙江接口查询很慢，为了防止浙江数据造成神州一直查不完
     elif url_id == 4:
         # 从盔甲接口查询违章数据
         origin_data = get_vio_from_kuijia(v_number, v_code, e_code)
@@ -267,6 +267,10 @@ def get_violations_old(v_number, v_type, v_code='', e_code='', city='', user_id=
         # 从zfb接口查询违章数据
         origin_data = get_vio_from_zfb(v_number, v_type, v_code, e_code)
         vio_data = vio_dic_for_zfb_old(v_number, origin_data, user_ip)
+    elif url_id == 6:
+        # 从少帅接口查询违章数据
+        origin_data = get_vio_from_shaoshuai(v_number, v_type, v_code, e_code)
+        vio_data = vio_dic_for_shaoshuai_old(v_number, origin_data, user_ip)
     else:
         # 返回该地区不支持查询
         origin_data = ''
@@ -909,6 +913,142 @@ def vio_dic_for_zfb_old(v_number, data, user_ip):
     return vio_dict
 
 
+# 根据少帅返回数据构造违章数据
+def vio_dic_for_shaoshuai_old(v_number, data, user_ip):
+    if data.get('state', '') == 'success':
+        status = '0'
+        vio_list = []
+        if 'historys' in data.get('result', ''):
+            for vio in data['result']['historys']:
+                # 缴费状态
+                try:
+                    if '未缴款' in vio.get('fine_status', ''):
+                        vio_pay = 0
+                    elif '已缴款' in vio.get('fine_status', ''):
+                        vio_pay = 1
+                    else:
+                        vio_pay = -1
+                except Exception as e:
+                    print(e)
+                    vio_pay = -1
+
+                # 已经缴费的违章数据不再返回
+                if vio_pay == 1:
+                    continue
+
+                # 违法时间
+                if 'occur_date' in vio:
+                    vio_time = vio['occur_date']
+                else:
+                    vio_time = ''
+
+                # 违法地点
+                if 'occur_area' in vio:
+                    vio_address = vio['occur_area']
+                else:
+                    vio_address = ''
+
+                # 违法行为
+                if 'info' in vio:
+                    vio_activity = vio['info']
+                else:
+                    vio_activity = ''
+
+                # 扣分
+                if 'fen' in vio:
+                    vio_point = vio['fen']
+                else:
+                    vio_point = ''
+
+                # 罚款
+                if 'money' in vio:
+                    vio_money = vio['money']
+                else:
+                    vio_money = ''
+
+                # 处理机关
+                if 'officer' in vio:
+                    vio_loc = vio['officer']
+                else:
+                    vio_loc = ''
+
+                # 违法代码
+                if 'illegal_code' in vio:
+                    vio_code = vio['illegal_code']
+                else:
+                    vio_code = ''
+
+                # 违法处理状态
+                try:
+                    if 'processStatus' in vio:
+                        vio_status = vio['processStatus']
+                    else:
+                        vio_status = -1
+                except Exception as e:
+                    print(e)
+                    vio_status = -1
+
+                try:
+                    if '未处理' in vio.get('fine_status', ''):
+                        vio_status = 0
+                    elif '已处理' in vio.get('fine_status', ''):
+                        vio_status = 1
+                    else:
+                        vio_status = -1
+                except Exception as e:
+                    print(e)
+                    vio_status = -1
+
+                vio_data = {
+                    'reason': vio_activity,
+                    'viocjjg': vio_loc,
+                    'punishPoint': str(vio_point),
+                    'location': str(vio_address),
+                    'time': vio_time,
+                    'punishMoney': vio_money,
+                    'paystat': str(vio_pay),
+                    'state': str(vio_status),
+                    'viocode': vio_code
+                }
+
+                vio_list.append(vio_data)
+
+        feedback = {
+            'cars': v_number,
+            'requestIp': user_ip,
+            'responseTime': time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+        }
+
+        result = {
+            'platNumber': v_number,
+            'punishs': vio_list,
+            'status': status
+        }
+
+        vio_dict = {'feedback': feedback, 'result': result}
+    else:
+        # 查询失败
+        if 'error_code' in data:
+            origin_status = data['error_code']
+
+            if origin_status == '50016':
+                status = 32
+                message = '车牌号或车辆类型错误'
+            elif origin_status == '50200':
+                status = 36
+                message = '车辆信息不正确'
+            else:
+                status = 51
+                message = '数据源异常'
+        else:
+            status = 99
+            message = '其它错误'
+
+        vio_dict = {'status': status, 'message': message}
+
+    return vio_dict
+
+
 # 查询结果保存到本地数据库
 def save_to_loc_db_old(vio_data, vehicle_number, vehicle_type):
 
@@ -1056,6 +1196,12 @@ def save_log_old(v_number, origin_data, vio_data, user_id, url_id, user_ip, city
 
             if 'message' in origin_data:
                 log_info.origin_msg = origin_data['message']
+
+        elif url_id == 6:
+
+            # 少帅接口
+            log_info.origin_status = origin_data.get('error_code', '')
+            log_info.origin_msg = origin_data.get('error_message', '')
 
     # 保存日志到数据库
     try:

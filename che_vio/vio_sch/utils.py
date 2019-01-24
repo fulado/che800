@@ -227,6 +227,48 @@ def get_vio_from_zfb(v_number, v_type, v_code, e_code):
     return response
 
 
+# 从少帅接口获取违章数据
+def get_vio_from_shaoshuai(v_number, v_type, v_code, e_code):
+
+    # 构造查询数据
+    username = 'HC'
+    password = 'HC'
+    timestamp = int(time.time())
+    car_type = v_type
+    area = v_number[0]
+
+    cypo_password = hashlib.md5(password.encode()).hexdigest().upper()
+
+    sign = username + cypo_password + v_number + e_code + v_code + car_type + area + str(timestamp)
+    sign = hashlib.md5(sign.encode()).hexdigest()
+
+    data = {'username': username,
+            'carNum': v_number,
+            'engineNumber': e_code,
+            'vin': v_code,
+            'carType': car_type,
+            'area': area,
+            'time': timestamp,
+            'sign': sign
+            }
+
+    data = urllib.parse.urlencode(data)
+
+    # 构造完整查询url
+    url = 'http://119.23.239.229/IllegalQuery/user/userApi'
+
+    # 请求头
+    headers = {'Content-type': 'application/x-www-form-urlencoded; charset=UTF-8'}
+
+    # 创建request请求
+    request = urllib.request.Request(url, headers=headers, data=data.encode())
+
+    # 获得response
+    response_data = urllib.request.urlopen(request)
+
+    return json.loads(response_data.read().decode('utf-8'))
+
+
 # 通过天津接口查询结果构造标准返回数据
 def vio_dic_for_tj(data):
     if 'status' in data and data['status'] == 0:
@@ -630,6 +672,121 @@ def vio_dic_for_zfb(v_number, data):
     return vio_dict
 
 
+# 通过少帅接口查询结果构造标准返回数据
+def vio_dic_for_shaoshuai(v_number, data):
+    """
+    通过少帅接口查询结构构造标准返回数据
+    :param v_number: 车牌
+    :param data: 少帅接口返回数据, dict
+    :return: 车八佰违章数据, dict
+    """
+
+    if 'state' in data and 'success' in data['state']:
+        status = 0
+
+        vio_list = []
+        if 'result' in data and 'historys' in data['result']:
+            for vio in data['result']['historys']:
+                # 缴费状态
+                try:
+                    if 'fine_status' in vio:
+                        if '未缴款' in vio['fine_status']:
+                            vio_pay = 0
+                        elif '已缴款' in vio['fine_status']:
+                            vio_pay = 1
+                        else:
+                            vio_pay = -1
+                    else:
+                        vio_pay = -1
+                except Exception as e:
+                    print(e)
+                    vio_pay = -1
+
+                # 已经缴费的违章数据不再返回
+                if vio_pay == 1:
+                    continue
+
+                # 违法时间
+                if 'occur_date' in vio:
+                    vio_time = vio['occur_date']
+                else:
+                    vio_time = ''
+
+                # 违法地点
+                if 'occur_area' in vio:
+                    vio_address = vio['occur_area']
+                else:
+                    vio_address = ''
+
+                # 违法行为
+                if 'info' in vio:
+                    vio_activity = vio['info']
+                else:
+                    vio_activity = ''
+
+                # 扣分
+                if 'fen' in vio:
+                    vio_point = str(vio['fen'])
+                else:
+                    vio_point = ''
+
+                # 罚款
+                if 'money' in vio:
+                    vio_money = str(vio['money'])
+                else:
+                    vio_money = ''
+
+                # 违法代码
+                if 'illegal_code' in vio:
+                    vio_code = vio['illegal_code']
+                else:
+                    vio_code = ''
+
+                # 处理机关
+                if 'officer' in vio:
+                    vio_loc = vio['officer']
+                else:
+                    vio_loc = ''
+
+                # 处理状态
+                try:
+                    if 'fine_status' in vio:
+                        if '未处理' in vio['fine_status']:
+                            vio_deal = 0
+                        elif '已处理' in vio['fine_status']:
+                            vio_deal = 1
+                        else:
+                            vio_deal = -1
+                    else:
+                        vio_deal = -1
+                except Exception as e:
+                    print(e)
+                    vio_deal = -1
+
+                vio_data = {
+                    'time': vio_time,
+                    'position': vio_address,
+                    'activity': vio_activity,
+                    'point': vio_point,
+                    'money': vio_money,
+                    'code': vio_code,
+                    'location': vio_loc,
+                    'deal': vio_deal,
+                    'pay': vio_pay
+                }
+
+                vio_list.append(vio_data)
+
+        vio_dict = {'vehicleNumber': v_number, 'status': status, 'data': vio_list}
+    else:
+        if 'error_code' in data and 'error_message' in data:
+            return get_status(data['error_code'], 6)
+        else:
+            return {'status': 53, 'msg': '查询失败'}
+
+    return vio_dict
+
+
 # 查询结果保存到本地数据库
 def save_to_loc_db(vio_data, vehicle_number, vehicle_type):
 
@@ -753,6 +910,12 @@ def save_log(v_number, origin_data, vio_data, user_id, url_id, user_ip, city='')
 
             if 'message' in origin_data:
                 log_info.origin_msg = origin_data['message']
+
+        elif url_id == 6:
+
+            # 少帅接口
+            log_info.origin_status = origin_data.get('error_code', '')
+            log_info.origin_msg = origin_data.get('error_message', '')
 
     # 保存日志到数据库
     try:
@@ -921,6 +1084,21 @@ def create_status_from_zfb(origin_msg):
     return {'status': status, 'msg': msg}
 
 
+# 根据少帅接口的返回状态码构造本地平台返回给用户的状态码
+def create_status_from_shaoshuai(origin_status):
+    if origin_status == 50016:
+        status = 32
+        msg = '车牌号或车辆类型错误'
+    elif origin_status == 50200:
+        status = 36
+        msg = '车辆信息不正确'
+    else:
+        status = 51
+        msg = '数据源异常'
+
+    return {'status': status, 'msg': msg}
+
+
 # 根据不同接口的返回状态码构造本地平台返回给用户的状态码
 def get_status(origin_status, url_id, origin_msg=''):
 
@@ -943,6 +1121,10 @@ def get_status(origin_status, url_id, origin_msg=''):
     # zfb接口
     elif url_id == 5:
         return create_status_from_zfb(origin_msg)
+
+    # 少帅接口
+    elif url_id == 6:
+        return create_status_from_shaoshuai(int(origin_status))
 
     else:
         return {'status': 52, 'msg': '违章查询接口异常'}

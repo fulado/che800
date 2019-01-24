@@ -3,7 +3,8 @@ from .forms import SearchForm
 from .models import UserInfo, VehicleInfo, LogInfo
 from .utils import get_vio_from_tj, get_vio_from_chelun, get_vio_from_ddyc, vio_dic_for_ddyc, vio_dic_for_chelun,\
     save_to_loc_db, save_log, get_vio_from_loc, get_url_id, save_error_log, vio_dic_for_tj, save_vehicle,\
-    get_vio_from_kuijia, vio_dic_for_kuijia, get_vio_from_zfb, vio_dic_for_zfb
+    get_vio_from_kuijia, vio_dic_for_kuijia, get_vio_from_zfb, vio_dic_for_zfb, get_vio_from_shaoshuai, \
+    vio_dic_for_shaoshuai
 from multiprocessing import Queue
 from threading import Thread
 from django.db import connection
@@ -170,6 +171,10 @@ def get_violations(v_number, v_type=2, v_code='', e_code='', city='', user_id=99
         # 从zfb接口查询违章数据
         origin_data = get_vio_from_zfb(v_number, v_code, e_code)
         vio_data = vio_dic_for_zfb(v_number, origin_data)
+    elif url_id == 6:
+        # 从少帅接口查询违章数据
+        origin_data = get_vio_from_shaoshuai(v_number, v_type, v_code, e_code)
+        vio_data = vio_dic_for_shaoshuai(v_number, origin_data)
     else:
         # 返回该地区不支持查询
         origin_data = ''
@@ -239,6 +244,7 @@ def query_thread(v_queue):
 
         except Exception as e:
             print(e)
+            print('Auto query complete.')
             break
 
 
@@ -355,4 +361,4 @@ def test_task():
 
 # 负载均衡测试
 def nginx_test(request):
-    return HttpResponse('<h1>server 01</h1>')
+    return HttpResponse('<h1>server 03</h1>')

@@ -15,29 +15,29 @@ class ViolationException(Exception):
 
 
 def get_token():
-    data = str({"username": 'shenzhou_vio', 'password': 'shenzhou_vio'})
-    url = 'http://58.87.123.72/login/shenzhou'
+    data = str({"username": 'test_old', 'password': 'test_old'})
+    # url = 'http://58.87.123.72/login/shenzhou'
     # url = 'http://illegal.ethane.com.cn:20900/violation-point/login'
     # url = 'http://58.87.123.72/login'
     # url = 'http://127.0.0.1:8000/login/shenzhou'
     # url = 'http://vio.che800.cc/login'
-    # url = 'http://vio.che800.cc/IllegalData-search/login'
+    url = 'http://58.87.123.72/IllegalData-search/login'
     data = get_json(get_response_encoded_data(url, data))
     print(data)
     return data['token']
 
 
 def get_violation(car_list):
-    url = 'http://58.87.123.72/illegal/shenzhou'
+    # url = 'http://58.87.123.72/illegal/shenzhou'
     # url = 'http://illegal.ethane.com.cn:20900/violation-point/illgledata/vehicleDate'
     # url = 'http://58.87.123.72/illegal'
     # url = 'http://127.0.0.1:8000/illegal/shenzhou'
     # url = 'http://vio.che800.cc/illegal'
-    # url = 'http://vio.che800.cc/IllegalData-search/vehicle'
+    url = 'http://58.87.123.72/IllegalData-search/vehicle'
 
     token = get_token()
     # token = '4589427C530383B4CAF85243E2B42DA3'
-    data = json.dumps({'userId': 'shenzhou_vio', 'token': token, 'cars': car_list})
+    data = json.dumps({'userId': 'test_old', 'token': token, 'cars': car_list})
     # print(data)
     data = get_response_encoded_data(url, data)
     # print(data)
@@ -236,10 +236,10 @@ if __name__ == '__main__':
     #          'carType': '02',
     #          'vinNumber': 'LSGBL5440HF090533'}]
 
-    # cars = [{'engineNumber': '30701708',
-    #          'platNumber': '沪D26737',
-    #          'carType': '02',
-    #          'vinNumber': 'LB1RF4491D8001380'}]
+    cars = [{'engineNumber': 'H1SG4020109',
+             'platNumber': '沪BBH772',
+             'carType': '02',
+             'vinNumber': 'LB1RF4491D8001380'}]
 
     # cars = [{'engineNumber': '751757V',
     #          'platNumber': '京HD9596',
@@ -275,17 +275,17 @@ if __name__ == '__main__':
     #          'platNumber': '津HVR531',
     #          'carType': '02'}]
 
-    cars = [{'engineNumber': '163143227',
-             'platNumber': '京Q0Q9N6',
-             'carType': '02',
-             'vinNumber': 'LSGJB84J6HY033957'}]
+    # cars = [{'engineNumber': '163143227',
+    #          'platNumber': '京Q0Q9N6',
+    #          'carType': '02',
+    #          'vinNumber': 'LSGJB84J6HY033957'}]
 
-    # try:
-    #     violation_data = get_violation(cars)
-    #     # violation_data = register_vehicle(cars)
-    #     pprint(violation_data)
-    # except Exception as e:
-    #     print(e)
+    try:
+        violation_data = get_violation(cars)
+        # violation_data = register_vehicle(cars)
+        pprint(violation_data)
+    except Exception as e:
+        print(e)
 
     # get_violation_from_mongo()
     # vehicle_number = '津NWX388'
@@ -304,7 +304,7 @@ if __name__ == '__main__':
 
     # get_token()
 
-    test_vio()
+    # test_vio()
 
     # test_vio_query()
 
