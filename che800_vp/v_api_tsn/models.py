@@ -9,6 +9,7 @@ class UserInfo(models.Model):
     password = models.CharField(max_length=50)                                  # 密码
     valid_date = models.DateTimeField(default='2099-2-24 00:00:00')             # 帐号有效期
     full_name = models.CharField(max_length=50, null=True, blank=True)          # 名称全称
+    timestamp = models.IntegerField(default=0)
 
 
 # ip白名单

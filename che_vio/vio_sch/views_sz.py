@@ -245,7 +245,11 @@ def get_vio_from_loc_sz(v_number, v_type, user_ip):
     try:
         vehicle_info = VehicleInfoSz.objects.filter(vehicle_number=v_number).get(vehicle_type=v_type)
         if vehicle_info.status != 0:
-            return {'status': vehicle_info.status, 'message': vehicle_info.msg}
+            if vehicle_info.status in [32, 33, 34, 35, 36]:
+                status = 21
+            else:
+                status = vehicle_info.status
+            return {'status': status, 'message': vehicle_info.msg}
     except Exception as e:
         print(e)
         return {'status': '98', 'message': '车辆未注册'}
@@ -602,6 +606,10 @@ def get_violations(v_number, v_type=2, v_code='', e_code='', city='', user_id=99
         save_to_loc_db(vio_data, v_number, int(v_type))
         save_to_loc_db_sz(vio_data, v_number, int(v_type))
 
+    # 返回数据中将所有车辆信息错误, 统一设置为status=21
+    if vio_data.get('status', 0) in [32, 33, 34, 35, 36]:
+        vio_data = {'status': 21, 'msg': '车辆信息错误'}
+
     # 不能直接返回data, 应该把data再次封装后再返回
     return vio_data
 
@@ -610,6 +618,12 @@ def get_violations(v_number, v_type=2, v_code='', e_code='', city='', user_id=99
 def save_to_loc_db_sz(vio_data, vehicle_number, vehicle_type):
 
     try:
+        # 如果本地sz数据中已经有该车辆的违章, 就在存储
+        # is_exist = VioInfoSz.objects.filter(vehicle_number=vehicle_number).filter(vehicle_type=vehicle_type).exist()
+        #
+        # if is_exist:
+        #     return
+
         # 如果没有违章, 创建一条只包含车牌和车辆类型的数据
         if len(vio_data['data']) == 0:
             vio_info = VioInfoSz()

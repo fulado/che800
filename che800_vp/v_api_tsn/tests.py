@@ -7,6 +7,8 @@ import time
 import hashlib
 import pymysql
 from pprint import pprint
+from v_api_tsn.utils import get_db
+from v_api_tsn.vehicle import Vehicle
 
 
 class ViolationException(Exception):
@@ -236,10 +238,10 @@ if __name__ == '__main__':
     #          'carType': '02',
     #          'vinNumber': 'LSGBL5440HF090533'}]
 
-    cars = [{'engineNumber': 'H1SG4020109',
-             'platNumber': '沪BBH772',
-             'carType': '02',
-             'vinNumber': 'LB1RF4491D8001380'}]
+    # cars = [{'engineNumber': 'H1SG4020109',
+    #          'platNumber': '沪BBH772',
+    #          'carType': '02',
+    #          'vinNumber': 'LB1RF4491D8001380'}]
 
     # cars = [{'engineNumber': '751757V',
     #          'platNumber': '京HD9596',
@@ -280,12 +282,12 @@ if __name__ == '__main__':
     #          'carType': '02',
     #          'vinNumber': 'LSGJB84J6HY033957'}]
 
-    try:
-        violation_data = get_violation(cars)
-        # violation_data = register_vehicle(cars)
-        pprint(violation_data)
-    except Exception as e:
-        print(e)
+    # try:
+    #     violation_data = get_violation(cars)
+    #     # violation_data = register_vehicle(cars)
+    #     pprint(violation_data)
+    # except Exception as e:
+    #     print(e)
 
     # get_violation_from_mongo()
     # vehicle_number = '津NWX388'
@@ -308,6 +310,29 @@ if __name__ == '__main__':
 
     # test_vio_query()
 
-    """
-    {'feedback': {'cars': '沪AYC967', 'requestIp': '47.94.18.47', 'responseTime': '2018-07-11 19:31:39'}, 'result': {'platNumber': '沪AYC967', 'punishs': [{'reason': '驾驶中型以上载客载货汽车、危险物品运输车辆以外的其他机动车行驶超过规定时速10%未达20%的', 'paystat': '1', 'viocjjg': '和静县公安局交警大队', 'punishPoint': '3', 'location': '国道218线575公里300米', 'state': '1', 'time': '2017-07-29 12:44:00', 'punishMoney': '200'}, {'reason': '驾驶中型以上载客载货汽车、校车、危险物品运输车辆以外的其他机动车行驶超过规定时速20%以上未达到50%的', 'paystat': '1', 'viocjjg': '吉木乃县交通警察大队', 'punishPoint': '6', 'location': '国道217线173公里', 'state': '1', 'time': '2018-07-03 15:28:00', 'punishMoney': '200'}], 'status': '0'}}
-platNumber"""
+    db = get_db()
+
+    plat_number = '津HVR531'
+    plate_type = '02'
+    engine_number = '382201'
+    request_ip = '127.0.0.1'
+    request_time = '2019-01-30 12:00:00'
+
+    vehicle = Vehicle(plat_number, plate_type, engine_number, request_ip, request_time)
+
+    vehicle.check_vehicle_info(db)
+
+    if not vehicle.status:
+        vehicle.get_violation_without_activity(db)
+
+    if not vehicle.status:
+        vehicle.add_activity_to_violation(db)
+
+    print(vehicle.engine_code)
+    print(vehicle.vin)
+    print(vehicle.plat_number)
+    print(vehicle.valid_date)
+    print(vehicle.zts)
+    pprint(vehicle.punishes)
+    # print(json.dumps(vehicle.punishes))
+
