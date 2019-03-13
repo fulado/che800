@@ -17,13 +17,15 @@ class ViolationException(Exception):
 
 
 def get_token():
-    data = str({"username": 'test_old', 'password': 'test_old'})
+    data = str({"username": 'test', 'password': 'test'})
     # url = 'http://58.87.123.72/login/shenzhou'
     # url = 'http://illegal.ethane.com.cn:20900/violation-point/login'
     # url = 'http://58.87.123.72/login'
     # url = 'http://127.0.0.1:8000/login/shenzhou'
     # url = 'http://vio.che800.cc/login'
-    url = 'http://58.87.123.72/IllegalData-search/login'
+    url = 'http://111.160.75.92:9528/violation-point/login'
+    # url = 'http://127.0.0.1:8000/violation-point/login'
+
     data = get_json(get_response_encoded_data(url, data))
     print(data)
     return data['token']
@@ -35,11 +37,12 @@ def get_violation(car_list):
     # url = 'http://58.87.123.72/illegal'
     # url = 'http://127.0.0.1:8000/illegal/shenzhou'
     # url = 'http://vio.che800.cc/illegal'
-    url = 'http://58.87.123.72/IllegalData-search/vehicle'
+    url = 'http://111.160.75.92:9528/violation-point/illgledata/vehicleDate'
+    # url = 'http://127.0.0.1:8000/violation-point/illgledata/vehicleDate'
 
     token = get_token()
     # token = '4589427C530383B4CAF85243E2B42DA3'
-    data = json.dumps({'userId': 'test_old', 'token': token, 'cars': car_list})
+    data = json.dumps({'userId': 'test', 'token': token, 'cars': car_list})
     # print(data)
     data = get_response_encoded_data(url, data)
     # print(data)
@@ -277,17 +280,21 @@ if __name__ == '__main__':
     #          'platNumber': '津HVR531',
     #          'carType': '02'}]
 
+    cars = [{'engineNumber': '523985',
+             'platNumber': '津D18553',
+             'carType': '02'}]
+
     # cars = [{'engineNumber': '163143227',
     #          'platNumber': '京Q0Q9N6',
     #          'carType': '02',
     #          'vinNumber': 'LSGJB84J6HY033957'}]
 
-    # try:
-    #     violation_data = get_violation(cars)
+    try:
+        violation_data = get_violation(cars)
     #     # violation_data = register_vehicle(cars)
-    #     pprint(violation_data)
-    # except Exception as e:
-    #     print(e)
+        pprint(violation_data)
+    except Exception as e:
+        print(e)
 
     # get_violation_from_mongo()
     # vehicle_number = '津NWX388'
@@ -310,29 +317,29 @@ if __name__ == '__main__':
 
     # test_vio_query()
 
-    db = get_db()
-
-    plat_number = '津HVR531'
-    plate_type = '02'
-    engine_number = '382201'
-    request_ip = '127.0.0.1'
-    request_time = '2019-01-30 12:00:00'
-
-    vehicle = Vehicle(plat_number, plate_type, engine_number, request_ip, request_time)
-
-    vehicle.check_vehicle_info(db)
-
-    if not vehicle.status:
-        vehicle.get_violation_without_activity(db)
-
-    if not vehicle.status:
-        vehicle.add_activity_to_violation(db)
-
-    print(vehicle.engine_code)
-    print(vehicle.vin)
-    print(vehicle.plat_number)
-    print(vehicle.valid_date)
-    print(vehicle.zts)
-    pprint(vehicle.punishes)
+    # db = get_db()
+    #
+    # plat_number = '津HVR531'
+    # plate_type = '02'
+    # engine_number = '382201'
+    # request_ip = '127.0.0.1'
+    # request_time = '2019-01-30 12:00:00'
+    #
+    # vehicle = Vehicle(plat_number, plate_type, engine_number, request_ip, request_time)
+    #
+    # vehicle.check_vehicle_info(db)
+    #
+    # if not vehicle.status:
+    #     vehicle.get_violation_without_activity(db)
+    #
+    # if not vehicle.status:
+    #     vehicle.add_activity_to_violation(db)
+    #
+    # print(vehicle.engine_code)
+    # print(vehicle.vin)
+    # print(vehicle.plat_number)
+    # print(vehicle.valid_date)
+    # print(vehicle.zts)
+    # pprint(vehicle.punishes)
     # print(json.dumps(vehicle.punishes))
 

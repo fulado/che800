@@ -24,36 +24,37 @@ SECRET_KEY = 'f=o8=qkdx-^9ov^v+pc6o2m#(@)exmo+s#m5h%q2hbv!x9bh50'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 # settings for development
-DEBUG = True
-
-ALLOWED_HOSTS = []
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'che800_vp',
-        'PORT': 3306,
-        'HOST': '127.0.0.1',
-        'USER': 'root',
-        'PASSWORD': 'xiaobai',
-    }
-}
-
-# settings for production
-# DEBUG = False
+# DEBUG = True
 #
-# ALLOWED_HOSTS = ['*', ]
+# ALLOWED_HOSTS = []
 #
 # DATABASES = {
 #     'default': {
 #         'ENGINE': 'django.db.backends.mysql',
-#         'NAME': 'violation',
+#         'NAME': 'che800_vp',
 #         'PORT': 3306,
-#         'HOST': '192.168.100.248',
+#         'HOST': '127.0.0.1',
 #         'USER': 'root',
-#         'PASSWORD': 'yxtc_20921',
+#         'PASSWORD': 'xiaobai',
 #     }
 # }
+
+# settings for production
+DEBUG = False
+
+ALLOWED_HOSTS = ['*', ]
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'violation',
+        'PORT': 3306,
+        'HOST': '192.168.100.248',
+        'USER': 'root',
+        'PASSWORD': 'yxtc_20921',
+        'CONN_MAX_AGE': 60,
+    }
+}
 
 # Application definition
 

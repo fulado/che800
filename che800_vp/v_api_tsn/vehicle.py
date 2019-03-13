@@ -93,7 +93,6 @@ class Vehicle(object):
                 vio['point'] = vio_activity.get('jfz', '')
                 vio['money'] = vio_activity.get('fke1', '')
 
-
         except Exception as e:
             self.status = 99
             print(e)
