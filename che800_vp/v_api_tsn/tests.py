@@ -17,7 +17,7 @@ class ViolationException(Exception):
 
 
 def get_token():
-    data = str({"username": 'test', 'password': 'test'})
+    data = str({"username": 'my_test', 'password': 'my_test'})
     # url = 'http://58.87.123.72/login/shenzhou'
     # url = 'http://illegal.ethane.com.cn:20900/violation-point/login'
     # url = 'http://58.87.123.72/login'
@@ -42,7 +42,7 @@ def get_violation(car_list):
 
     token = get_token()
     # token = '4589427C530383B4CAF85243E2B42DA3'
-    data = json.dumps({'userId': 'test', 'token': token, 'cars': car_list})
+    data = json.dumps({'userId': 'my_test', 'token': token, 'cars': car_list})
     # print(data)
     data = get_response_encoded_data(url, data)
     # print(data)
@@ -276,13 +276,13 @@ if __name__ == '__main__':
     #          'platNumber': '津RAA272',
     #          'carType': '02'}]
 
-    # cars = [{'engineNumber': '382201',
-    #          'platNumber': '津HVR531',
-    #          'carType': '02'}]
-
-    cars = [{'engineNumber': '523985',
-             'platNumber': '津D18553',
+    cars = [{'engineNumber': '382201',
+             'platNumber': '津HVR531',
              'carType': '02'}]
+
+    # cars = [{'engineNumber': '523985',
+    #          'platNumber': '津D18553',
+    #          'carType': '02'}]
 
     # cars = [{'engineNumber': '163143227',
     #          'platNumber': '京Q0Q9N6',

@@ -6,7 +6,7 @@ import time
 from django.http import HttpResponse
 import pymongo
 
-from .models import UserInfo
+from .models import UserInfo, LogInfo
 
 
 # 用户登录
@@ -181,6 +181,22 @@ def violation_service(request):
     response_data = get_violations(v_number, v_type, e_code, request_time, user_ip)
     # print(response_data)
     response_data = base64.b64encode(json.dumps(response_data).encode('utf-8'))
+
+    response_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
+
+    # 保存日志
+    try:
+        log_info = LogInfo()
+
+        log_info.request_time = request_time
+        log_info.response_time = response_time
+        log_info.v_number = v_number
+        log_info.v_type = v_type
+
+        log_info.save()
+    except Exception as e:
+        print(e)
+
     return HttpResponse(response_data)
 
 

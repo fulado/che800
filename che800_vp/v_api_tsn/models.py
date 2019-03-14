@@ -20,7 +20,15 @@ class IpInfo(models.Model):
 
 # 违法代码表
 class VioCode(models.Model):
-    code = models.CharField(max_length=10)                                  # 违法代码
-    activity = models.CharField(max_length=200)  # 违法行为
-    point = models.IntegerField(default=0)       # 扣分
-    fine = models.IntegerField(default=0)        # 罚款金额
+    code = models.CharField(max_length=10)                                      # 违法代码
+    activity = models.CharField(max_length=200)                                 # 违法行为
+    point = models.IntegerField(default=0)                                      # 扣分
+    fine = models.IntegerField(default=0)                                       # 罚款金额
+
+
+# 日志表
+class LogInfo(models.Model):
+    request_time = models.DateTimeField(default='2099-2-24 00:00:00')
+    response_time = models.DateTimeField(default='2099-2-24 00:00:00')
+    v_number = models.CharField(max_length=20)
+    v_type = models.CharField(max_length=10)
