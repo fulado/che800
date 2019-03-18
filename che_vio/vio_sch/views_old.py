@@ -4,7 +4,7 @@
 from django.http import HttpResponse
 from .models import UserInfo, VioInfo, LogInfo, VehicleInfo
 from .utils import get_vio_from_tj, get_vio_from_ddyc, get_vio_from_chelun, get_url_id, save_error_log, save_vehicle, \
-    get_vio_from_kuijia, get_vio_from_zfb, get_vio_from_shaoshuai
+    get_vio_from_kuijia, get_vio_from_zfb, get_vio_from_shaoshuai, get_vio_from_doyun
 import base64
 import json
 import time
@@ -271,6 +271,10 @@ def get_violations_old(v_number, v_type, v_code='', e_code='', city='', user_id=
         # 从少帅接口查询违章数据
         origin_data = get_vio_from_shaoshuai(v_number, v_type, v_code, e_code)
         vio_data = vio_dic_for_shaoshuai_old(v_number, origin_data, user_ip)
+    elif url_id == 7:
+        # 从懂云接口查询违章数据, 并标准化
+        origin_data = get_vio_from_doyun(v_number, v_type, v_code, e_code, city)
+        vio_data = vio_dic_for_ddyc_old(v_number, origin_data, user_ip)
     else:
         # 返回该地区不支持查询
         origin_data = ''

@@ -276,8 +276,8 @@ if __name__ == '__main__':
     #          'platNumber': '津RAA272',
     #          'carType': '02'}]
 
-    cars = [{'engineNumber': '382201',
-             'platNumber': '津HVR531',
+    cars = [{'engineNumber': '378115',
+             'platNumber': '津DBS855',
              'carType': '02'}]
 
     # cars = [{'engineNumber': '523985',

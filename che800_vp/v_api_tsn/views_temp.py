@@ -283,13 +283,13 @@ def check_vehicle(v_number, v_type, e_code, db):
 
     # 如果不是津牌, 直接返回0, 否则判断发动机号是否为空, 如果为空, 返回2-发动机号错误
     if v_number[0] != '津':
-        # v_info = {'yxqz': '',
-        #           'enginenums': '',
-        #           'vins': '',
-        #           'zts': '',
-        #           'hpzls': v_type
-        #           }
-        return False
+        v_info = {'yxqz': '',
+                  'enginenums': '',
+                  'vins': '',
+                  'zts': '',
+                  'hpzls': v_type
+                  }
+        return v_info
     elif e_code == '':
         return False
 
