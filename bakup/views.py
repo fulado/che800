@@ -4,7 +4,7 @@ from .models import UserInfo, VehicleInfo, LogInfo
 from .utils import get_vio_from_tj, get_vio_from_chelun, get_vio_from_ddyc, vio_dic_for_ddyc, vio_dic_for_chelun,\
     save_to_loc_db, save_log, get_vio_from_loc, get_url_id, save_error_log, vio_dic_for_tj, save_vehicle,\
     get_vio_from_kuijia, vio_dic_for_kuijia, get_vio_from_zfb, vio_dic_for_zfb, get_vio_from_shaoshuai, \
-    vio_dic_for_shaoshuai, get_vio_from_doyun
+    vio_dic_for_shaoshuai
 from multiprocessing import Queue
 from threading import Thread
 from django.db import connection
@@ -175,10 +175,6 @@ def get_violations(v_number, v_type=2, v_code='', e_code='', city='', user_id=99
         # 从少帅接口查询违章数据
         origin_data = get_vio_from_shaoshuai(v_number, v_type, v_code, e_code)
         vio_data = vio_dic_for_shaoshuai(v_number, origin_data)
-    elif url_id == 7:
-        # 从董云接口查询违章数据
-        origin_data = get_vio_from_doyun(v_number, v_type, v_code, e_code, city)
-        vio_data = vio_dic_for_ddyc(v_number, origin_data)
     else:
         # 返回该地区不支持查询
         origin_data = ''
@@ -211,17 +207,13 @@ def get_vehicle_thread(v_queue):
         except:
             connection.close()
         finally:
-            vehicle_list = VehicleInfo.objects.filter(status=0).\
-                exclude(vehicle_number__contains='浙').exclude(vehicle_number__contains='沪')
+            vehicle_list = VehicleInfo.objects.filter(status=0).exclude(vehicle_number__contains='浙')
 
         # 查询违章
         for vehicle in vehicle_list:
             # 将车辆信息放入队列
             v_queue.put(vehicle, True)
 
-
-# 车辆读取线程
-def get_vehicle_thread_sh(v_queue):
     for i in range(3):
         try:
             connection.connection.ping()
@@ -229,18 +221,6 @@ def get_vehicle_thread_sh(v_queue):
             connection.close()
         finally:
             vehicle_list = VehicleInfo.objects.filter(status=0).filter(vehicle_number__contains='浙')
-
-        for vehicle in vehicle_list:
-            # 将车辆信息放入队列
-            v_queue.put(vehicle, True)
-
-    for i in range(3):
-        try:
-            connection.connection.ping()
-        except:
-            connection.close()
-        finally:
-            vehicle_list = VehicleInfo.objects.filter(status=0).filter(vehicle_number__contains='沪')
 
         for vehicle in vehicle_list:
             # 将车辆信息放入队列
@@ -264,29 +244,6 @@ def query_thread(v_queue):
 
         except Exception as e:
             print(e)
-            print('Auto query complete.')
-            break
-
-
-# 违章查询线程上海
-def query_thread_sh(v_queue):
-    while True:
-        try:
-            # print('query thread %d start' % t_id)
-            vehicle = v_queue.get(True, 5)
-            # print(vehicle.vehicle_number)
-            data = get_violations(vehicle.vehicle_number, vehicle.vehicle_type, vehicle.vehicle_code,
-                                  vehicle.engine_code, vehicle.city)
-
-            # 如果查询成功, 将车辆查询状态置为1
-            if data['status'] == 0:
-                vehicle.status = 1
-                vehicle.save()
-            
-            time.sleep(1)
-        except Exception as e:
-            print(e)
-            print('Auto query complete.')
             break
 
 
@@ -296,25 +253,15 @@ def query_vio_auto():
 
     # 创建车辆队列
     vehicle_queue = Queue(5)
-    vehicle_queue_sh = Queue(5)
 
     # 创建车辆读取线程
     t_get_vehicle_thread = Thread(target=get_vehicle_thread, args=(vehicle_queue,))
     t_get_vehicle_thread.start()
 
-    # 创建车辆读取线程
-    t_get_vehicle_thread_sh = Thread(target=get_vehicle_thread_sh, args=(vehicle_queue_sh,))
-    t_get_vehicle_thread_sh.start()
-
     # 创建5个车辆查询线程
     for i in range(5):
         t_query_thread = Thread(target=query_thread, args=(vehicle_queue,))
         t_query_thread.start()
-
-    # 创建2个上海, 浙江车辆查询线程
-    for i in range(2):
-        vehicle_queue_sh = Thread(target=query_thread_sh, args=(vehicle_queue_sh,))
-        vehicle_queue_sh.start()
 
 
 # 定时任务, 备份并初始化违章表和日志表
@@ -413,4 +360,4 @@ def test_task():
 
 # 负载均衡测试
 def nginx_test(request):
-    return HttpResponse('<h1>server 03</h1>')
+    return HttpResponse('<h1>server 01</h1>')
