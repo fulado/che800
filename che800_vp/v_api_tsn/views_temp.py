@@ -258,11 +258,11 @@ def get_violations(v_number, v_type, e_code='', request_time='', ip_addr=''):
 
         else:
 
-            result = {'status': 6, 'msg': '发动机号错误'}
+            result = {'status': 6, 'message': '发动机号错误'}
 
     except Exception as e:
         print(e)
-        result = {'status': 99, 'msg': '其它错误'}
+        result = {'status': 99, 'message': '其它错误'}
     finally:
         return result
 

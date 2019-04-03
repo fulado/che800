@@ -69,7 +69,7 @@ def get_response_encoded_data(url, data):
     # base64加密
     data = base64.b64encode(data.encode('utf-8'))
     data = 'param=%s' % data.decode('utf-8')
-    # print(data)
+    print(data)
 
     request = urllib.request.Request(url, data.encode('utf-8'))
 
@@ -276,13 +276,17 @@ if __name__ == '__main__':
     #          'platNumber': '津RAA272',
     #          'carType': '02'}]
 
-    cars = [{'engineNumber': '000000',
-             'platNumber': '冀DR161G',
-             'carType': '02'}]
+    # cars = [{'engineNumber': '000000',
+    #          'platNumber': '冀DR161G',
+    #          'carType': '02'}]
 
     # cars = [{'engineNumber': '523985',
-    #          'platNumber': '津D18553',
-    #          'carType': '02'}]
+    #     #          'platNumber': '津D18553',
+    #     #          'carType': '02'}]
+
+    cars = [{'engineNumber': 'K43458',
+             'platNumber': '津RVR378',
+             'carType': '02'}]
 
     # cars = [{'engineNumber': '163143227',
     #          'platNumber': '京Q0Q9N6',
@@ -291,7 +295,6 @@ if __name__ == '__main__':
 
     try:
         violation_data = get_violation(cars)
-    #     # violation_data = register_vehicle(cars)
         pprint(violation_data)
     except Exception as e:
         print(e)
