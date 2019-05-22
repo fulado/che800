@@ -1,0 +1,85 @@
+*{
+    font-family: "Microsoft YaHei", Arial, Helvetica, sans-serif
+}
+html,body{height: 100%;}
+/*.header{*/
+    /*min-width: 1200px!important;*/
+/*}*/
+.header .tooltip_text{
+    position: absolute;
+    top: 28px;
+    right: 45px;
+    height: 30px;
+}
+.header .number_word{
+    margin-left: 25px;
+    color: #97c0ed;
+
+}
+.header .tooltip_text .tooltip_btn{
+    display: inline-block;
+    width: 80px;
+    height: 25px;
+    border-radius: 15px;
+    background: linear-gradient(to right, #25b4b2, #44cbc9, #25b4b2 70%);
+    border: solid 2px #15b1ae;
+    text-align: center;
+    line-height: 25px;
+    color: #fff;
+    cursor: pointer;
+    margin-left: 15px;
+}
+/*导航*/
+.nav_bar{
+    position: relative;
+    width: 200px;
+    background: #0b2849;
+
+}
+.nav_bar .first li{
+    position: relative;
+    list-style: none;
+    width: 100%;
+    height: 60px;
+    background: -ms-linear-gradient(top,#44cbc9,#25b4b2 70%);
+    background: -webkit-linear-gradient(top,#44cbc9,#25b4b2 70%);
+    text-align: center;
+    line-height: 60px;
+    font-weight: bold;
+    cursor: pointer;
+    color: #276867;
+
+}
+.nav_bar .first li .JT{
+    position: absolute;
+    top: 23px;
+    right: 26px;
+    width: 8px;
+    height: 8px;
+    border-right: 2px solid #fff;
+    border-bottom: 2px solid #fff;
+/*  transform: rotate(145deg);
+    transition: transform .3s ease ;*/
+}
+
+/* .JT_active{
+//     transform: rotate(45deg)!important;
+// }*/
+
+.nav_bar .first .down_menu{
+    background: #224e80;
+    color: #93b9e4;
+    font-weight: normal;
+/*  display: none;*/
+}
+.active{
+    color: #fff!important;
+}
+/*表格部分*/
+.content{
+    position: absolute;
+    top: 80px;
+    left: 200px;
+    font-size: 0;
+    background: #f4f4f4;
+}
