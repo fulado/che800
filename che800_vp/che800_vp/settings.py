@@ -24,10 +24,10 @@ SECRET_KEY = 'f=o8=qkdx-^9ov^v+pc6o2m#(@)exmo+s#m5h%q2hbv!x9bh50'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 # settings for development
-# DEBUG = True
-#
-# ALLOWED_HOSTS = []
-#
+DEBUG = True
+
+ALLOWED_HOSTS = []
+
 # DATABASES = {
 #     'default': {
 #         'ENGINE': 'django.db.backends.mysql',
@@ -40,9 +40,9 @@ SECRET_KEY = 'f=o8=qkdx-^9ov^v+pc6o2m#(@)exmo+s#m5h%q2hbv!x9bh50'
 # }
 
 # settings for production
-DEBUG = False
+# DEBUG = False
 
-ALLOWED_HOSTS = ['*', ]
+# ALLOWED_HOSTS = ['*', ]
 
 DATABASES = {
     'default': {

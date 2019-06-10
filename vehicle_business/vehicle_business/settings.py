@@ -55,8 +55,7 @@ ROOT_URLCONF = 'vehicle_business.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'templates')]
-        ,
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -79,10 +78,12 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'vehicle_business',
-        'HOST': '127.0.0.1',
-        'PORT': 3306,
+        'HOST': 'cd-cdb-6ko6xzpg.sql.tencentcdb.com',
+        'PORT': 63560,
+        # 'HOST': '172.27.0.14',
+        # 'PORT': 3306,
         'USER': 'root',
-        'PASSWORD': 'xiaobai',
+        'PASSWORD': 'Init1234',
     }
 }
 

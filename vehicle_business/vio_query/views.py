@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from django.http import HttpResponseRedirect, HttpResponse, JsonResponse
 from PIL import Image, ImageDraw, ImageFont
+import xlrd
 
 import io
 import hashlib
@@ -8,8 +9,9 @@ import random
 
 from vehicle_business.utils import MyPaginator
 from vehicle_business import settings
-from .models import UserInfo, VehicleInfo
+from .models import UserInfo, VehicleInfo, VioInfo
 from .decorator import login_check
+from .violation import Violation
 
 # Create your views here.
 
@@ -123,18 +125,15 @@ def main(request):
 
 # 显示车辆管理页面
 @login_check
-def vehicle(request):
+def vehicle_management(request):
     # 获取session中的user_id, 根据user_id查询企业
     user_id = int(request.session.get('user_id', ''))
 
     # 查询该企业的所有车辆数据
     if user_id != '' and user_id != 1:
-        vehicle_list = VehicleInfo.objects.filter(enterprise_id=user_id).order_by('id')
+        vehicle_list = VehicleInfo.objects.filter(user_id=user_id).order_by('id')
     else:
         vehicle_list = VehicleInfo.objects.all().order_by('id')
-
-    # 获取用户选择的车辆查询状态
-    status = int(request.GET.get('status', 0))
 
     # 获取车辆搜索信息
     number = request.GET.get('number', '')
@@ -154,13 +153,10 @@ def vehicle(request):
 
     context = {'mp': mp,
                'number': number,
-               'user_id': user_id,
-               'status': status,
                }
 
     # 保存页面状态到session
     request.session['number'] = number
-    request.session['status'] = status
     request.session['page_num'] = page_num
 
     return render(request, 'vehicle.html', context)
@@ -186,7 +182,7 @@ def vehicle_add(request):
 
     number = request.POST.get('number', '')                     # 号牌号码
     engine = request.POST.get('engine', '')                     # 发动机号
-    vehicle_type = int(request.POST.get('type', '2'))            # 车辆类型
+    vehicle_type = int(request.POST.get('type', '2'))           # 车辆类型
     vin = request.POST.get('vin', '')                           # 车架号
 
     # 创建车辆数据对象
@@ -276,8 +272,129 @@ def vehicle_delete(request):
 def query_vio(request):
     vehicle_id = request.GET.get('vehicle_id', '')
 
+    vehicle = VehicleInfo.objects.get(id=vehicle_id)
+
+    if vehicle.status < 0:
+        violation = Violation(vehicle)
+        violation.get_violations_from_api()
+        violation.save_violations()
+
+        url = '/vehicle'
+    else:
+        url = '/vio_display?vehicle_id=' + vehicle_id
+
+    return HttpResponseRedirect(url)
+
+
+# 显示违章
+def vio_display(request):
+    vehicle_id = request.GET.get('vehicle_id', '')
+
+    # 获取车辆搜索信息
+    number = request.GET.get('number', '')
+
     if vehicle_id:
-        car = car = VehicleInfo.objects.get(id=vehicle_id)
+        vehicle = VehicleInfo.objects.get(id=vehicle_id)
+        vio_list = VioInfo.objects.filter(number=vehicle.number, type=vehicle.type)
+    elif number:
+        vio_list = VioInfo.objects.filter(number=number, type=2)
+    else:
+        vio_list = VioInfo.objects.all()
+
+    # 获得用户指定的页面
+    page_num = int(request.GET.get('page_num', 1))
+
+    # 创建分页
+    mp = MyPaginator()
+    mp.paginate(vio_list, 10, page_num)
+
+    # 查询是否允许提交
+    context = {'mp': mp,
+               'number': number,
+               }
+
+    return render(request, 'violation.html', context)
+
+
+# 退出登录
+def logout(request):
+    request.session.clear()
+    request.session.flush()
+
+    return HttpResponseRedirect('/')
+
+
+# 批量导入车辆信息
+def vehicle_import(request):
+    # 获取用户上传的excel文件, 文件不存储, 在内存中对文件进行操作
+    excel_file = request.FILES.get('excel_file')
+
+    # 打开excel文件, 直接从内存读取文件内容
+    workbook = xlrd.open_workbook(filename=None, file_contents=excel_file.read())
+    # 获得sheets列表
+    sheets = workbook.sheet_names()
+    # 获得第一个sheet对象
+    worksheet = workbook.sheet_by_name(sheets[0])
+    # 遍历
+    for i in range(1, worksheet.nrows):
+        # row = worksheet.row(i)
+        # 读取一条车辆信息
+        # ctype： 0-empty, 1-string, 2-number, 3-date, 4-boolean, 5-error
+        if worksheet.cell(i, 0).ctype == 2:
+            number = str(int(worksheet.cell_value(i, 0))).replace(' ', '')     # 车牌号
+        else:
+            number = str(worksheet.cell_value(i, 0)).replace(' ', '')
+
+        if worksheet.cell(i, 1).ctype == 2:
+            engine = str(int(worksheet.cell_value(i, 1))).replace(' ', '')     # 发动机型号
+        else:
+            engine = str(worksheet.cell_value(i, 1)).replace(' ', '')
+
+        if worksheet.cell(i, 2).ctype == 2:
+            vin = str(int(worksheet.cell_value(i, 2))).replace(' ', '')     # 车架号
+        else:
+            vin = str(worksheet.cell_value(i, 2)).replace(' ', '')
+
+        # 如果车牌不为空, 创建车辆对象, 否则略过该条数据
+        if number == '' or number is None:
+            continue
+        else:
+            # 如果库中该企业已经存在该车牌, 则忽略该车辆, 否者创建新的车辆对象
+            # 获取session中的user_id, 根据user_id查询企业
+            user_id = int(request.session.get('user_id', ''))
+
+        # 查询该企业的所有车辆数据
+        if user_id == '':
+            continue
+        else:
+            exist_truck_list = VehicleInfo.objects.filter(user_id=user_id).filter(number=number)
+
+        if exist_truck_list:
+            vehicle = exist_truck_list[0]
+        else:
+            vehicle = VehicleInfo()
+            vehicle.number = number
+
+        # 添加车辆属性
+        vehicle.type = 2
+        vehicle.engine = engine if engine else None
+        vehicle.vin = vin if vin else None
+
+        vehicle.save()
+
+    # 构建返回url
+    number = request.session.get('number', '')
+    page_num = request.session.get('page_num', '')
+    url = '/vehicle?number=%s&page_num=%s' % (number, page_num)
+
+    return HttpResponseRedirect(url)
+
+
+
+
+
+
+
 
 
 

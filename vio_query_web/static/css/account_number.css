@@ -1,0 +1,220 @@
+body{
+    font-family: "Microsoft YaHei", Arial, Helvetica, sans-serif
+}
+
+.table_wrapper{
+    width: 95%;
+    height:600px;
+    background: #fff;
+    margin: 30px auto 200px auto;
+}
+.table_wrapper .table_head{
+    width: 100%;
+    height: 40px;
+    background: linear-gradient(#ffffff,#f4f4f4 60%);
+}
+.table_wrapper .table_head span{
+    margin-left: 22px;
+    line-height: 40px;
+    color: #224e80;
+}
+.table_container{
+    width: 97%;
+    height: 90%;
+    margin: 20px auto;
+
+}
+/*搜索框*/
+.table_container .search_input{
+    height: 50px;
+    padding: 20px 0 0 0;
+}
+.table_container .search_input label{
+    margin-right: 10px;
+    font-size: 12px;
+}
+.table_container .search_input input{
+    width: 150px;
+    height: 24px;
+    border-radius: 4px;
+    padding-left: 10px;
+    background-color: #f9f9f9;
+    border: solid 1px #eeeeee;
+    margin-right: 10px;
+    outline: none;
+}
+.table_container .search_input .find_btn{
+    display: inline-block;
+    width: 47px;
+    height: 24px;
+    background: #fff;
+    line-height: 24px;
+    text-align: center;
+    color: #25b4b2;
+    font-size: 12px;
+    border: 1px solid #25b4b2;
+    border-radius: 8px;
+    margin-right: 10px;
+    cursor: pointer;
+}
+.table_container .search_input .find_btn:hover{
+    background: #25b4b2;
+    color: #fff;
+}
+.table_container .search_input #add{
+    display: inline-block;
+    width: 73px;
+    height: 24px;
+    border-radius: 8px;
+    line-height: 24px;
+    background: #25b4b2;
+    font-size: 12px;
+    color: #fff;
+    text-align: center;
+    margin-right: 10px;
+    cursor: pointer;
+}
+.table_container .search_input #add:hover{
+    background: #139b99;
+}
+.table_container .search_input input::-webkit-input-placeholder{
+    color:#cfcfcf;
+}    /* 使用webkit内核的浏览器 */
+.table_container .search_input input:-moz-placeholder{
+    color: #cfcfcf;
+}                  /* Firefox版本4-18 */
+.table_container .search_input input::-moz-placeholder{
+    color: #cfcfcf;
+}                  /* Firefox版本19+ */
+.table_container .search_input input:-ms-input-placeholder{
+    color: #cfcfcf;
+}           /* IE浏览器 */
+
+
+/*表格*/
+.table_container .table_box{
+    width: 100%;
+    border-top: 2px solid #f7f7f7;
+    text-align: center;
+    font-size: 14px;
+    color: #666;
+    table-layout:fixed;
+}
+.table_container .table_box tbody tr td{
+    width: 318px;
+    word-break:keep-all;/* 不换行 */
+    white-space:nowrap;/* 不换行 */
+    overflow:hidden;/* 内容超出宽度时隐藏超出部分的内容 */
+    text-overflow:ellipsis;/* 当对象内文本溢出时显示省略标记(...) ；需与overflow:hidden;一 起使用。*/
+    padding: 8px;
+    border-right: 2px solid #f7f7f7;
+}
+.table_container .table_box tbody tr td:last-child{
+    border: none;
+}
+.table_container .table_box thead tr{
+    height: 54px;
+}
+.table_container .table_box tbody tr{
+    height: 40px;
+}
+.table_container .table_box tbody tr:nth-child(odd){
+    background:#f9f9f9;
+
+}
+.table_container .table_box .see{
+    display: inline-block;
+    width: 40px;
+    height: 20px;
+    border-radius: 4px;
+    background-color: #ffffff;
+    border: solid 1px #25b4b2;
+    color:#25b4b2 ;
+    line-height: 20px;
+    cursor: pointer;
+    font-size: 12px;
+}
+.table_container .table_box .see:hover{
+    background: #25b4b2;
+    color: #fff;
+}
+
+/*审核页面导出导入审核按钮——————————————————————————————————————————————————————————————————————*/
+.table_container .in,.table_container .out{
+    display: inline-block;
+    width: 113px;
+    height: 24px;
+    border-radius: 8px;
+    line-height: 24px;
+    background: #25b4b2;
+    font-size: 12px;
+    color: #fff;
+    text-align: center;
+    margin-right: 10px;
+    cursor: pointer;
+    float: right;
+}
+.table_container .in:hover{
+    background: #139b99;
+}
+.table_container .out:hover{
+    background: #139b99;
+}
+.table_container .table_box .no_see{
+    border: solid 1px #ea4964;
+    color:#ea4964 ;
+}
+.table_container .table_box .no_see:hover{
+    background: #ea4964;
+    color: #fff;
+}
+/*车辆列表提交、编辑、删除按钮————————————————————————————————————————————————————————————————————————————————*/
+.td_btn{
+    display: inline-block;
+    width: 40px;
+    height: 20px;
+    border-radius: 4px;
+    line-height: 20px;
+    cursor: pointer;
+    font-size: 12px;
+    margin-right: 5px;
+}
+
+ .submit{
+      background: #25b4b2;
+      color:#fff ;
+      border: solid 1px #25b4b2;
+}
+.submit:hover{
+    background: #139b99;
+}
+
+ .editor{
+    background: #fff;
+    color:#25b4b2 ;
+    border: solid 1px #25b4b2;
+}
+.editor:hover{
+    background: #25b4b2;
+    color: #fff;
+}
+
+ .remove{
+    background: #fff;
+    color:#ea4964 ;
+    border: solid 1px #ea4964;
+}
+.remove:hover{
+    background: #ea4964;
+    color: #fff;
+}
+ .download{
+    background: #fff;
+    color:#25b4b2 ;
+    border: solid 1px #25b4b2;
+    border-radius: 12px;
+}
+.download:hover{
+    background: #25b4b2;
+    color: #fff;
+}

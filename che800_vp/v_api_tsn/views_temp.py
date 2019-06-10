@@ -4,9 +4,11 @@ import json
 import time
 
 from django.http import HttpResponse
-import pymongo
 
 from .models import UserInfo, LogInfo
+from .driver import Driver
+
+from .utils import check_user, create_response_data, get_db, decode_data
 
 
 # 用户登录
@@ -82,64 +84,20 @@ def violation_service(request):
     # 获取用户传递的参数
     param = request.POST.get('param', '')
 
-    if param == '':
-        response_data = {'status': 15, 'message': '无效请求'}
-        response_data = base64.b64encode(json.dumps(response_data).encode('utf-8'))
+    response_data = check_user(param)
 
+    if response_data.get('status'):
+        response_data = create_response_data(response_data)
         return HttpResponse(response_data)
 
-    try:
-        param = json.loads(base64.b64decode(param).decode('utf-8').replace('\'', '\"'))
-    except Exception as e:
-        print(e)
-        response_data = {'status': 16, 'message': '请求参数错误'}
-        response_data = base64.b64encode(json.dumps(response_data).encode('utf-8'))
-
-        return HttpResponse(response_data)
-
-    # print(param)
-    try:
-        # 获取用户名和密码
-        username = param['userId']
-        user_token = param['token']
-
-        # 对比用户和密码
-        user = UserInfo.objects.get(username=username)
-    except Exception as e:
-        print(e)
-        response_data = {'status': 11, 'message': '用户未登录'}
-        response_data = base64.b64encode(json.dumps(response_data).encode('utf-8'))
-
-        return HttpResponse(response_data)
-
-    # 判断token是否过期
-    current_timestamp = int(time.time())
-
-    if current_timestamp - user.timestamp > 3600:
-        response_data = {'status': 17, 'message': 'token已过期'}
-        response_data = base64.b64encode(json.dumps(response_data).encode('utf-8'))
-
-        return HttpResponse(response_data)
-
-    # 计算token
-    token = '%s%d%s' % (username, user.timestamp, user.password)
-    token = hashlib.sha1(token.encode('utf-8')).hexdigest().upper()
-
-    # 对比token
-    if token != user_token:
-        response_data = {'status': 18, 'message': 'token错误'}
-        response_data = base64.b64encode(json.dumps(response_data).encode('utf-8'))
-
-        return HttpResponse(response_data)
-
+    param = decode_data(param)
     # 获取车辆数据
     try:
         v_data = param['cars'][0]
     except Exception as e:
         print(e)
         response_data = {'status': 21, 'message': '车辆信息不正确'}
-        response_data = base64.b64encode(json.dumps(response_data).encode('utf-8'))
-
+        response_data = create_response_data(response_data)
         return HttpResponse(response_data)
 
     # 判断车辆类型
@@ -152,8 +110,7 @@ def violation_service(request):
     except Exception as e:
         print(e)
         response_data = {'status': 20, 'message': '车辆类型错误'}
-        response_data = base64.b64encode(json.dumps(response_data).encode('utf-8'))
-
+        response_data = create_response_data(response_data)
         return HttpResponse(response_data)
 
     # 判断车牌号
@@ -164,8 +121,7 @@ def violation_service(request):
     except Exception as e:
         print(e)
         response_data = {'status': 5, 'message': '车牌号错误'}
-        response_data = base64.b64encode(json.dumps(response_data).encode('utf-8'))
-
+        response_data = create_response_data(response_data)
         return HttpResponse(response_data)
 
     # 判断车辆识别代号, 发动机号
@@ -174,8 +130,7 @@ def violation_service(request):
     except Exception as e:
         print(e)
         response_data = {'status': 6, 'message': '发动机号错误'}
-        response_data = base64.b64encode(json.dumps(response_data).encode('utf-8'))
-
+        response_data = create_response_data(response_data)
         return HttpResponse(response_data)
 
     response_data = get_violations(v_number, v_type, e_code, request_time, user_ip)
@@ -371,19 +326,48 @@ def get_violation_from_mongodb(v_number, v_type, db):
 
 
 # 获得MongoDB数据库连接
-def get_db():
-    try:
-        # mongodb数据库ip, 端口
-        mongodb_ip = '192.168.100.234'
-        mongodb_port = 27017
+# def get_db():
+#     try:
+#         # mongodb数据库ip, 端口
+#         mongodb_ip = '192.168.100.234'
+#         mongodb_port = 27017
+#
+#         # 创建连接对象
+#         client = pymongo.MongoClient(host=mongodb_ip, port=mongodb_port)
+#
+#         # 获得数据库
+#         vio_db = client.violation
+#
+#         return vio_db
+#     except Exception as e:
+#         print(e)
+#         raise e
 
-        # 创建连接对象
-        client = pymongo.MongoClient(host=mongodb_ip, port=mongodb_port)
 
-        # 获得数据库
-        vio_db = client.violation
+# 查询驾驶人信息
+def driver_service(request):
 
-        return vio_db
-    except Exception as e:
-        print(e)
-        raise e
+    # 获取用户传递的参数
+    param = request.POST.get('param', '')
+
+    response_data = check_user(param)
+
+    if response_data.get('status'):
+        response_data = create_response_data(response_data)
+        return HttpResponse(response_data)
+
+    param_dict = decode_data(param)
+    driver_name = param_dict.get('xm')
+    file_id = param_dict.get('dabh')
+
+    driver = Driver(driver_name, file_id)
+
+    db = get_db()
+    print(db)
+    driver.get_driver_info(db)
+
+    if driver.is_exist:
+        driver.create_driver_info()
+
+    response_data = create_response_data(driver.license_info)
+    return HttpResponse(response_data)

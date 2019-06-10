@@ -7,8 +7,6 @@ import time
 import hashlib
 import pymysql
 from pprint import pprint
-from v_api_tsn.utils import get_db
-from v_api_tsn.vehicle import Vehicle
 
 
 class ViolationException(Exception):
@@ -27,7 +25,7 @@ def get_token():
     # url = 'http://127.0.0.1:8000/violation-point/login'
 
     data = get_json(get_response_encoded_data(url, data))
-    print(data)
+    # print(data)
     return data['token']
 
 
@@ -65,11 +63,29 @@ def register_vehicle(car_list):
     return get_json(data)
 
 
+def get_driver_info(driver_name, file_id):
+    # url = 'http://58.87.123.72/illegal/shenzhou'
+    # url = 'http://illegal.ethane.com.cn:20900/violation-point/illgledata/vehicleDate'
+    # url = 'http://58.87.123.72/illegal'
+    # url = 'http://127.0.0.1:8000/illegal/shenzhou'
+    # url = 'http://vio.che800.cc/illegal'
+    # url = 'http://111.160.75.92:9528/violation-point/illgledata/vehicleDate'
+    url = 'http://111.160.75.92:9528/violation-point/illgledata/driver'
+
+    token = get_token()
+    # token = '4589427C530383B4CAF85243E2B42DA3'
+    data = json.dumps({'userId': 'my_test', 'token': token, 'xm': driver_name, 'dabh': file_id})
+
+    data = get_response_encoded_data(url, data)
+
+    return get_json(data)
+
+
 def get_response_encoded_data(url, data):
     # base64加密
     data = base64.b64encode(data.encode('utf-8'))
     data = 'param=%s' % data.decode('utf-8')
-    print(data)
+    # print(data)
 
     request = urllib.request.Request(url, data.encode('utf-8'))
 
@@ -246,11 +262,11 @@ if __name__ == '__main__':
     #          'carType': '02',
     #          'vinNumber': 'LB1RF4491D8001380'}]
 
-    # cars = [{'engineNumber': '751757V',
-    #          'platNumber': '京HD9596',
-    #          'carType': '02',
-    #          'vinNumber': 'LGBF5AE00HR276883',
-    #          }]
+    cars = [{'engineNumber': '751757V',
+             'platNumber': '京HD9596',
+             'carType': '02',
+             'vinNumber': 'LGBF5AE00HR276883',
+             }]
 
     # cars = [{'engineNumber': 'H17079',
     #          'platNumber': '津CC825',
@@ -272,8 +288,8 @@ if __name__ == '__main__':
     #          'carType': '02',
     #          'vinNumber': 'LSGUD84XXFE013334'}]
 
-    # cars = [{'engineNumber': '930083',
-    #          'platNumber': '津RAA272',
+    # cars = [{'engineNumber': '382201',
+    #          'platNumber': '津HVR531',
     #          'carType': '02'}]
 
     # cars = [{'engineNumber': '000000',
@@ -281,12 +297,12 @@ if __name__ == '__main__':
     #          'carType': '02'}]
 
     # cars = [{'engineNumber': '523985',
-    #     #          'platNumber': '津D18553',
-    #     #          'carType': '02'}]
+    #          'platNumber': '津D18553',
+    #          'carType': '02'}]
 
-    cars = [{'engineNumber': 'K43458',
-             'platNumber': '津RVR378',
-             'carType': '02'}]
+    # cars = [{'engineNumber': 'K43458',
+    #          'platNumber': '冀BF572E',
+    #          'carType': '02'}]
 
     # cars = [{'engineNumber': '163143227',
     #          'platNumber': '京Q0Q9N6',
@@ -294,8 +310,10 @@ if __name__ == '__main__':
     #          'vinNumber': 'LSGJB84J6HY033957'}]
 
     try:
-        violation_data = get_violation(cars)
-        pprint(violation_data)
+        # violation_data = get_violation(cars)
+        # pprint(violation_data)
+        driver_info = get_driver_info('张宇', '120002843932')
+        pprint(driver_info)
     except Exception as e:
         print(e)
 

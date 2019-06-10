@@ -14,19 +14,11 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
-from vio_query import views as vio_query_views
+from django.conf.urls import url, include
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('check_code/', vio_query_views.check_code),
-    path('login_handle/', vio_query_views.login_handle),
-    path('main/', vio_query_views.main),
-    path('vehicle/', vio_query_views.vehicle),
-    path('is_vehicle_exist/', vio_query_views.is_vehicle_exist),    # 判断车辆是否已经存在
-    path('vehicle_add/', vio_query_views.vehicle_add),              # 添加车辆
-    path('vehicle_modify/', vio_query_views.vehicle_modify),        # 修改车辆
-    path('vehicle_delete/', vio_query_views.vehicle_delete),        # 修改车辆
-    path('query_vio/', vio_query_views.query_vio),                  # 查询违章
-    path('', vio_query_views.login)
+    url(r'^admin/', admin.site.urls),
+    url(r'^', include('vio_query.urls')),
 ]
+
+

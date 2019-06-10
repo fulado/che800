@@ -493,7 +493,8 @@ def get_vio_from_doyun(v_number, v_type, v_code, e_code, city):
 
     # 构造完整查询url
     url = '%s?app_key=%s&timestamp=%d&sign=%s' % (url, app_key, timestamp, sign)
-
+    print(url)
+    print(data)
     # 请求头
     headers = {'Content-type': 'application/json'}
 
@@ -513,17 +514,18 @@ if __name__ == '__main__':
     # car2 = {'v_number': '沪AYC335', 'v_type': '02', 'v_code': 'LSKG4AC11FA413877', 'e_code': 'H1SF5250141'}
     # car2 = {'v_number': '陕AS71N5', 'v_type': '02', 'v_code': 'LSVNB418XGN043525', 'e_code': '480843'}
     # car2 = {'v_number': '沪ABT031', 'v_type': '02', 'v_code': '', 'e_code': '132111162'}
-    car2 = {'v_number': '冀A173SZ', 'v_type': '02', 'v_code': 'LJDLAA293D0223021', 'e_code': 'D5566502'}
-    #
-    response_data = get_vio_from_doyun(car2['v_number'], car2['v_type'], car2['v_code'], car2['e_code'], '')
+    # car2 = {'v_number': '冀A173SZ', 'v_type': '02', 'v_code': 'LJDLAA293D0223021', 'e_code': 'D5566502'}
+    car2 = {'v_number': '苏A27HE0', 'v_type': '02', 'v_code': 'LSGXE8457HD266869', 'e_code': '171581053'}
+
+    # response_data = get_vio_from_doyun(car2['v_number'], car2['v_type'], car2['v_code'], car2['e_code'], '')
     #
     # response_data = get_vio_from_ddyc2(car2['v_number'], car2['v_type'], car2['v_code'], car2['e_code'])
-    pprint(response_data)
+    # pprint(response_data)
     #
     # response_data = vio_dic_for_shaoshuai(car2['v_number'], response_data)
     # pprint(response_data)
 
-    # create_sign('test', 'test')
+    create_sign('test', 'test')
     # create_sign('pingan3', 'pingan3_init')
 
     # q = queue.Queue(maxsize=5)

@@ -3,7 +3,8 @@ import hashlib
 import json
 import urllib.request
 import urllib.parse
-from .models import VioInfo, LogInfo, LocInfo, VehicleBackup
+import pprint
+# from .models import VioInfo, LogInfo, LocInfo, VehicleBackup
 
 
 # 判断查询城市是否正确
@@ -1203,17 +1204,17 @@ def save_vehicle(v_number, v_type, v_code, e_code):
 
 
 if __name__ == '__main__':
-    carno = '京HD9596'
-    cartype = '02'
-    vcode = 'LGBF5AE00HR276883'
-    ecode = '751757V'
-    car2 = {'v_number': '浙B78KG7', 'v_type': '02', 'v_code': 'LSVCJ2BM1HN043778', 'e_code': '415650'}
-    response_data = get_vio_from_chelun(car2['v_number'], car2['v_type'], car2['v_code'], car2['e_code'])
+    # carno = '京HD9596'
+    # cartype = '02'
+    # vcode = 'LGBF5AE00HR276883'
+    # ecode = '751757V'
+    car2 = {'v_number': '沪AYM305', 'v_type': '02', 'v_code': 'LSKG4AC19FA413724', 'e_code': 'H1SF5220113'}
+    response_data = get_vio_from_shaoshuai(car2['v_number'], car2['v_type'], car2['v_code'], car2['e_code'])
 
     # response_data = get_vio_from_zfb(v_number=carno, v_type=cartype, v_code=vcode, e_code=ecode)
 
     # response_data = get_vio_from_tj('津N02070', '02')
-    print(response_data)
+    pprint.pprint(response_data)
 
     # v_data = vio_dic_for_ddyc(carno, response_data)
     # v_data = vio_dic_for_chelun(car2['v_number'], response_data)

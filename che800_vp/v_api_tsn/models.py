@@ -32,3 +32,5 @@ class LogInfo(models.Model):
     response_time = models.DateTimeField(default='2099-2-24 00:00:00')
     v_number = models.CharField(max_length=20)
     v_type = models.CharField(max_length=10)
+
+
