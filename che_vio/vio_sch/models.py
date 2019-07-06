@@ -47,7 +47,7 @@ class VioInfo(models.Model):
     vehicle_type = models.IntegerField(default=2, blank=True, null=True)        # 车辆类型
     vio_time = models.CharField(max_length=30, blank=True, null=True)           # 违法时间
     vio_position = models.CharField(max_length=100, blank=True, null=True)      # 违法地点
-    vio_activity = models.CharField(max_length=100, blank=True, null=True)      # 违法行为
+    vio_activity = models.CharField(max_length=255, blank=True, null=True)      # 违法行为
     vio_point = models.IntegerField(default=0, blank=True, null=True)           # 扣分
     vio_money = models.IntegerField(default=0, blank=True, null=True)           # 罚款
     vio_code = models.CharField(max_length=20, blank=True, null=True)           # 违法代码

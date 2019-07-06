@@ -4,7 +4,7 @@
 from django.http import HttpResponse
 from .models import UserInfo, VioInfo, LogInfo, VehicleInfo
 from .utils import get_vio_from_tj, get_vio_from_ddyc, get_vio_from_chelun, get_url_id, save_error_log, save_vehicle, \
-    get_vio_from_kuijia, get_vio_from_zfb, get_vio_from_shaoshuai, get_vio_from_doyun
+    get_vio_from_kuijia, get_vio_from_zfb, get_vio_from_shaoshuai, get_vio_from_doyun, get_vio_from_cwb
 import base64
 import json
 import time
@@ -275,6 +275,10 @@ def get_violations_old(v_number, v_type, v_code='', e_code='', city='', user_id=
         # 从懂云接口查询违章数据, 并标准化
         origin_data = get_vio_from_doyun(v_number, v_type, v_code, e_code, city)
         vio_data = vio_dic_for_ddyc_old(v_number, origin_data, user_ip)
+    elif url_id == 8:
+        # 从车务帮接口查询违章数据, 并标准化
+        origin_data = get_vio_from_cwb(v_number, v_type, v_code, e_code, city)
+        vio_data = vio_dic_for_cwb_old(v_number, origin_data, user_ip)
     else:
         # 返回该地区不支持查询
         origin_data = ''
@@ -1047,6 +1051,95 @@ def vio_dic_for_shaoshuai_old(v_number, data, user_ip):
         else:
             status = 99
             message = '其它错误'
+
+        vio_dict = {'status': status, 'message': message}
+
+    return vio_dict
+
+
+# 根据车务帮返回数据构造违章数据
+def vio_dic_for_cwb_old(v_number, data, user_ip):
+    if data.get('status_code', -1) == 2000:
+        status = '0'
+        vio_list = []
+
+        for vio in data.get('historys', ''):
+            # 缴费状态
+            try:
+                if '未缴款' in vio.get('fine_status', ''):
+                    vio_pay = 0
+                elif '已缴款' in vio.get('fine_status', ''):
+                    vio_pay = 1
+                else:
+                    vio_pay = -1
+            except Exception as e:
+                print(e)
+                vio_pay = -1
+
+            # 已经缴费的违章数据不再返回
+            if vio_pay == 1:
+                continue
+
+            try:
+                if '未处理' in vio.get('fine_status', ''):
+                    vio_status = 0
+                elif '已处理' in vio.get('fine_status', ''):
+                    vio_status = 1
+                else:
+                    vio_status = -1
+            except Exception as e:
+                print(e)
+                vio_status = -1
+
+            vio_time = vio.get('occur_date', '')  # 违法时间
+            vio_address = vio.get('occur_area', '')  # 违法地点
+            vio_activity = vio.get('info', '')  # 违法行为
+            vio_point = vio.get('fen', '')  # 扣分
+            vio_money = vio.get('money', '')  # 罚款
+            vio_loc = vio.get('officer', '')  # 处理机关
+            vio_code = ''  # 违法代码
+
+            vio_data = {
+                'reason': vio_activity,
+                'viocjjg': vio_loc,
+                'punishPoint': str(vio_point),
+                'location': str(vio_address),
+                'time': vio_time,
+                'punishMoney': str(vio_money),
+                'paystat': str(vio_pay),
+                'state': str(vio_status),
+                'viocode': str(vio_code)
+            }
+
+            vio_list.append(vio_data)
+
+        feedback = {
+            'cars': v_number,
+            'requestIp': user_ip,
+            'responseTime': time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+        }
+
+        result = {
+            'platNumber': v_number,
+            'punishs': vio_list,
+            'status': status
+        }
+
+        vio_dict = {'feedback': feedback, 'result': result}
+    else:
+        # 查询失败
+
+        origin_status = data.get('status_code', -1)
+
+        if origin_status == 5000:
+            status = 21
+            message = '车辆信息不正确'
+        elif origin_status == 5003:
+            status = 39
+            message = '数据源不稳定, 请稍后再查'
+        else:
+            status = 51
+            message = '数据源异常'
 
         vio_dict = {'status': status, 'message': message}
 

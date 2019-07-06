@@ -2,6 +2,7 @@ from django.conf.urls import url
 from . import views
 from . import views_old
 from . import views_sz
+from . import views_kj
 
 urlpatterns = [
     url(r'^violation/?', views.violation),
@@ -14,4 +15,6 @@ urlpatterns = [
     url(r'^IllegalData-search/vehicle/?', views_old.violation_service),
     url(r'^register/shenzhou/?', views_sz.register_service),
     url(r'^register/?', views_old.register_service),
+    url(r'^vehicle/register/?', views_kj.register),
+    url(r'^vehicle/unregister/?', views_kj.unregister),
 ]

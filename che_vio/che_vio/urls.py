@@ -18,7 +18,7 @@ from django.conf.urls import url, include
 
 
 urlpatterns = [
-    url(r'^web/?', include('vio_web.urls')),
+    # path('admin/', admin.site.urls),
     url(r'^', include('vio_sch.urls'))
 ]
 

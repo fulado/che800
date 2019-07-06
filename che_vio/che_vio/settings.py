@@ -23,9 +23,9 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = '_c_nkqad*5jqhc4v2%pippkzd$s7v-n52qtr#tczdh+rax9!g7'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-# DEBUG = True
-#
-# ALLOWED_HOSTS = []
+DEBUG = True
+
+ALLOWED_HOSTS = []
 #
 # DATABASES = {
 #     'default': {
@@ -54,11 +54,7 @@ SECRET_KEY = '_c_nkqad*5jqhc4v2%pippkzd$s7v-n52qtr#tczdh+rax9!g7'
 #     }
 # }
 
-# Database setting for configuration and test
-
-DEBUG = True
-
-ALLOWED_HOSTS = ['*', ]
+# Database setting for configuration
 
 DATABASES = {
     'default': {
@@ -81,7 +77,6 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'vio_sch.apps.VioSchConfig',
-    'vio_web.apps.VioWebConfig',
 ]
 
 MIDDLEWARE = [

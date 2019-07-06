@@ -39,10 +39,10 @@ scheduler.add_job(reset_status, 'cron', hour=2, minute=8, second=0)
 scheduler.add_job(query_vio_auto, 'cron', hour=3, minute=0, second=0)
 
 # 每天10:00, 再查一遍
-scheduler.add_job(query_vio_auto, 'cron', hour=10, minute=0, second=0)
+scheduler.add_job(query_vio_auto, 'cron', hour=10, minute=23, second=0)
 
 # 每天15:00, 再查一遍
-scheduler.add_job(query_vio_auto, 'cron', hour=16, minute=39, second=0)
+scheduler.add_job(query_vio_auto, 'cron', hour=15, minute=0, second=0)
 
 # 每天18:00, 爬取重庆高速违章
 scheduler.add_job(main, 'cron', hour=18, minute=0, second=0)

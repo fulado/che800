@@ -156,7 +156,7 @@ def main():
     t_get_vehicle_thread.start()
 
     # 创建5个车辆查询线程
-    for i in range(100):
+    for i in range(5):
         t_query_thread = Thread(target=query_thread, args=(vehicle_queue,))
         t_query_thread.start()
 
