@@ -4,7 +4,8 @@
 from django.http import HttpResponse
 from .models import UserInfo, VioInfo, LogInfo, VehicleInfo
 from .utils import get_vio_from_tj, get_vio_from_ddyc, get_vio_from_chelun, get_url_id, save_error_log, save_vehicle, \
-    get_vio_from_kuijia, get_vio_from_zfb, get_vio_from_shaoshuai, get_vio_from_doyun, get_vio_from_cwb
+    get_vio_from_kuijia, get_vio_from_zfb, get_vio_from_shaoshuai, get_vio_from_doyun, get_vio_from_cwb, \
+    get_loc_by_vio_id
 import base64
 import json
 import time
@@ -1096,7 +1097,7 @@ def vio_dic_for_cwb_old(v_number, data, user_ip):
             vio_activity = vio.get('info', '')  # 违法行为
             vio_point = vio.get('fen', '')  # 扣分
             vio_money = vio.get('money', '')  # 罚款
-            vio_loc = vio.get('officer', '')  # 处理机关
+            vio_loc = get_loc_by_vio_id(vio.get('vioid', ''))  # 处理机关
             vio_code = ''  # 违法代码
 
             vio_data = {
@@ -1169,11 +1170,11 @@ def save_to_loc_db_old(vio_data, vehicle_number, vehicle_type):
                 vio_info.vio_activity = vio['reason']
 
                 try:
-                    vio_info.vio_point = int(vio['punishPoint'])
+                    vio_info.vio_point = int(float(vio['punishPoint']))
                 except Exception as e:
                     print(e)
                 try:
-                    vio_info.vio_money = int(vio['punishMoney'])
+                    vio_info.vio_money = int(float(vio['punishMoney']))
                 except Exception as e:
                     print(e)
 

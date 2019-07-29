@@ -170,6 +170,39 @@ def get_vio_from_ddyc3(v_number, v_type, v_code, e_code, city):
     return json.loads(response_data.read().decode('utf-8'))
 
 
+# 从车务帮接口查询数据
+def get_vio_from_cwb(v_number, v_type, vin, e_code='', city=''):
+    url = 'http://www.chewubang.net/api/get/fine/'
+
+    username = "ChunBo"  # 用户名
+    password = "XcJ6JeUIXMmP6bKzxigmNUuBvlVybMD2"  # 密码
+
+    area = v_number[0] if v_number else ''
+    timestamp = int(time.time())  # 当前时间10位unix时间戳
+
+    if v_number[0] in ['陕', '琼']:
+        vin = e_code
+
+    vin = vin[-6:]
+
+    sign = username + password + str(timestamp) + v_number + vin + v_type + area
+    sign = hashlib.md5(sign.encode()).hexdigest()
+
+    data = {
+        "username": username,
+        "brandType": v_type,
+        "vehNumKey": vin,
+        "time": timestamp,
+        "carNum": v_number,
+        "sign": sign,
+        'area': area
+    }
+
+    response_data = requests.post(url=url, data=data)
+
+    return json.loads(response_data.content.decode())
+
+
 # 生成查询sign
 def create_sign(username, password):
     password = hashlib.sha1(password.encode('utf_8')).hexdigest().upper()
@@ -327,15 +360,58 @@ def get_vio_from_shaoshuai(v_number, v_type, v_code, e_code):
     return json.loads(response_data.read().decode('utf-8'))
 
 
+# 从懂云接口查询数据
+def get_vio_from_doyun(v_number, v_type, v_code, e_code, city=''):
+    """
+    调用典典接口查询违章
+    :param v_number: 车牌号
+    :param v_type: 车辆类型
+    :param v_code: 车架号
+    :param e_code: 发动机号
+    :return: 违章数据, json格式
+    """
+    # 查询接口url
+    url = 'https://openapi.docloud.vip/violation/query/1.0'
+
+    # 构造查询数据
+    app_key = 'KSJWW7OABAMMV4VX'                        # 账号
+    app_secret = 'YMPQFUKTTRIE4UA44NXN89SEEYCAIGQ7'     # 密码
+
+    timestamp = int(time.time() * 1000)                 # 时间戳
+
+    # 构造查询数据
+    data = {'plateNumber': v_number, 'carType': v_type, 'engineNo': e_code, 'vin': v_code, 'city': city}
+    data = json.dumps(data).replace(' ', '')
+
+    # 构造sign
+    sign = "%s%sapp_key=%s&timestamp=%d%s" % (app_key, app_secret, app_key, timestamp, data)
+    sign = sign[::-1]
+    sign = hashlib.md5(sign.encode('utf-8')).hexdigest().upper()
+
+    # 构造完整查询url
+    url = '%s?app_key=%s&timestamp=%d&sign=%s' % (url, app_key, timestamp, sign)
+
+    # 请求头
+    headers = {'Content-type': 'application/json'}
+
+    # 创建request请求
+    request = urllib.request.Request(url, headers=headers, data=data.encode('utf-8'))
+
+    # 获得response
+    response_data = urllib.request.urlopen(request)
+
+    return json.loads(response_data.read().decode('utf-8'))
+
+
 if __name__ == '__main__':
     # car2 = {'v_number': '京HD9596', 'v_type': '02', 'v_code': 'LGBF5AE00HR276883', 'e_code': '751757V'}
-    # car2 = {'v_number': '苏AQ6R59', 'v_type': '02', 'v_code': 'LSGUD84X3FE009951', 'e_code': '150330725'}
-    # car2 = {'v_number': '沪E59583', 'v_type': '02', 'v_code': 'LTVBJ874960003131', 'e_code': '5GRC044604'}
-    car2 = {'v_number': '沪H31092', 'v_type': '02', 'v_code': 'LFV4A24F383049673', 'e_code': '171809'}
+    # car2 = {'v_number': '津RAV877', 'v_type': '02', 'v_code': 'LSGGJ5450JS043259', 'e_code': '173073371'}
+    car2 = {'v_number': '冀AC110Q', 'v_type': '02', 'v_code': 'LJ166A330E7020540', 'e_code': 'E3034066'}
+    # car2 = {'v_number': '沪H31092', 'v_type': '02', 'v_code': 'LFV4A24F383049673', 'e_code': '171809'}
     #
-    # response_data = get_vio_from_chelun(car2['v_number'], car2['v_type'], car2['v_code'], car2['e_code'])
+    # response_data = get_vio_from_shaoshuai(car2['v_number'], car2['v_type'], car2['v_code'], car2['e_code'])
     #
-    response_data = get_vio_from_shaoshuai(car2['v_number'], car2['v_type'], car2['v_code'], car2['e_code'])
+    response_data = get_vio_from_doyun(car2['v_number'], car2['v_type'], car2['v_code'], car2['e_code'])
     #
     pprint(response_data)
 

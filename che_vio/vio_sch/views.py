@@ -274,6 +274,9 @@ def query_thread(v_queue, city):
             if data['status'] == 0:
                 vehicle.status = 1
                 vehicle.save()
+            elif data['status'] in (32, 33, 34, 35, 36):
+                vehicle.status = data['status']
+                vehicle.save()
 
         except Exception as e:
             print(e)
@@ -414,4 +417,4 @@ def test_task():
 
 # 负载均衡测试
 def nginx_test(request):
-    return HttpResponse('<h1>server 03</h1>')
+    return HttpResponse('<h1>server 01</h1>')

@@ -17,7 +17,7 @@ from .models import UserInfo, VehicleInfoSz, VioInfoSz
 from .utils import save_error_log, save_log, get_url_id, get_vio_from_loc, get_vio_from_tj, get_vio_from_ddyc, \
     get_vio_from_chelun, get_vio_from_kuijia, get_vio_from_zfb, vio_dic_for_tj, vio_dic_for_ddyc, vio_dic_for_chelun, \
     vio_dic_for_kuijia, vio_dic_for_zfb, save_to_loc_db, get_vio_from_shaoshuai, get_vio_from_doyun, \
-    vio_dic_for_shaoshuai
+    vio_dic_for_shaoshuai, get_vio_from_cwb, vio_dic_for_cwb
 from .views_old import save_log_old
 
 
@@ -602,6 +602,10 @@ def get_violations(v_number, v_type=2, v_code='', e_code='', city='', user_id=99
         # 从董云接口查询违章数据
         origin_data = get_vio_from_doyun(v_number, v_type, v_code, e_code, city)
         vio_data = vio_dic_for_ddyc(v_number, origin_data)
+    elif url_id == 8:
+        # 从车务帮接口查询违章数据
+        origin_data = get_vio_from_cwb(v_number, v_type, v_code, e_code, city)
+        vio_data = vio_dic_for_cwb(v_number, origin_data)
     else:
         # 返回该地区不支持查询
         origin_data = ''

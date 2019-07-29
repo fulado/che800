@@ -5,7 +5,21 @@ import json
 import requests
 import urllib.request
 import urllib.parse
-from .models import VioInfo, LogInfo, LocInfo, VehicleBackup
+from .models import VioInfo, LogInfo, LocInfo, VehicleBackup, VioCode
+
+
+# 根据违法行为返回违法代码
+def get_vio_code(vio_activity):
+    try:
+        vio_code_list = VioCode.objects.filter(vio_activity__contains=vio_activity)
+        if vio_code_list:
+            vio_code = vio_code_list[0]
+            return vio_code.vio_code
+        else:
+            return ''
+    except Exception as e:
+        print(e)
+        return ''
 
 
 # 判断查询城市是否正确
@@ -315,7 +329,7 @@ def get_vio_from_doyun(v_number, v_type, v_code, e_code, city):
 
 
 # 从车务帮接口查询数据
-def get_vio_from_cwb(v_number, v_type, vin):
+def get_vio_from_cwb(v_number, v_type, vin, e_code='', city=''):
     url = 'http://www.chewubang.net/api/get/fine/'
 
     username = "ChunBo"  # 用户名
@@ -323,6 +337,11 @@ def get_vio_from_cwb(v_number, v_type, vin):
 
     area = v_number[0] if v_number else ''
     timestamp = int(time.time())  # 当前时间10位unix时间戳
+
+    if v_number[0] in ['陕', '琼']:
+        vin = e_code
+
+    vin = vin[-6:]
 
     sign = username + password + str(timestamp) + v_number + vin + v_type + area
     sign = hashlib.md5(sign.encode()).hexdigest()
@@ -898,21 +917,21 @@ def vio_dic_for_cwb(v_number, data):
             else:
                 vio_deal = -1
 
-            # 违法时间
-            vio_time = vio.get('occur_date', '')
+            vio_time = vio.get('occur_date', '')  # 违法时间
             vio_address = vio.get('occur_area', '')  # 违法地点
             vio_activity = vio.get('info', '')  # 违法行为
             vio_point = vio.get('fen', '')  # 扣分
-            vio_money = vio.get('money', '')  # 罚款
-            vio_code = ''  # 违法代码
-            vio_loc = vio.get('officer', '')  # 处理机关
+            vio_money = str(vio.get('money', ''))  # 罚款
+            vio_money = vio_money[: -2] if '.' in vio_money else vio_money
+            vio_code = get_vio_code(vio_activity)  # 违法代码
+            vio_loc = get_loc_by_vio_id(vio.get('vioid', ''))  # 处理城市
 
             vio_data = {
                 'time': vio_time,
                 'position': vio_address,
                 'activity': vio_activity,
                 'point': str(vio_point),
-                'money': str(vio_money),
+                'money': vio_money,
                 'code': str(vio_code),
                 'location': vio_loc,
                 'deal': str(vio_deal),
@@ -926,6 +945,22 @@ def vio_dic_for_cwb(v_number, data):
         return get_status(data.get('status_code', -1), 8)
 
     return vio_dict
+
+
+# 通过车务帮返回的违法文书号判断违法地点
+def get_loc_by_vio_id(vio_id):
+    if len(vio_id) < 4:
+        return ''
+
+    loc_id = vio_id[0: 4] + '00'
+
+    try:
+        loc_info = LocInfo.objects.get(loc_id=loc_id)
+    except Exception as e:
+        print(e)
+        return ''
+
+    return loc_info.loc_name
 
 
 # 查询结果保存到本地数据库
@@ -951,12 +986,12 @@ def save_to_loc_db(vio_data, vehicle_number, vehicle_type):
                 vio_info.vio_activity = vio['activity']
 
                 try:
-                    vio_info.vio_point = int(vio['point'])
+                    vio_info.vio_point = int(float(vio['point']))
                 except Exception as e:
                     print(e)
 
                 try:
-                    vio_info.vio_money = int(vio['money'])
+                    vio_info.vio_money = int(float(vio['money']))
                 except Exception as e:
                     print(e)
 
@@ -1025,9 +1060,9 @@ def save_log(v_number, origin_data, vio_data, user_id, url_id, user_ip, city='')
             if 'msg' in origin_data:
                 log_info.origin_msg = origin_data['msg']
 
-        elif url_id == 2:
+        elif url_id in (2, 7):
 
-            # 典典接口
+            # 典典/懂云接口
             if 'errCode' in origin_data:
                 log_info.origin_status = origin_data['errCode']
 
@@ -1057,6 +1092,12 @@ def save_log(v_number, origin_data, vio_data, user_id, url_id, user_ip, city='')
             # 少帅接口
             log_info.origin_status = origin_data.get('error_code', '')
             log_info.origin_msg = origin_data.get('error_message', '')
+
+        elif url_id == 8:
+
+            # 车务帮接口
+            log_info.origin_status = origin_data.get('status_code', '')
+            log_info.origin_msg = str(origin_data.get('message', ''))
 
     # 保存日志到数据库
     try:
@@ -1324,12 +1365,12 @@ if __name__ == '__main__':
     vcode = 'LGBF5AE00HR276883'
     ecode = '751757V'
     car2 = {'v_number': '沪H31092', 'v_type': '02', 'v_code': 'LFV4A24F383049673', 'e_code': '171809'}
-    response_data = get_vio_from_shaoshuai(car2['v_number'], car2['v_type'], car2['v_code'], car2['e_code'])
+    # response_data = get_vio_from_tj(car2['v_number'], car2['v_type'], car2['e_code'])
 
     # response_data = get_vio_from_zfb(v_number=carno, v_type=cartype, v_code=vcode, e_code=ecode)
 
     # response_data = get_vio_from_tj('津N02070', '02')
-    print(response_data)
+    # print(response_data)
 
     # v_data = vio_dic_for_ddyc(carno, response_data)
     # v_data = vio_dic_for_chelun(car2['v_number'], response_data)

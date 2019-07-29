@@ -103,3 +103,10 @@ class VioInfoSz(models.Model):
     vio_loc = models.CharField(max_length=50, blank=True, null=True)            # 处理机关
     deal_status = models.IntegerField(default=-1, blank=True, null=True)    # 是否已处理, 0-否, 1-是, -1-未知
     pay_status = models.IntegerField(default=-1, blank=True, null=True)     # 是否已缴费, 0-否, 1-是, -1-未知
+
+
+class VioCode(models.Model):
+    vio_code = models.CharField(max_length=20, primary_key=True)            # 违法代码
+    vio_activity = models.CharField(max_length=100, blank=True, null=True)  # 违法行为
+    vio_point = models.IntegerField(default=0, blank=True, null=True)       # 扣分
+    vio_money = models.IntegerField(default=0, blank=True, null=True)       # 罚款

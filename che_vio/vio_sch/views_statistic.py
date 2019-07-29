@@ -37,7 +37,7 @@ def day_times_query(day, vehicle_dic):
         # 获取Cursor对象
         cs = conn.cursor()
 
-        # 神州
+        # 神州租车
         # sql = 'SELECT DISTINCT vehicle_number, status from vio_sch_loginfo_%s ' \
         #       'where user_id=6 and url_id not in (98, 100) and status<>51 ' % day
 
@@ -45,12 +45,16 @@ def day_times_query(day, vehicle_dic):
         # sql = 'SELECT DISTINCT vehicle_number, status from vio_sch_loginfo_%s ' \
         #       'where user_id=15 and url_id not in (98, 100) and status not in (97, 41, 39)' % day
 
-        # 全部查询车辆
-        # sql = 'SELECT DISTINCT vehicle_number, status from vio_sch_loginfo_%s ' \
-        #       'where url_id = 7 and status not in (97, 41, 39, 51, 41)' % day
-
         # 懂云查询统计
-        sql = 'SELECT id FROM `vio_sch_loginfo_%s` where url_id=6 and status not in (51, 39, 41, 31)' % day
+        # sql = 'SELECT vehicle_number, status from vio_sch_loginfo_%s ' \
+        #       'where url_id = 7 and status not in (97, 41, 39, 51, 31)' % day
+
+        # 盔甲查询统计
+        sql = 'SELECT vehicle_number, status from vio_sch_loginfo_%s ' \
+              'where user_id = 3' % day
+
+        # 上海查询统计
+        # sql = 'SELECT id FROM `vio_sch_loginfo_%s` where url_id=6 and status not in (51, 39, 41, 31)' % day
 
         # 上海接口查询统计
 
@@ -61,9 +65,9 @@ def day_times_query(day, vehicle_dic):
 
         # for r in results:
         #     vehicle = r[0]
-            # 神州统计
-            # save_vehicle_into_dic(vehicle, vehicle_dic)
-            # save_vehicle_into_dic_by_location(vehicle, vehicle_dic)
+        #     # 神州统计
+        #     save_vehicle_into_dic(vehicle, vehicle_dic)
+        #     # save_vehicle_into_dic_by_location(vehicle, vehicle_dic)
 
     except Exception as e:
         print(e)
@@ -129,7 +133,6 @@ def export_excel(vehicle_dic, month):
 if __name__ == '__main__':
     v_dic = {}
     query_year = '2019'
-    query_month = '06'
 
     # monthly_times_query(query_year, query_month, v_dic)
     #

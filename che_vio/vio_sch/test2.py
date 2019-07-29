@@ -38,7 +38,7 @@ def vio_dic_for_cwb(v_number, data):
     :param data: 车轮接口返回数据, dict
     :return: 车八佰违章数据, dict
     """
-
+    print(data)
     status_code = data.get('status_code', -1)
 
     if status_code == 2000:
@@ -75,7 +75,7 @@ def vio_dic_for_cwb(v_number, data):
             vio_point = vio.get('fen', '')  # 扣分
             vio_money = vio.get('money', '')  # 罚款
             vio_code = ''  # 违法代码
-            vio_loc = vio.get('officer', '')  # 处理机关
+            vio_loc = ''  # 处理机关
 
             vio_data = {
                 'time': vio_time,
@@ -124,11 +124,16 @@ def get_status(origin_status, url_id):
 
 
 if __name__ == '__main__':
-    v_number = '津RBN277'
+    # v_number = '闽DC3Q01'
+    # v_type = '02'
+    # vin = 'LSVNB4187HN044147'E3034066
+
+    v_number = '冀AC110Q'
     v_type = '02'
-    vin = 'LSGLP83X7HF028522'
+    vin = 'LJ166A330E7020540'
 
     vio_data = get_vio_from_cwb(v_number, v_type, vin)
-    vio_dic = vio_dic_for_cwb(v_number, vio_data)
+    pprint.pprint(vio_data)
+    # vio_dic = vio_dic_for_cwb(v_number, vio_data)
 
-    pprint.pprint(vio_dic)
+    # pprint.pprint(vio_dic)
