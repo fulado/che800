@@ -51,7 +51,7 @@ def day_times_query(day, vehicle_dic):
 
         # 盔甲查询统计
         sql = 'SELECT vehicle_number, status from vio_sch_loginfo_%s ' \
-              'where user_id = 3' % day
+              'where user_id = 19' % day
 
         # 上海查询统计
         # sql = 'SELECT id FROM `vio_sch_loginfo_%s` where url_id=6 and status not in (51, 39, 41, 31)' % day
@@ -127,7 +127,7 @@ def export_excel(vehicle_dic, month):
         i += 1
 
     # 将文件保存在内存中
-    wb.save(r'D:\2019%s.xls' % month)
+    wb.save(r'/Users/Barry/99_temp/%s.xls' % month)
 
 
 if __name__ == '__main__':
@@ -138,7 +138,7 @@ if __name__ == '__main__':
     #
     # export_excel(v_dic, query_month)
 
-    month_list = ['06']
+    month_list = ['07']
 
     for query_month in month_list:
         v_dic = {}

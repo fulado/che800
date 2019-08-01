@@ -1,5 +1,5 @@
 """
-用户类
+查询请求类
 """
 
 
@@ -9,14 +9,18 @@ import hashlib
 from .models import UserInfo
 
 
-class User(object):
+class QueryRequest(object):
     """
-    User class
+    QueryRequest class
     """
     def __init__(self, username, timestamp, sign):
         self.username = username
         self.timestamp = timestamp
         self.sign = sign
+        self.status = 0
+        self.msg = ''
+        self.src_status = None
+        self.src_msg = None
 
     # login check
     def check_user(self):
@@ -24,23 +28,33 @@ class User(object):
         try:
             user_timestamp = int(self.timestamp)
         except ValueError:
-            return 15
+            self.status = 15
+            self.msg = '时间戳格式错误'
+            return
 
         if abs(user_timestamp - int(time.time())) > 60 * 5:
-            return 16
+            self.status = 16
+            self.msg = '时间戳超时'
+            return
 
         try:
             user_info = UserInfo.objects.get(username=self.username)
         except Exception as e:
             print(e)
-            return 11
+            self.status = 11
+            self.msg = '用户不存在'
+            return
 
-        password = user_info.password
+        user_sign = hashlib.sha1((self.username + self.timestamp + user_info.password).encode()).hexdigest().upper()
 
-        user_sign = hashlib.sha1(())
+        if self.sign != user_sign:
+            self.status = 12
+            self.msg = 'sign签名错误'
+            return
 
 
-
+    # save_log
+    def save_log(self):
 
 
 
