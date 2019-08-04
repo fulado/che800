@@ -123,17 +123,37 @@ def get_status(origin_status, url_id):
         return {'status': 51, 'msg': '数据源异常'}
 
 
+# 车辆档案接口签名
+def create_sign(hphm, hpzl, sf, syr):
+    app_id = '100370'
+    secret = '254c0cc463d0474c6e35b1994aa7f1dd'
+    str_sign = 'appid=%s&hphm=%s&hpzl=%s&secret=%s&sf=%s&syr=%s' % (app_id, hphm, hpzl, secret, sf, syr)
+
+    str_sign = hashlib.md5(str_sign.encode()).hexdigest()
+
+    return str_sign
+
+
 if __name__ == '__main__':
     # v_number = '闽DC3Q01'
     # v_type = '02'
     # vin = 'LSVNB4187HN044147'E3034066
 
-    v_number = '冀AC110Q'
-    v_type = '02'
-    vin = 'LJ166A330E7020540'
-
-    vio_data = get_vio_from_cwb(v_number, v_type, vin)
-    pprint.pprint(vio_data)
+    # v_number = '冀AC110Q'
+    # v_type = '02'
+    # vin = 'LJ166A330E7020540'
+    #
+    # vio_data = get_vio_from_cwb(v_number, v_type, vin)
+    # pprint.pprint(vio_data)
     # vio_dic = vio_dic_for_cwb(v_number, vio_data)
 
     # pprint.pprint(vio_dic)
+
+    hphm = 'DC76P1'
+    hpzl = '02'
+    sf = '浙'
+    syr = '朱卫国'
+
+    sign = create_sign(hphm, hpzl, sf, syr)
+
+    print(sign)

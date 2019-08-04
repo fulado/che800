@@ -13,7 +13,7 @@ class User(object):
     """
     QueryRequest class
     """
-    def __init__(self, username, timestamp, sign, ip, url_id):
+    def __init__(self, username, timestamp, sign, ip):
         self.username = username
         self.timestamp = timestamp
         self.sign = sign
@@ -22,9 +22,10 @@ class User(object):
         self.src_status = None
         self.src_msg = None
         self.vehicle = None
-        self.user_id = None
+        self.user_info = None
         self.ip = ip
-        self.url_id = url_id
+        self.query_url = None
+        self.query_result = None
 
     # login check
     def check_user(self):
@@ -34,12 +35,12 @@ class User(object):
         except ValueError:
             self.status = 13
             self.msg = '时间戳格式错误'
-            return
+            return False
 
         if abs(user_timestamp - int(time.time())) > 60 * 5:
             self.status = 14
             self.msg = '时间戳超时'
-            return
+            return False
 
         try:
             user_info = UserInfo.objects.get(username=self.username)
@@ -47,16 +48,36 @@ class User(object):
             print(e)
             self.status = 11
             self.msg = '用户不存在'
-            return
+            return False
 
         user_sign = hashlib.sha1((self.username + self.timestamp + user_info.password).encode()).hexdigest().upper()
 
         if self.sign != user_sign:
             self.status = 12
             self.msg = 'sign签名错误'
-            return
+            return False
 
-        self.user_id = user_info.id
+        self.user_info = user_info
+
+        return True
+
+    # get_url
+    def get_url(self):
+        permit_list = self.user_info.permit_province.split()
+
+        if self.vehicle.v_number not in permit_list:
+            self.status = 31
+            self.msg = '该地区车辆不支持查询'
+            return False
+        else:
+            self.query_url = 'http://39.98.255.209:3001/vehicle/checkName'
+            return True
+
+    # save log and create query result
+    def create_result(self):
+        self.create_log()
+        self.save_log()
+        self.get_query_result()
 
     # create log
     def create_log(self):
@@ -76,7 +97,7 @@ class User(object):
             self.status = 22
             self.msg = '车辆信息错误'
         elif self.src_status == 224:
-            self.status = 31
+            self.status = 41
             self.msg = '查询失败'
 
     # save_log
