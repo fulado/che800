@@ -13,17 +13,20 @@ class User(object):
     """
     QueryRequest class
     """
-    def __init__(self, username, timestamp, sign, ip):
+    def __init__(self, username, timestamp, sign, ip, v_number, v_type, vin):
         self.username = username
         self.timestamp = timestamp
         self.sign = sign
-        self.status = 0
+        self.status = None
         self.msg = ''
         self.src_status = None
         self.src_msg = None
         self.vehicle = None
         self.user_info = None
         self.ip = ip
+        self.v_number = v_number
+        self.v_type = v_type
+        self.vin = vin
         self.query_url = None
         self.query_result = None
 
@@ -63,14 +66,26 @@ class User(object):
 
     # get_url
     def get_url(self):
-        permit_list = self.user_info.permit_province.split()
+        try:
+            int(self.v_type)
+        except ValueError:
+            self.status = 23
+            self.msg = '车辆类型错误'
+            return False
 
-        if self.vehicle.v_number not in permit_list:
+        if len(self.vin) != 4:
+            self.status = 24
+            self.msg = '车架号错误'
+            return False
+
+        permit_list = self.user_info.permit_province
+
+        if self.v_number[0] not in permit_list:
             self.status = 31
             self.msg = '该地区车辆不支持查询'
             return False
         else:
-            self.query_url = 'http://39.98.255.209:3001/vehicle/checkName'
+            self.query_url = 'http://39.98.255.209:3001/vehicle/two'
             return True
 
     # save log and create query result
@@ -81,10 +96,13 @@ class User(object):
 
     # create log
     def create_log(self):
-        self.src_status = self.vehicle.status
-        self.src_msg = self.vehicle.msg
+        self.src_status = self.vehicle.status if self.vehicle else None
+        self.src_msg = self.vehicle.msg if self.vehicle else None
 
-        if self.src_status == 200:
+        if self.src_status is None:
+            return
+
+        if self.src_status in (0, 200):
             self.status = 0
             self.msg = '查询成功'
         elif self.src_status > 400:
@@ -104,13 +122,13 @@ class User(object):
     def save_log(self):
         log_info = LogInfo()
 
-        log_info.user_id = self.user_id
-        log_info.ip = self.ip
+        log_info.user_id = self.user_info.id if self.user_info else None
+        log_info.ip = self.ip if self.ip else None
         log_info.query_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-        log_info.vehicle_number = self.vehicle.v_number
-        log_info.vehicle_type = self.vehicle.v_type
-        log_info.vehicle_owner = self.vehicle.v_owner
-        log_info.url_id = self.url_id
+        log_info.vehicle_number = self.vehicle.v_number if self.vehicle else None
+        log_info.vehicle_type = self.vehicle.v_type if self.vehicle else None
+        log_info.vin = self.vehicle.vin if self.vehicle else None
+        log_info.url_id = 1
         log_info.status = self.status
         log_info.msg = self.msg
         log_info.src_status = self.src_status
@@ -123,19 +141,18 @@ class User(object):
 
     # create_query_result
     def get_query_result(self):
+
         if self.status == 0:
-            query_result = {
+            self.query_result = {
                 'status': self.status,
                 'message': self.msg,
                 'data': self.vehicle.data
             }
         else:
-            query_result = {
+            self.query_result = {
                 'status': self.status,
                 'message': self.msg
             }
-
-        return query_result
 
 
 

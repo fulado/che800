@@ -3,7 +3,7 @@ from . import views
 
 
 urlpatterns = [
-    # url(r'^violation/?', views.violation),
+    url(r'^vehicle/?', views.vehicle_info),
     # url(r'^test/?', views.nginx_test),
     # url(r'^login/shenzhou/?', views_sz.login_service),
     # url(r'^login/?', views_old.login_service),

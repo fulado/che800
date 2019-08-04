@@ -77,6 +77,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'vio_sch.apps.VioSchConfig',
+    'vehicle_info.apps.VehicleInfoConfig',
 ]
 
 MIDDLEWARE = [

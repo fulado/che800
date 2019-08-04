@@ -1,6 +1,7 @@
 from django.http import JsonResponse
-from.forms import SearchForm
+from .forms import SearchForm
 from .user import User
+from .vehicle import Vehicle
 
 
 # Create your views here.
@@ -25,21 +26,34 @@ def vehicle_info(request):
         result = {'status': 99, 'msg': '请求数据无效'}
         return JsonResponse(result)
 
-    # 获取请求表单对象
-    if request.method == 'GET':
-        form_obj = SearchForm(request.GET)
-    else:
-        form_obj = SearchForm(request.POST)
+    # get request data
+    request_data = form_obj.clean()
 
-    user = User(form_obj.username, form_obj.timestamp, form_obj.sign, user_ip)
+    # create user object
+    user = User(request_data['username'], request_data['timestamp'], request_data['sign'], user_ip,
+                request_data['vehicleNumber'], request_data['vehicleType'], request_data['vin'])
 
+    # check user info
     if not user.check_user():
         user.create_result()
         return JsonResponse(user.query_result)
 
+    # get query url
     if not user.get_url():
         user.create_result()
         return JsonResponse(user.query_result)
+
+    # create vehicle object
+    vehicle = Vehicle(user.v_number, user.v_type, user.vin, user.query_url)
+
+    # get vehicle info
+    if vehicle.get_vehicle_info():
+        vehicle.save_vehicle_info()
+
+    # return query result
+    user.vehicle = vehicle
+    user.create_result()
+    return JsonResponse(user.query_result)
 
 
 
