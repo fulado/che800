@@ -924,7 +924,8 @@ def vio_dic_for_cwb(v_number, data):
             vio_money = str(vio.get('money', ''))  # 罚款
             vio_money = vio_money[: -2] if '.' in vio_money else vio_money
             vio_code = get_vio_code(vio_activity)  # 违法代码
-            vio_loc = get_loc_by_vio_id(vio.get('vioid', ''))  # 处理城市
+            # vio_loc = get_loc_by_vio_id(vio.get('vioid', '')) if vio.get('vioid', None) else ''  # 处理城市
+            vio_loc = None
 
             vio_data = {
                 'time': vio_time,

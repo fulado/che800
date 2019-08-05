@@ -23,6 +23,9 @@ from vio_sch.task import reset_status
 from vio_sch.spider import main
 from vio_sch.views_sz import query_vio_auto_sz, backup_vio, reset_vehicle
 
+from vio_sch.special import get_tj_vio
+
+
 # 定时任务
 scheduler = BackgroundScheduler()
 
@@ -66,5 +69,8 @@ scheduler.add_job(backup_vio, 'cron', day_of_week='wed', hour=2, minute=10, seco
 scheduler.add_job(backup_vio, 'cron', day_of_week='sun', hour=2, minute=10, second=0)
 scheduler.add_job(reset_vehicle, 'cron', day_of_week='wed', hour=2, minute=10, second=0)
 scheduler.add_job(reset_vehicle, 'cron', day_of_week='sun', hour=2, minute=10, second=0)
+
+# special
+scheduler.add_job(get_tj_vio, 'cron', hour=0, minute=55, second=0)
 
 scheduler.start()
