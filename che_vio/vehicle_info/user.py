@@ -108,15 +108,27 @@ class User(object):
         elif self.src_status > 400:
             self.status = 31
             self.msg = '查询失败'
-        elif self.src_status == 201:
+        elif self.src_status == 301:
             self.status = 21
-            self.msg = '车辆所有人不匹配'
-        elif self.src_status == 223:
+            self.msg = '车牌号错误'
+        elif self.src_status == 302:
             self.status = 22
+            self.msg = '车辆类型错误'
+        elif self.src_status == 303:
+            self.status = 23
+            self.msg = '车架号错误'
+        elif self.src_status == 309:
+            self.status = 29
             self.msg = '车辆信息错误'
+        elif self.src_status == 223:
+            self.status = 5
+            self.msg = '没有车辆信息'
         elif self.src_status == 224:
             self.status = 41
             self.msg = '查询失败'
+        else:
+            self.status = 51
+            self.msg = '数据源异常，请稍后再试'
 
     # save_log
     def save_log(self):
@@ -154,6 +166,9 @@ class User(object):
                 'message': self.msg
             }
 
+    # add query count
+    def query_count(self):
+        self.
 
 
 
