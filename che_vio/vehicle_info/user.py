@@ -69,12 +69,12 @@ class User(object):
         try:
             int(self.v_type)
         except ValueError:
-            self.status = 23
+            self.status = 22
             self.msg = '车辆类型错误'
             return False
 
         if len(self.vin) != 4:
-            self.status = 24
+            self.status = 23
             self.msg = '车架号错误'
             return False
 
@@ -121,10 +121,10 @@ class User(object):
             self.status = 29
             self.msg = '车辆信息错误'
         elif self.src_status == 223:
-            self.status = 5
+            self.status = 41
             self.msg = '没有车辆信息'
         elif self.src_status == 224:
-            self.status = 41
+            self.status = 31
             self.msg = '查询失败'
         else:
             self.status = 51
@@ -167,8 +167,8 @@ class User(object):
             }
 
     # add query count
-    def query_count(self):
-        self.
+    # def query_count(self):
+    #     self.
 
 
 
