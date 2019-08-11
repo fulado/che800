@@ -84,7 +84,7 @@ DATABASES = {
         'NAME': 'vehicle_business',
         'HOST': 'cd-cdb-6ko6xzpg.sql.tencentcdb.com',
         'PORT': 63560,
-        # 'HOST': '172.27.0.14',
+        # 'HOST': '127.0.0.1',
         # 'PORT': 3306,
         'USER': 'root',
         'PASSWORD': 'Init1234',

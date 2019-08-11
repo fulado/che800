@@ -83,6 +83,7 @@ class Violation(object):
                 vio_info.loc = vio.get('loc', '')
                 vio_info.deal_status = vio.get('deal', '')
                 vio_info.pay_status = vio.get('pay', '')
+                vio_info.user_id = self.vehicle.user_id
 
                 vio_info.save()
         else:

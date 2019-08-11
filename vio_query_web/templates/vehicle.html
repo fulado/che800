@@ -119,9 +119,10 @@
             <span class="find_btn">查询</span>
             <span class="add_account" id="add">新增车辆</span>
 
-{#            <a href="javascript:clear_all('{{ user_id }}');"><span class="out">删除全部车辆</span></a>#}
-{#            <a href="javascript:submit_all('{{ user_id }}');"><span class="out">全部查询</span></a>#}
-            <a href="/static/excel/车辆信息.xlsx"><span class="out outexcel">模版下载</span></a>
+            <!--<a href="/delete_all"><span class="out">删除全部车辆和违章</span></a>-->
+            <a href="/delete_all"><span class="out">删除全部车辆</span></a>
+            <a href="javascript:query_all();"><span class="out">全部查询</span></a>
+            <a href="/static/excel/车辆信息.xls"><span class="out outexcel">模版下载</span></a>
             <span class="out import-excel">导入车辆</span>
 
 
@@ -170,13 +171,11 @@
                         <button type="button" class="see modify-vehicle-info" style="margin-right: 5px;" onclick="setVehicleInfo(
                         '{{ vehicle.type }}', '{{ vehicle.number|linebreaksbr }}', '{{ vehicle.engine|linebreaksbr }}',
                         '{{ vehicle.vin|linebreaksbr }}', '{{ vehicle.id }}')">编辑</button>
-                        <a href="javascript:submit_vehicle('{{ vehicle.id }}');" class="see" style="margin-right: 5px;">
-                            {% if vehicle.status < 0 %}
-                                查询
-                            {% else %}
-                                查看
-                            {% endif %}
-                        </a>
+                        {% if vehicle.status < 0 %}
+                            <a href="javascript:submit_vehicle('{{ vehicle.id }}', 0);" class="see" style="margin-right: 5px;">查询</a>
+                        {% else %}
+                            <a href="javascript:submit_vehicle('{{ vehicle.id }}', 1);" class="see" style="margin-right: 5px;">查看</a>
+                        {% endif %}
                     </td>
                 </tr>
                 {% endfor %}
@@ -314,20 +313,22 @@
 </div>
 
 <!--模态框-->
-<div class="container">
-    <div class="pop-up" style="width: 560px;height: 268px;margin: 15% auto;display: none">
-        <form>
-            <div class="ePrisename" style="height: 200px;">
-                <label for="reason" style="vertical-align: top;width: 100px">填写原因</label>
-                <textarea name="" id="reason" style="resize:none;border-radius:4px; background-color: #f9f9f9;border: solid 1px #eeeeee;outline: none;padding: 10px;width:400px;height:150px"></textarea>
-            </div>
+<div class="pop-up querying" style="width: 560px;height: 268px;margin: 15% auto; border: 2px solid gray;display: none;">
+    <form>
+        <div class="ePrisename" style="height: 200px;">
+            <p style="width: 500px; text-align: center;margin-top: 90px;font-size: 20px;">查询中，请稍候...</p>
+        </div>
+    </form>
+</div>
 
-            <div class="clickbtn" style="margin: 0 auto;width: 430px">
-                <div class="btn save" id="save">提交</div>
-                <div class="btn del" id="del">关闭</div>
-            </div>
-        </form>
-    </div>
+
+<!--模态框-->
+<div class="pop-up importing" style="width: 560px;height: 268px;margin: 15% auto; border: 2px solid gray;display: none;">
+    <form>
+        <div class="ePrisename" style="height: 200px;">
+            <p style="width: 500px; text-align: center;margin-top: 90px;font-size: 20px;">导入中，请稍候...</p>
+        </div>
+    </form>
 </div>
 
 <!--上传文件模态框-->
@@ -340,7 +341,7 @@
         </div>
 
         <div class="btndiv" style="margin-top: 50px;">
-            <button type="button" class="btn save" style="line-height: 27px;" >导入</button>
+            <button type="button" class="btn save" style="line-height: 27px;" onclick="importing()">导入</button>
             <!--<input type="submit" class="btn" style="line-height: 27px;" value="导入" />-->
             <div class="btn" id="close" style="line-height: 27px;">关闭</div>
         </div>
@@ -517,8 +518,25 @@
     }
 
     // 查询违章
-    function submit_vehicle(vehicle_id) {
+    function submit_vehicle(vehicle_id, query_status) {
+        if (query_status == 0) {
+            $('.querying').show();
+            $('.mask').show();
+        }
         window.location.href = "/query_vio?vehicle_id=" + vehicle_id;
+    }
+
+    // 查询全部违章
+    function query_all() {
+        $('.querying').show();
+        $('.mask').show();
+        window.location.href = "/query_all";
+    }
+
+    // 导入车辆信息
+    function importing() {
+        $('.importing').show();
+        $('.pop-up1').hide();
     }
 
     // 提交全部车辆, 判断是否到达上限, 如到达上限, 则仅提交部分车辆, 并给出提示

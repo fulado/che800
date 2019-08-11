@@ -31,6 +31,18 @@ urlpatterns = [
     url(r'^vehicle/?', views.vehicle_management),
 
     url(r'^query_vio/?', views.query_vio),                  # 查询违章
+    url(r'^query_all/?', views.query_all),                  # 查询违章
     url(r'^vio_display/?', views.vio_display),              # 违章显示
+    url(r'^vio_export/?', views.vio_export),                # 违章导出
+
+    url(r'^delete_all_vehicle/?', views.delete_all_vehicle),                  # 删除账号内全部车辆
+    url(r'^delete_all_violation/?', views.delete_all_violation),                  # 删除账号内的全部违章
+    url(r'^delete_all/?', views.delete_all),              # 删除账号内的全部车辆和违章
+
+    url(r'^is_user_exist/?', views.is_user_exist),  # 判断用户是否已经存在
+    url(r'^user_show/?', views.user_show),  # 显示用户管理界面
+    url(r'^user_add/?', views.user_add),    # 保存新增用户信息
+    # url(r'^user_modify/?', views.user_modify),  # 保存用户信息
+
     url(r'^', views.login),
 ]

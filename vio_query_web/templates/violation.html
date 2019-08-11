@@ -99,7 +99,7 @@
 <body>
 <div class="table_wrapper">
     <div class="table_head">
-        <span>车辆列表</span>
+        <span>违章列表</span>
 {#        <span class="number_word">车辆提交上限&nbsp;:&nbsp;{{ limit_number }}</span>#}
 {#        <span class="number_word">已提交车辆数&nbsp;:&nbsp;{{ applied_number }}</span>#}
     </div>
@@ -119,9 +119,9 @@
             <span class="find_btn">查询</span>
 {#            <span class="add_account" id="add">新增车辆</span>#}
 
-{#            <a href="javascript:clear_all('{{ user_id }}');"><span class="out">删除全部车辆</span></a>#}
+            <a href="/delete_all_violation"><span class="out">删除全部违章</span></a>
 {#            <a href="javascript:submit_all('{{ user_id }}');"><span class="out">全部查询</span></a>#}
-{#            <a href="/static/excel/vehicle.xls"><span class="out outexcel">模版下载</span></a>#}
+              <a href="/vio_export/"><span class="out outexcel">导出违章</span></a>
 {#            <span class="out import-excel">导入车辆</span>#}
 
 
@@ -178,9 +178,9 @@
                 <a href="/vio_display?page_num={{ mp.current_num|add:-1 }}&number={{ number }}"><li class="js-page-prev js-page-action ui-pager">上一页</li></a>
                 {% for num in mp.page_range %}
                     {% if num == mp.current_num %}
-                    <a href="/vio_display?page_num={{ num }}&search_name={{ number }}"><li class="ui-pager focus">{{ num }}</li></a>
+                    <a href="/vio_display?page_num={{ num }}&number={{ number }}"><li class="ui-pager focus">{{ num }}</li></a>
                     {% else %}
-                    <a href="/vio_display?page_num={{ num }}&search_name={{ number }}"><li class="ui-pager">{{ num }}</li></a>
+                    <a href="/vio_display?page_num={{ num }}&number={{ number }}"><li class="ui-pager">{{ num }}</li></a>
                     {% endif %}
                 {% endfor %}
                 <a href="/vio_display?page_num={{ mp.current_num|add:1 }}&number={{ number }}"><li class="js-page-next js-page-action ui-pager">下一页</li></a>

@@ -2,6 +2,7 @@ from django.shortcuts import render
 from django.http import HttpResponseRedirect, HttpResponse, JsonResponse
 from PIL import Image, ImageDraw, ImageFont
 import xlrd
+import xlwt
 
 import io
 import hashlib
@@ -149,8 +150,6 @@ def vehicle_management(request):
     mp = MyPaginator()
     mp.paginate(vehicle_list, 10, page_num)
 
-    # 查询是否允许提交
-
     context = {'mp': mp,
                'number': number,
                }
@@ -252,11 +251,16 @@ def vehicle_delete(request):
     # 获取车辆id
     vehicle_id = request.POST.get('vehicle_id')  # 车辆id
 
-    # 根据id查询车辆
-    car = VehicleInfo.objects.get(id=vehicle_id)
-
     # 删除车辆
     try:
+        # 根据id查询车辆
+        car = VehicleInfo.objects.get(id=vehicle_id)
+
+        # 删除与该车相关的违章信息
+        vio_list = VioInfo.objects.filter(number=car.number)
+        vio_list.delete()
+
+        # 删除车辆
         car.delete()
     except Exception as e:
         print(e)
@@ -267,6 +271,17 @@ def vehicle_delete(request):
     url = '/vehicle?number=%s&page_num=%s&' % (number, page_num)
 
     return HttpResponseRedirect(url)
+
+
+# 是否超出查询辆限制
+def is_exceed_limitation(request):
+    user_id = int(request.session.get('user_id', ''))
+    user_info = UserInfo.objects.get(id=user_id)
+
+    if user_info.queried_number >= user_info.limitation:
+        return True
+    else:
+        return False
 
 
 # 查询违章
@@ -280,11 +295,54 @@ def query_vio(request):
         violation.get_violations_from_api()
         violation.save_violations()
 
+        # 记录查询次数
+        user_id = int(request.session.get('user_id', ''))
+
+        try:
+            user_info = UserInfo.objects.get(id=user_id)
+
+            if vehicle.status >= 0 or vehicle.status == -2:
+                user_info.queried_number += 1
+
+            user_info.save()
+        except Exception as e:
+            print(e)
+
         number = request.session.get('number', '')
         page_num = request.session.get('page_num', '')
         url = '/vehicle?number=%s&page_num=%s&' % (number, page_num)
     else:
         url = '/vio_display?vehicle_id=' + vehicle_id
+
+    return HttpResponseRedirect(url)
+
+
+# 查询全部违章
+def query_all(request):
+    user_id = int(request.session.get('user_id', ''))
+    vehicle_list = VehicleInfo.objects.filter(user_id=user_id).filter(status__in=[-1, -3])
+    user_info = UserInfo.objects.get(id=user_id)
+
+    for vehicle in vehicle_list:
+
+        violation = Violation(vehicle)
+        violation.get_violations_from_api()
+        violation.save_violations()
+
+        if vehicle.status >= 0 or vehicle.status == -2:
+            user_info.queried_number += 1
+
+        if user_info.queried_number >= user_info.limitation:
+            break
+
+    try:
+        user_info.save()
+    except Exception as e:
+        print(e)
+
+    number = request.session.get('number', '')
+    page_num = request.session.get('page_num', '')
+    url = '/vehicle?number=%s&page_num=%s&' % (number, page_num)
 
     return HttpResponseRedirect(url)
 
@@ -296,14 +354,17 @@ def vio_display(request):
     # 获取车辆搜索信息
     number = request.GET.get('number', '')
 
+    # 获取用户id
+    user_id = int(request.session.get('user_id', ''))
+
     if vehicle_id:
-        vehicle = VehicleInfo.objects.get(id=vehicle_id)
-        vio_list = VioInfo.objects.filter(number=vehicle.number, type=vehicle.type)
+        vehicle = VehicleInfo.objects.get(id=vehicle_id, user_id=user_id)
+        vio_list = VioInfo.objects.filter(number=vehicle.number, type=vehicle.type, user_id=user_id)
         number = vehicle.number
     elif number:
-        vio_list = VioInfo.objects.filter(number=number, type=2)
+        vio_list = VioInfo.objects.filter(number=number, type=2, user_id=user_id)
     else:
-        vio_list = VioInfo.objects.all()
+        vio_list = VioInfo.objects.filter(user_id=user_id)
 
     # 获得用户指定的页面
     page_num = int(request.GET.get('page_num', 1))
@@ -375,6 +436,8 @@ def vehicle_import(request):
 
         if exist_truck_list:
             vehicle = exist_truck_list[0]
+            if vehicle.status == -2:
+                vehicle.status = -1
         else:
             vehicle = VehicleInfo()
             vehicle.number = number
@@ -383,6 +446,7 @@ def vehicle_import(request):
         vehicle.type = 2
         vehicle.engine = engine if engine else None
         vehicle.vin = vin if vin else None
+        vehicle.user_id = user_id
 
         vehicle.save()
 
@@ -394,9 +458,192 @@ def vehicle_import(request):
     return HttpResponseRedirect(url)
 
 
+# 导出违章数据
+def vio_export(request):
+
+    user_id = request.session.get('user_id', None)
+
+    if user_id:
+        vio_list = VioInfo.objects.filter(user_id=user_id)
+    else:
+        vio_list = VioInfo.objects.all()
+
+    if vio_list:
+
+        # 创建工作簿
+        wb = xlwt.Workbook(encoding='utf-8')
+        ws = wb.add_sheet('sheet1', cell_overwrite_ok=True)
+
+        # 设置表头
+        title = ['车牌号码', '车辆类型', '违法时间', '违法地点', '违法行为', '扣分', '罚款', '处理状态', '缴费状态']
+
+        # 生成表头
+        len_col = len(title)
+        for i in range(0, len_col):
+            ws.write(0, i, title[i])
+
+        # 写入车辆数据
+        i = 1
+        for vio in vio_list:
+            # 读取违章数据
+            vehicle_number = vio.number
+            vehicle_type = vio.type
+            vehicle_time = vio.time
+            vehicle_position = vio.position
+            vehicle_activity = vio.activity
+            vehicle_point = vio.point
+            vehicle_money = vio.money
+
+            if vio.deal_status == 1:
+                vehicle_deal = '已处理'
+            elif vio.deal_status == 0:
+                vehicle_deal = '未处理'
+            else:
+                vehicle_deal = '未知'
+
+            if vio.pay_status == 1:
+                vehicle_pay = '已缴费'
+            elif vio.pay_status == 0:
+                vehicle_pay = '未缴费'
+            else:
+                vehicle_pay = '未知'
+
+            content = [vehicle_number,
+                       vehicle_type,
+                       vehicle_time,
+                       vehicle_position,
+                       vehicle_activity,
+                       vehicle_point,
+                       vehicle_money,
+                       vehicle_deal,
+                       vehicle_pay
+                       ]
+
+            for j in range(0, len_col):
+                ws.write(i, j, content[j])
+            i += 1
+
+        # 内存文件操作
+        buf = io.BytesIO()
+
+        # 将文件保存在内存中
+        wb.save(buf)
+        response = HttpResponse(buf.getvalue(), content_type='application/vnd.ms-excel')
+        response['Content-Disposition'] = 'attachment; filename=violations.xls'
+        response.write(buf.getvalue())
+        return response
+    else:
+        # 构建返回url
+        number = request.session.get('number', '')
+        page_num = request.session.get('page_num', '')
+        url = '/vehicle?number=%s&page_num=%s' % (number, page_num)
+
+        return HttpResponseRedirect(url)
 
 
+# 删除全部车辆
+def delete_all_vehicle(request):
+    user_id = int(request.session.get('user_id', ''))
 
+    try:
+        vehicle_list = VehicleInfo.objects.filter(user_id=user_id)
+        vehicle_list.delete()
+    except Exception as e:
+        print(e)
+
+    return render(request, 'vehicle.html')
+
+
+# 删除全部违章
+def delete_all_violation(request):
+    user_id = int(request.session.get('user_id', ''))
+
+    try:
+        vio_list = VioInfo.objects.filter(user_id=user_id)
+        vio_list.delete()
+
+        VehicleInfo.objects.exclude(status__in=[-2, -4]).update(status=-1)
+    except Exception as e:
+        print(e)
+
+    return render(request, 'violation.html')
+
+
+# 删除全部车辆和违章
+def delete_all(request):
+    user_id = int(request.session.get('user_id', ''))
+
+    try:
+        vio_list = VioInfo.objects.filter(user_id=user_id)
+        vio_list.delete()
+
+        vehicle_list = VehicleInfo.objects.filter(user_id=user_id)
+        vehicle_list.delete()
+    except Exception as e:
+        print(e)
+
+    return render(request, 'vehicle.html')
+
+
+# 显示用户管理页面
+def user_show(request):
+    username = request.GET.get('username', '')
+
+    if username:
+        user_list = UserInfo.objects.filter(username=username)
+    else:
+        user_list = UserInfo.objects.all()
+
+    # 获得用户指定的页面
+    page_num = int(request.GET.get('page_num', 1))
+
+    # 创建分页
+    mp = MyPaginator()
+    mp.paginate(user_list, 10, page_num)
+
+    # 查询是否允许提交
+    context = {'mp': mp,
+               'username': username,
+               }
+
+    # 保存页面状态到session
+    request.session['username'] = username
+    request.session['page_num'] = page_num
+
+    return render(request, 'user.html', context)
+
+
+# 判断用户是否存在
+def is_user_exist(request):
+    username = request.GET.get('username', '')
+
+    result = UserInfo.objects.filter(username=username).exists()
+
+    return JsonResponse({'result': result})
+
+
+# 新增用户
+def user_add(request):
+    username = request.POST.get('username', '')
+    password = request.POST.get('password', '')
+    authority = request.POST.get('authority', 1)
+
+    user = UserInfo()
+    user.username = username
+    user.password = hashlib.sha1(password.encode('utf8')).hexdigest()
+    user.authority = int(authority)
+
+    try:
+        user.save()
+    except Exception as e:
+        print(e)
+
+    # 构建返回url
+    username = request.session.get('username', '')
+    page_num = request.session.get('page_num', '')
+    url = '/user_show?username=%s&page_num=%s&' % (username, page_num)
+
+    return HttpResponseRedirect(url)
 
 
 

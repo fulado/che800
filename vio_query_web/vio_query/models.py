@@ -10,6 +10,8 @@ class UserInfo(models.Model):
     authority = models.IntegerField(default=1, null=True, blank=True)           # 权限等级, 1-企业权限, 2-管理员权限
     comments = models.CharField(max_length=200, null=True, blank=True)          # 企业名称
     is_delete = models.BooleanField(default=False)
+    limitation = models.IntegerField(default=0, null=True, blank=True)          # 每日限制查询量
+    queried_number = models.IntegerField(default=0, null=True, blank=True)      # 每日实际查询量
 
 
 # 车辆表
@@ -36,4 +38,5 @@ class VioInfo(models.Model):
     loc = models.CharField(max_length=50, blank=True, null=True)  # 处理机关
     deal_status = models.IntegerField(default=-1, blank=True, null=True)  # 是否已处理, 0-否, 1-是, -1-未知
     pay_status = models.IntegerField(default=-1, blank=True, null=True)  # 是否已缴费, 0-否, 1-是, -1-未知
+    user = models.ForeignKey(UserInfo, on_delete=models.CASCADE, blank=True, null=True)  # 所属用户
 
