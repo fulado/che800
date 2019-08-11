@@ -21,7 +21,8 @@ class VehicleInfo(models.Model):
     engine = models.CharField(max_length=50, null=True, blank=True)         # 发动机型号
     vin = models.CharField(max_length=50, null=True, blank=True)            # 车辆识别代码
     location = models.CharField(max_length=50, null=True, blank=True)       # 查询地
-    status = models.IntegerField(default=-1, null=True, blank=True)         # 状态: -1-未查询, 0-无违章, n-有n条违章, -2-车辆信息不正确, -3-查询失败
+    # 状态: -1-未查询, 0-无违章, n-有n条违章, -2-车辆信息不正确, -3-查询失败, -4-地区不可查
+    status = models.IntegerField(default=-1, null=True, blank=True)
     user = models.ForeignKey(UserInfo, on_delete=models.CASCADE, blank=True, null=True)  # 所属用户
 
 

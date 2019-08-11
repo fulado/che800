@@ -279,9 +279,26 @@ def is_exceed_limitation(request):
     user_info = UserInfo.objects.get(id=user_id)
 
     if user_info.queried_number >= user_info.limitation:
-        return True
+        result = True
     else:
-        return False
+        result = False
+
+    return JsonResponse({'result': result})
+
+
+# 是否可以查询全部车辆
+def can_query_all(request):
+    user_id = int(request.session.get('user_id', ''))
+    user_info = UserInfo.objects.get(id=user_id)
+
+    vehicle_list = VehicleInfo.objects.filter(user_id=user_id, status__in=[-1, -3])
+    # print(len(vehicle_list))
+    if user_info.queried_number + len(vehicle_list) > user_info.limitation:
+        result = False
+    else:
+        result = True
+
+    return JsonResponse({'result': result})
 
 
 # 查询违章

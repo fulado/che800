@@ -520,17 +520,34 @@
     // 查询违章
     function submit_vehicle(vehicle_id, query_status) {
         if (query_status == 0) {
-            $('.querying').show();
-            $('.mask').show();
+            $.get('/is_exceed_limitation', function(data) {
+                if (data.result) {
+                    alert('超出每日查询限量，请联系管理员。');
+                }
+                else {
+                    $('.querying').show();
+                    $('.mask').show();
+                    window.location.href = "/query_vio?vehicle_id=" + vehicle_id;
+                }
+            });
         }
-        window.location.href = "/query_vio?vehicle_id=" + vehicle_id;
+        else {
+            window.location.href = "/vio_display?vehicle_id=" + vehicle_id;
+        }
     }
 
     // 查询全部违章
     function query_all() {
-        $('.querying').show();
-        $('.mask').show();
-        window.location.href = "/query_all";
+        $.get('/can_query_all', function(data) {
+            if (data.result) {
+                $('.querying').show();
+                $('.mask').show();
+                window.location.href = "/query_all";
+            }
+            else {
+                alert('超出每日查询限量，不能完成该操作，请联系管理员。');
+            }
+        });
     }
 
     // 导入车辆信息

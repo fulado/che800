@@ -42,6 +42,8 @@ urlpatterns = [
     url(r'^is_user_exist/?', views.is_user_exist),  # 判断用户是否已经存在
     url(r'^user_show/?', views.user_show),  # 显示用户管理界面
     url(r'^user_add/?', views.user_add),    # 保存新增用户信息
+    url(r'^is_exceed_limitation/?', views.is_exceed_limitation),  # 判断查询量是否超限
+    url(r'^can_query_all/?', views.can_query_all),  # 判断是否可以查询全部车辆
     # url(r'^user_modify/?', views.user_modify),  # 保存用户信息
 
     url(r'^', views.login),

@@ -50,7 +50,9 @@
 {#        {% endif %}#}
         <li class="down_menu" data-url="/vehicle">车辆管理</li>
         <li class="down_menu" data-url="/vio_display">违章信息</li>
+        {% if user.authority == 2 %}
         <li class="down_menu" data-url="/user_show">用户管理</li>
+        {% endif %}
     </ul>
 </div>
 <div class="content">
