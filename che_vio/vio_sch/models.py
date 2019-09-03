@@ -10,6 +10,8 @@ class UserInfo(models.Model):
     authority = models.IntegerField(default=0)                                          # 权限: 2-企业, 1-管理员
     is_valid = models.BooleanField(default=True)                                        # 是否可用
     timestamp = models.IntegerField(default=0, blank=False, null=False)                 # 时间戳
+    number_limit = models.IntegerField(default=-1)
+    number_used = models.IntegerField(default=0)
 
 
 class VehicleType(models.Model):
@@ -27,6 +29,12 @@ class LocInfo(models.Model):
     plate_name = models.CharField(max_length=10, blank=True, null=True)                             # 车牌简称
     url = models.ForeignKey(UrlInfo, on_delete=models.CASCADE, blank=True, null=True, default=2)    # 查询接口url
     status = models.BooleanField(default=1)                                                         # 是否可以查询违章
+
+
+class LocUrlRelation(models.Model):
+    location = models.ForeignKey(LocInfo, on_delete=models.CASCADE, blank=True, null=True)  # 地区
+    url = models.ForeignKey(UrlInfo, on_delete=models.CASCADE, blank=True, null=True)  # 接口
+    user = models.ForeignKey(UserInfo, on_delete=models.CASCADE, blank=True, null=True)  # 用户
 
 
 class VehicleInfo(models.Model):

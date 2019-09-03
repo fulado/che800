@@ -687,7 +687,7 @@ def get_vehicle_thread(v_queue):
         except:
             connection.close()
         finally:
-            vehicle_list = VehicleInfoSz.objects.exclude(status__in=[0, 32, 33, 34, 35, 36, 41, 42]).\
+            vehicle_list = VehicleInfoSz.objects.exclude(status__in=[0, 21, 32, 33, 34, 35, 36, 41, 42]).\
                 exclude(vehicle_number__contains='浙')
 
         # 查询违章
@@ -705,7 +705,7 @@ def get_vehicle_thread(v_queue):
         except:
             connection.close()
         finally:
-            vehicle_list = VehicleInfoSz.objects.exclude(status__in=[0, 32, 33, 34, 35, 36, 41, 42]).\
+            vehicle_list = VehicleInfoSz.objects.exclude(status__in=[0, 21, 32, 33, 34, 35, 36, 41, 42]).\
                 filter(vehicle_number__contains='浙')
 
         for vehicle in vehicle_list:

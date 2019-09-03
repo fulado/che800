@@ -39,22 +39,34 @@ def day_times_query(day, vehicle_dic):
 
         # 神州租车
         # sql = 'SELECT DISTINCT vehicle_number, status from vio_sch_loginfo_%s ' \
-        #       'where user_id=6 and url_id not in (98, 100) and status<>51 ' % day
+        #       'where user_id=6 and url_id not in (98, 100) and status not in (97, 41, 39, 51, 31, 21, 19) ' % day
 
         # 神州买卖车
         # sql = 'SELECT DISTINCT vehicle_number, status from vio_sch_loginfo_%s ' \
-        #       'where user_id=15 and url_id not in (98, 100) and status not in (97, 41, 39)' % day
+        #       'where user_id=15 and url_id not in (98, 100) and status not in (97, 41, 39, 51, 31, 21, 19)' % day
 
         # 懂云查询统计
         # sql = 'SELECT vehicle_number, status from vio_sch_loginfo_%s ' \
-        #       'where url_id = 7 and status not in (97, 41, 39, 51, 31)' % day
+        #       'where url_id = 7 and status not in (97, 41, 39, 51, 31, 21, 19)' % day
 
         # 盔甲查询统计
         sql = 'SELECT vehicle_number, status from vio_sch_loginfo_%s ' \
-              'where user_id = 3 and status not in (97, 41, 39)' % day
+              'where user_id = 3 and status not in (97, 41, 39, 51, 31, 21, 19)' % day
+
+        # 安吉查询统计
+        # sql = 'SELECT vehicle_number, status from vio_sch_loginfo_%s ' \
+        #       'where user_id in (18, 19) and status not in (97, 41, 39, 51, 31, 21, 19)' % day
+
+        # 安吉查询统计——每日查询车辆总数
+        # sql = 'SELECT distinct vehicle_number from vio_sch_loginfo_%s ' \
+        #       'where user_id in (18, 19) and status not in (97, 41, 39, 51, 31, 21, 19)' % day
+
+        # 安吉查询统计——每日查询车辆总数
+        # sql = 'SELECT distinct vehicle_number from vio_sch_loginfo_%s ' \
+        #       'where user_id = 20 and status not in (97, 41, 39, 51, 31, 21, 19)' % day
 
         # 上海查询统计
-        # sql = 'SELECT id FROM `vio_sch_loginfo_%s` where url_id=6 and status not in (51, 39, 41, 31)' % day
+        # sql = 'SELECT id FROM `vio_sch_loginfo_%s` where url_id=6 and status not in (status not in (97, 41, 39, 51, 31, 21, 19))' % day
 
         # 上海接口查询统计
 
@@ -128,7 +140,7 @@ def export_excel(vehicle_dic, month):
 
     # 将文件保存在内存中
     # wb.save(r'/Users/Barry/99_temp/%s.xls' % month)
-    wb.save(r'd:/%s.xls' % month)
+    wb.save(r'd:/shenzhou_2019%s.xls' % month)
 
 
 if __name__ == '__main__':
@@ -139,7 +151,7 @@ if __name__ == '__main__':
     #
     # export_excel(v_dic, query_month)
 
-    month_list = ['07']
+    month_list = ['08']
 
     for query_month in month_list:
         v_dic = {}

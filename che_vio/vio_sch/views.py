@@ -98,6 +98,12 @@ def violation(request):
         save_error_log(12, 'sign签名错误', user.id, user_ip)
         return JsonResponse(result)
 
+    # 判断查询次数是否超限
+    if 0 <= user.number_limit <= user.number_used:
+        result = {'status': 18, 'msg': '查询次数超限'}
+        save_error_log(18, '查询次数超限', user.id, user_ip)
+        return JsonResponse(result)
+
     # 查询违章信息
     # print('查询车辆, 号牌号码: %s, 号牌种类: %s' % (data['vehicleNumber'], data['vehicleType']))
     vio_data = get_violations(v_number=data['vehicleNumber'], v_type=data['vehicleType'],
@@ -133,6 +139,15 @@ def get_violations(v_number, v_type=2, v_code='', e_code='', city='', user_id=99
         # 保存日志
         save_log(v_number, '', '', user_id, 99, user_ip, city)
 
+        # 查询次数+1
+        try:
+            user = UserInfo.objects.get(id=user_id)
+            if user.number_limit >= 0:
+                user.number_used += 1
+                user.save()
+        except Exception as e:
+            print(e)
+
         return vio_data
 
     # 将车牌类型转为字符串'02'
@@ -142,7 +157,7 @@ def get_violations(v_number, v_type=2, v_code='', e_code='', city='', user_id=99
         v_type = str(v_type)
 
     # 根据城市选择确定查询端口的url_id
-    url_id, city = get_url_id(v_number, city)
+    url_id = get_url_id(v_number, user_id)
 
     # 如果url_id是None就返回查询城市错误
     if url_id is None:
@@ -199,6 +214,16 @@ def get_violations(v_number, v_type=2, v_code='', e_code='', city='', user_id=99
 
         # 保存车辆数据到本地数据库
         save_vehicle(v_number, v_type, v_code, e_code)
+
+    # 如果查询成功或车辆信息不正确，查询次数累计加1
+    if vio_data['status'] in (0, 32, 33, 34, 35, 36):
+        try:
+            user = UserInfo.objects.get(id=user_id)
+            if user.number_limit >= 0:
+                user.number_used += 1
+                user.save()
+        except Exception as e:
+            print(e)
 
     # 不能直接返回data, 应该把data再次封装后再返回
     return vio_data
@@ -417,4 +442,4 @@ def test_task():
 
 # 负载均衡测试
 def nginx_test(request):
-    return HttpResponse('<h1>server 01</h1>')
+    return HttpResponse('<h1>server 03</h1>')

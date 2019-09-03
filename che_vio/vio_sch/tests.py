@@ -415,7 +415,7 @@ if __name__ == '__main__':
     #
     # pprint(response_data)
 
-    create_sign('test', 'test')
+    create_sign('ctrip', 'ctrip_init')
 
     # q = queue.Queue(maxsize=5)
     # for i in range(10):

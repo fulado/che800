@@ -5,7 +5,7 @@ import json
 import requests
 import urllib.request
 import urllib.parse
-from .models import VioInfo, LogInfo, LocInfo, VehicleBackup, VioCode
+from .models import VioInfo, LogInfo, LocInfo, VehicleBackup, VioCode, LocUrlRelation
 
 
 # 根据违法行为返回违法代码
@@ -23,21 +23,24 @@ def get_vio_code(vio_activity):
 
 
 # 判断查询城市是否正确
-def get_url_id(v_number, city):
+def get_url_id(v_number, user_id):
 
-    if city not in ['津', '天津', '天津市']:  # 目前除天津市外, 均不提供外地车查询, 如果以后开通, 可以去掉这行
-        city = ''                            # 和这一行
+    # if city not in ['津', '天津', '天津市']:  # 目前除天津市外, 均不提供外地车查询, 如果以后开通, 可以去掉这行
+    #     city = ''                            # 和这一行
 
     try:
-        if city == '':
-            loc_info = LocInfo.objects.get(plate_name=v_number[0])
-        else:
-            loc_info = LocInfo.objects.get(loc_name__contains=city)
+        # if city == '':
+        #     loc_info = LocInfo.objects.get(plate_name=v_number[0])
+        # else:
+        #     loc_info = LocInfo.objects.get(loc_name__contains=city)
+
+        loc_info = LocInfo.objects.get(plate_name=v_number[0])
+        loc_url_relation = LocUrlRelation.objects.get(user_id=user_id, location_id=loc_info.loc_id)
     except Exception as e:
         print(e)
-        return None, city
+        return None
 
-    return loc_info.url.id, city
+    return loc_url_relation.url_id
 
 
 # 从本地数据库查询违章
@@ -338,7 +341,7 @@ def get_vio_from_cwb(v_number, v_type, vin, e_code='', city=''):
     area = v_number[0] if v_number else ''
     timestamp = int(time.time())  # 当前时间10位unix时间戳
 
-    if v_number[0] in ['陕', '琼']:
+    if v_number[0] in ['陕', '琼', '津']:
         vin = e_code
 
     vin = vin[-6:]
@@ -379,7 +382,7 @@ def vio_dic_for_ddyc(v_number, data):
     :param data: 车轮接口返回数据, dict
     :return: 车八佰违章数据, dict
     """
-
+    # print('vio_dic_for_ddyc')
     if 'success' in data and data['success']:
         status = 0
 
@@ -498,6 +501,7 @@ def vio_dic_for_chelun(v_number, data):
     :param data: 车轮接口返回数据, dict
     :return: 车八佰违章数据, dict
     """
+    # print('vio_dic_for_chelun')
     if 'code' in data and data['code'] == 0 and 'data' in data and data['data'] is not None:
         status = 0
 
@@ -581,11 +585,12 @@ def vio_dic_for_chelun(v_number, data):
 # 通过盔甲接口查询结果构造标准返回数据
 def vio_dic_for_kuijia(v_number, data):
     """
-        通过盔甲接口查询结构构造标准返回数据
-        :param v_number: 车牌
-        :param data: 盔甲接口返回数据, dict
-        :return: 车八佰违章数据, dict
-        """
+    通过盔甲接口查询结构构造标准返回数据
+    :param v_number: 车牌
+    :param data: 盔甲接口返回数据, dict
+    :return: 车八佰违章数据, dict
+    """
+    # print('vio_dic_for_kuijia')
     if data.get('success', False):
         status = 0
 
@@ -918,14 +923,14 @@ def vio_dic_for_cwb(v_number, data):
                 vio_deal = -1
 
             vio_time = vio.get('occur_date', '')  # 违法时间
-            vio_address = vio.get('occur_area', '')  # 违法地点
+            vio_address = vio.get('occur_area', '') # 违法地点
             vio_activity = vio.get('info', '')  # 违法行为
             vio_point = vio.get('fen', '')  # 扣分
             vio_money = str(vio.get('money', ''))  # 罚款
             vio_money = vio_money[: -2] if '.' in vio_money else vio_money
             vio_code = get_vio_code(vio_activity)  # 违法代码
-            # vio_loc = get_loc_by_vio_id(vio.get('vioid', '')) if vio.get('vioid', None) else ''  # 处理城市
-            vio_loc = None
+            vio_loc = get_loc_by_vio_id(vio.get('vioid', '')) if vio.get('vioid', None) else ''  # 处理城市
+            # vio_loc = ''
 
             vio_data = {
                 'time': vio_time,
@@ -950,6 +955,7 @@ def vio_dic_for_cwb(v_number, data):
 
 # 通过车务帮返回的违法文书号判断违法地点
 def get_loc_by_vio_id(vio_id):
+
     if len(vio_id) < 4:
         return ''
 
@@ -966,7 +972,7 @@ def get_loc_by_vio_id(vio_id):
 
 # 查询结果保存到本地数据库
 def save_to_loc_db(vio_data, vehicle_number, vehicle_type):
-
+    # print('save_to_loc_db')
     try:
         # 如果没有违章, 创建一条只包含车牌和车辆类型的数据
         if len(vio_data['data']) == 0:
@@ -1004,8 +1010,6 @@ def save_to_loc_db(vio_data, vehicle_number, vehicle_type):
                 vio_info.save()
     except Exception as e:
         print(e)
-
-    # print('saved to local db')
 
 
 # 保存查询日志
@@ -1299,7 +1303,7 @@ def create_status_from_cwb(origin_status):
 
 # 根据不同接口的返回状态码构造本地平台返回给用户的状态码
 def get_status(origin_status, url_id, origin_msg=''):
-
+    # print('get_status')
     # 天津接口
     if url_id == 1:
         return create_status_from_tj(int(origin_status))

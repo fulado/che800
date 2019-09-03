@@ -137,23 +137,23 @@ def create_sign(hphm, hpzl, sf, syr):
 if __name__ == '__main__':
     # v_number = '闽DC3Q01'
     # v_type = '02'
-    # vin = 'LSVNB4187HN044147'E3034066
+    # vin = 'LSVNB4187HN044147'
 
-    # v_number = '冀AC110Q'
-    # v_type = '02'
-    # vin = 'LJ166A330E7020540'
-    #
-    # vio_data = get_vio_from_cwb(v_number, v_type, vin)
+    v_number = '津RF3599'
+    v_type = '02'
+    vin = '095038'
+
+    vio_data = get_vio_from_cwb(v_number, v_type, vin)
     # pprint.pprint(vio_data)
-    # vio_dic = vio_dic_for_cwb(v_number, vio_data)
+    vio_dic = vio_dic_for_cwb(v_number, vio_data)
 
-    # pprint.pprint(vio_dic)
+    pprint.pprint(vio_dic)
 
-    hphm = 'DC76P1'
-    hpzl = '02'
-    sf = '浙'
-    syr = '朱卫国'
-
-    sign = create_sign(hphm, hpzl, sf, syr)
-
-    print(sign)
+    # hphm = 'DC76P1'
+    # hpzl = '02'
+    # sf = '浙'
+    # syr = '朱卫国'
+    #
+    # sign = create_sign(hphm, hpzl, sf, syr)
+    #
+    # print(sign)
