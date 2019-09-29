@@ -3,11 +3,12 @@
 """
 
 
-from .models import UserInfo, VehicleInfo, VioInfo
+from .models import VehicleInfo, VioInfo
 
 
 # system initialized
 def system_init():
+    print('system init start')
     vio_info = VioInfo.objects.all()
     vio_info.delete()
 
@@ -16,7 +17,4 @@ def system_init():
         vehicle_info.status = -1
         vehicle_info.save()
 
-    user_list = UserInfo.object.all()
-    for user_info in user_list:
-        user_info.queried_number = 0
-        user_info.save()
+    print('system init end')
