@@ -360,6 +360,49 @@ def get_vio_from_shaoshuai(v_number, v_type, v_code, e_code):
     return json.loads(response_data.read().decode('utf-8'))
 
 
+# 从少帅接口获取违章数据
+def get_vio_from_haotong(v_number, v_type, v_code, e_code):
+
+    # 构造查询数据
+    username = 'HC_shanghai'
+    password = 'HC_shanghai'
+    timestamp = int(time.time())
+    car_type = v_type
+    area = v_number[0]
+
+    cypo_password = hashlib.md5(password.encode()).hexdigest().upper()
+
+    sign = username + cypo_password + v_number + e_code + v_code + car_type + area + str(timestamp)
+    sign = hashlib.md5(sign.encode()).hexdigest()
+
+    data = {'username': username,
+            'carNum': v_number,
+            'engineNumber': e_code,
+            'vin': v_code,
+            'carType': car_type,
+            'area': area,
+            'time': timestamp,
+            'sign': sign
+            }
+
+    data = urllib.parse.urlencode(data)
+
+    # 构造完整查询url
+    url = 'http://119.23.239.229/IllegalQuery/user/userApi'
+
+    # 请求头
+    headers = {'Content-type': 'application/x-www-form-urlencoded; charset=UTF-8'}
+
+    # 创建request请求
+    request = urllib.request.Request(url, headers=headers, data=data.encode())
+
+    # 获得response
+    response_data = urllib.request.urlopen(request)
+
+    return json.loads(response_data.read().decode('utf-8'))
+
+
+
 # 从懂云接口查询数据
 def get_vio_from_doyun(v_number, v_type, v_code, e_code, city=''):
     """
@@ -406,16 +449,17 @@ def get_vio_from_doyun(v_number, v_type, v_code, e_code, city=''):
 if __name__ == '__main__':
     # car2 = {'v_number': '京HD9596', 'v_type': '02', 'v_code': 'LGBF5AE00HR276883', 'e_code': '751757V'}
     # car2 = {'v_number': '津RAV877', 'v_type': '02', 'v_code': 'LSGGJ5450JS043259', 'e_code': '173073371'}
-    car2 = {'v_number': '冀AC110Q', 'v_type': '02', 'v_code': 'LJ166A330E7020540', 'e_code': 'E3034066'}
-    # car2 = {'v_number': '沪H31092', 'v_type': '02', 'v_code': 'LFV4A24F383049673', 'e_code': '171809'}
+    car2 = {'v_number': '闽DZ299M', 'v_type': '02', 'v_code': 'LSGJB84JXHY031967', 'e_code': '163084534'}
+    # car2 = {'v_number': '津RPU307', 'v_type': '02', 'v_code': 'LXVD3GFC2JA014542', 'e_code': 'J014144'}
+    car2 = {'v_number': '沪D77737', 'v_type': '02', 'v_code': 'LFMH65816ES002064', 'e_code': '8583791'}
     #
     # response_data = get_vio_from_shaoshuai(car2['v_number'], car2['v_type'], car2['v_code'], car2['e_code'])
     #
-    # response_data = get_vio_from_doyun(car2['v_number'], car2['v_type'], car2['v_code'], car2['e_code'])
+    response_data = get_vio_from_haotong(car2['v_number'], car2['v_type'], car2['v_code'], car2['e_code'])
     #
-    # pprint(response_data)
+    pprint(response_data)
 
-    create_sign('ctrip', 'ctrip_init')
+    # create_sign('ctrip', 'ctrip_init')
 
     # q = queue.Queue(maxsize=5)
     # for i in range(10):
