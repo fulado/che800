@@ -66,6 +66,9 @@ class VioInfo(models.Model):
 
 class LogInfo(models.Model):
     vehicle_number = models.CharField(max_length=20, blank=True, null=True)                     # 车牌号
+    vehicle_type = models.IntegerField(default=2, blank=True, null=True)                        # 车辆类型
+    vehicle_code = models.CharField(max_length=50, blank=True, null=True)                       # 车架号
+    engine_code = models.CharField(max_length=50, blank=True, null=True)                        # 发动机号
     user = models.ForeignKey(UserInfo, on_delete=models.CASCADE, blank=True, null=True)         # 所属用户
     url = models.ForeignKey(UrlInfo, on_delete=models.CASCADE, blank=True, null=True)           # 查询接口url
     query_time = models.DateTimeField(blank=True, null=True)                                    # 查询时间

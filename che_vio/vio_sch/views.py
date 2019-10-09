@@ -137,7 +137,7 @@ def get_violations(v_number, v_type=2, v_code='', e_code='', city='', user_id=99
     if vio_data is not None:
 
         # 保存日志
-        save_log(v_number, '', '', user_id, 99, user_ip, city)
+        save_log(v_number, v_type, v_code, e_code, user_id, 99, user_ip, city)
 
         # 查询次数+1
         try:
@@ -161,7 +161,7 @@ def get_violations(v_number, v_type=2, v_code='', e_code='', city='', user_id=99
 
     # 如果url_id是None就返回查询城市错误
     if url_id is None:
-        save_log(v_number, '', '', user_id, url_id, user_ip, city)
+        save_log(v_number, v_type, v_code, e_code, user_id, url_id, user_ip, city)
         return {'status': 17, 'msg': '查询城市错误'}  # 查询城市错误
 
     # 根据url_id调用不同接口, 1-天津接口, 2-典典接口, 3-车轮接口
@@ -204,7 +204,7 @@ def get_violations(v_number, v_type=2, v_code='', e_code='', city='', user_id=99
         vio_data = {'status': 41, 'msg': '该城市不支持查询'}
 
     # 保存日志
-    save_log(v_number, origin_data, vio_data, user_id, url_id, user_ip, city)
+    save_log(v_number, v_type, v_code, e_code, origin_data, vio_data, user_id, url_id, user_ip, city)
 
     # 如果查询成功
     if vio_data['status'] == 0:

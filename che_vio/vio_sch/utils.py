@@ -1013,7 +1013,7 @@ def save_to_loc_db(vio_data, vehicle_number, vehicle_type):
 
 
 # 保存查询日志
-def save_log(v_number, origin_data, vio_data, user_id, url_id, user_ip, city=''):
+def save_log(v_number, v_type, v_code, e_code, origin_data, vio_data, user_id, url_id, user_ip, city=''):
     """
     保存典典返回的查询结果到日志
     :param v_number: 车牌号
@@ -1031,6 +1031,9 @@ def save_log(v_number, origin_data, vio_data, user_id, url_id, user_ip, city='')
 
     # 保存基本查询信息
     log_info.vehicle_number = v_number
+    log_info.vehicle_type = v_type
+    log_info.vehicle_code = v_code
+    log_info.engine_code = e_code
     log_info.user_id = user_id
     log_info.url_id = url_id
     log_info.query_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
