@@ -42,8 +42,8 @@ def day_times_query(day, vehicle_dic):
         #       'where user_id=6 and url_id not in (98, 100) and status not in (97, 41, 39, 51, 31, 21, 19) ' % day
 
         # 神州买卖车
-        sql = 'SELECT DISTINCT vehicle_number, status from vio_sch_loginfo_%s ' \
-              'where user_id=15 and url_id not in (98, 100) and status not in (99, 98, 97, 41, 39, 51, 31, 21, 19)' % day
+        # sql = 'SELECT DISTINCT vehicle_number, status from vio_sch_loginfo_%s ' \
+        #       'where user_id=15 and url_id not in (98, 100) and status not in (99, 98, 97, 41, 39, 51, 31, 21, 19)' % day
 
         # 懂云查询统计
         # sql = 'SELECT vehicle_number, status from vio_sch_loginfo_%s ' \
@@ -52,10 +52,6 @@ def day_times_query(day, vehicle_dic):
         # 盔甲查询统计
         # sql = 'SELECT vehicle_number, status from vio_sch_loginfo_%s ' \
         #       'where user_id = 3 and status not in (97, 41, 39, 51, 31, 21, 19)' % day
-
-        # 安吉查询统计
-        # sql = 'SELECT vehicle_number, status from vio_sch_loginfo_%s ' \
-        #       'where user_id in (18, 19) and status not in (97, 41, 39, 51, 31, 21, 19)' % day
 
         # 安吉查询统计——每日查询车辆总数
         # sql = 'SELECT distinct vehicle_number from vio_sch_loginfo_%s ' \
@@ -66,7 +62,8 @@ def day_times_query(day, vehicle_dic):
         #       'where user_id = 20 and status not in (97, 41, 39, 51, 31, 21, 19)' % day
 
         # 上海查询统计
-        # sql = 'SELECT id FROM `vio_sch_loginfo_%s` where url_id=6 and status not in (status not in (97, 41, 39, 51, 31, 21, 19))' % day
+        sql = 'SELECT id FROM `vio_sch_loginfo_%s` where url_id=6 and status not in (97, 41, 39, 51, 31, 21, 19)' \
+              % day
 
         # 上海接口查询统计
 
@@ -77,12 +74,12 @@ def day_times_query(day, vehicle_dic):
         cs.execute(sql)
         results = cs.fetchall()
 
-        # vehicle_dic[day] = len(results)
+        vehicle_dic[day] = len(results)
 
         for r in results:
             vehicle = r[0]
         #     # 神州统计
-            save_vehicle_into_dic(vehicle, vehicle_dic)
+        #     save_vehicle_into_dic(vehicle, vehicle_dic)
         #     # save_vehicle_into_dic_by_location(vehicle, vehicle_dic)
 
         # for r in results:
@@ -158,7 +155,7 @@ if __name__ == '__main__':
     #
     # export_excel(v_dic, query_month)
 
-    month_list = ['08']
+    month_list = ['09']
 
     for query_month in month_list:
         v_dic = {}

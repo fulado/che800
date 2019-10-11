@@ -455,11 +455,11 @@ if __name__ == '__main__':
     #
     # response_data = get_vio_from_shaoshuai(car2['v_number'], car2['v_type'], car2['v_code'], car2['e_code'])
     #
-    response_data = get_vio_from_haotong(car2['v_number'], car2['v_type'], car2['v_code'], car2['e_code'])
+    # response_data = get_vio_from_haotong(car2['v_number'], car2['v_type'], car2['v_code'], car2['e_code'])
     #
-    pprint(response_data)
+    # pprint(response_data)
 
-    # create_sign('ctrip', 'ctrip_init')
+    create_sign('test', 'test')
 
     # q = queue.Queue(maxsize=5)
     # for i in range(10):

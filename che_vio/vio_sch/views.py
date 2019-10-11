@@ -5,9 +5,11 @@ from .utils import get_vio_from_tj, get_vio_from_chelun, get_vio_from_ddyc, vio_
     save_to_loc_db, save_log, get_vio_from_loc, get_url_id, save_error_log, vio_dic_for_tj, save_vehicle,\
     get_vio_from_kuijia, vio_dic_for_kuijia, get_vio_from_zfb, vio_dic_for_zfb, get_vio_from_shaoshuai, \
     vio_dic_for_shaoshuai, get_vio_from_doyun, get_vio_from_cwb, vio_dic_for_cwb
+from .utils_avis import save_vehicle as save_vehicle_avis
 from multiprocessing import Queue
 from threading import Thread
 from django.db import connection
+
 import time
 import hashlib
 import pymysql
@@ -137,7 +139,7 @@ def get_violations(v_number, v_type=2, v_code='', e_code='', city='', user_id=99
     if vio_data is not None:
 
         # 保存日志
-        save_log(v_number, v_type, v_code, e_code, user_id, 99, user_ip, city)
+        save_log(v_number, v_type, v_code, e_code, '', vio_data, user_id, 99, user_ip, city)
 
         # 查询次数+1
         try:
@@ -214,6 +216,10 @@ def get_violations(v_number, v_type=2, v_code='', e_code='', city='', user_id=99
 
         # 保存车辆数据到本地数据库
         save_vehicle(v_number, v_type, v_code, e_code)
+
+        # 如果是avis的车，保存车辆信息到每日查询车辆信息库
+        if user_id == 19:
+            save_vehicle_avis(v_number, v_type, v_code, e_code, user_id)
 
     # 如果查询成功或车辆信息不正确，查询次数累计加1
     if vio_data['status'] in (0, 32, 33, 34, 35, 36):
@@ -388,6 +394,9 @@ def backup_log():
                       `city` varchar(20) DEFAULT NULL,
                       `origin_msg` varchar(200) DEFAULT NULL,
                       `origin_status` int(11),
+                      `engine_code` varchar(50) DEFAULT NULL,
+                      `vehicle_code` varchar(50) DEFAULT NULL,
+                      `vehicle_type` int(11) DEFAULT NULL,
                       PRIMARY KEY (`id`),
                       FOREIGN KEY (`url_id`) REFERENCES `vio_sch_urlinfo` (`id`),
                       FOREIGN KEY (`user_id`) REFERENCES `vio_sch_userinfo` (`id`)
@@ -442,4 +451,4 @@ def test_task():
 
 # 负载均衡测试
 def nginx_test(request):
-    return HttpResponse('<h1>server 03</h1>')
+    return HttpResponse('<h1>server 01</h1>')

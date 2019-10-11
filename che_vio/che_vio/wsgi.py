@@ -73,4 +73,4 @@ scheduler.add_job(reset_vehicle, 'cron', day_of_week='sun', hour=2, minute=10, s
 # special
 # scheduler.add_job(get_tj_vio, 'cron', hour=0, minute=55, second=0)
 
-scheduler.start()
+# scheduler.start()
