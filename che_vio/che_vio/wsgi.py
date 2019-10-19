@@ -22,6 +22,7 @@ from vio_sch.views import query_vio_auto, backup_log
 from vio_sch.task import reset_status
 from vio_sch.spider import main
 from vio_sch.views_sz import query_vio_auto_sz, backup_vio, reset_vehicle
+from vio_sch.utils_avis import delete_vehicle as delete_vehicle_avis
 
 # from vio_sch.special import get_tj_vio
 
@@ -65,12 +66,15 @@ scheduler.add_job(query_vio_auto_sz, 'cron', day_of_week='sun', hour=19, minute=
 # scheduler.add_job(query_vio_auto_sz, 'cron', hour=17, minute=24, second=0)
 
 # 每周日、周三凌2:00开始初始化神州买卖车查询状态
-scheduler.add_job(backup_vio, 'cron', day_of_week='wed', hour=2, minute=10, second=0)
-scheduler.add_job(backup_vio, 'cron', day_of_week='sun', hour=2, minute=10, second=0)
-scheduler.add_job(reset_vehicle, 'cron', day_of_week='wed', hour=2, minute=10, second=0)
-scheduler.add_job(reset_vehicle, 'cron', day_of_week='sun', hour=2, minute=10, second=0)
+# scheduler.add_job(backup_vio, 'cron', day_of_week='wed', hour=2, minute=10, second=0)
+# scheduler.add_job(backup_vio, 'cron', day_of_week='sun', hour=2, minute=10, second=0)
+# scheduler.add_job(reset_vehicle, 'cron', day_of_week='wed', hour=2, minute=10, second=0)
+# scheduler.add_job(reset_vehicle, 'cron', day_of_week='sun', hour=2, minute=10, second=0)
 
 # special
 # scheduler.add_job(get_tj_vio, 'cron', hour=0, minute=55, second=0)
+
+# 每天1:00 删除库中超过30天未查询的车辆
+scheduler.add_job(delete_vehicle_avis, 'cron', hour=1, minute=0, second=0)
 
 # scheduler.start()
