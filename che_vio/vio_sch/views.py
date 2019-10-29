@@ -451,4 +451,4 @@ def test_task():
 
 # 负载均衡测试
 def nginx_test(request):
-    return HttpResponse('<h1>server 01</h1>')
+    return HttpResponse('<h1>server 03</h1>')
