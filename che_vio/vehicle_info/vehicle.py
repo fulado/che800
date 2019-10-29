@@ -48,7 +48,7 @@ class Vehicle(object):
 
         response_data = requests.post(url=self.query_url, data=data)
         response_data = json.loads(response_data.content.decode())
-
+        print(response_data)
         self.status = response_data.get('code', None)
         self.msg = response_data.get('msg', None)
         self.data = response_data.get('data', None)

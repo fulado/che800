@@ -17,7 +17,7 @@ def monthly_times_query(year, month, vehicle_dic):
         else:
             day = '%s%s%d' % (year, month, day)
 
-        print(day)
+        # print(day)
         day_times_query(day, vehicle_dic)
 
 
@@ -62,8 +62,8 @@ def day_times_query(day, vehicle_dic):
         #       'where user_id = 20 and status not in (97, 41, 39, 51, 31, 21, 19)' % day
 
         # 上海查询统计
-        sql = 'SELECT id FROM `vio_sch_loginfo_%s` where url_id=6 and status not in (97, 41, 39, 51, 31, 21, 19)' \
-              % day
+        # sql = 'SELECT id FROM `vio_sch_loginfo_%s` where url_id=6 and status not in (97, 41, 39, 51, 31, 21, 19)' \
+        #       % day
 
         # 上海接口查询统计
 
@@ -71,16 +71,25 @@ def day_times_query(day, vehicle_dic):
         # sql = 'SELECT * from vio_sch_loginfo_%s ' \
         #           'where user_id=15 and vehicle_number="皖B77313"' % day
 
+        # 差异统计
+        sql = '''select count(vehicle_number) from vio_sch_vehicleinfo 
+                 where (user_id = 6 or user_id is null) and vehicle_number not in (
+                    select vehicle_number from vio_sch_loginfo_%s where user_id = 6
+                    and vehicle_number is not null);''' % day
+
         cs.execute(sql)
         results = cs.fetchall()
 
-        vehicle_dic[day] = len(results)
+        # vehicle_dic[day] = len(results)
 
         for r in results:
             vehicle = r[0]
         #     # 神州统计
         #     save_vehicle_into_dic(vehicle, vehicle_dic)
         #     # save_vehicle_into_dic_by_location(vehicle, vehicle_dic)
+
+            # 车辆差异统计
+            print(day, r[0])
 
         # for r in results:
         #     print(r)

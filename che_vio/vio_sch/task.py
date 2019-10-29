@@ -11,3 +11,6 @@ def reset_status():
         connection.close()
     finally:
         VehicleInfo.objects.all().update(status=0, spider_status=False)
+
+
+
