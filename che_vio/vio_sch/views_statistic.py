@@ -54,8 +54,8 @@ def day_times_query(day, vehicle_dic):
         #       'where user_id = 3 and status not in (97, 41, 39, 51, 31, 21, 19)' % day
 
         # 安吉查询统计——每日查询车辆总数
-        # sql = 'SELECT distinct vehicle_number from vio_sch_loginfo_%s ' \
-        #       'where user_id in (18, 19) and status not in (98, 97, 41, 39, 51, 31, 21, 19)' % day
+        sql = 'SELECT distinct vehicle_number from vio_sch_loginfo_%s ' \
+              'where user_id in (18, 19) and status not in (98, 97, 41, 39, 51, 31, 21, 19)' % day
 
         # 点艺洗车查询统计——每日查询车辆总数
         # sql = 'SELECT distinct vehicle_number from vio_sch_loginfo_%s ' \
@@ -72,24 +72,24 @@ def day_times_query(day, vehicle_dic):
         #           'where user_id=15 and vehicle_number="皖B77313"' % day
 
         # 差异统计
-        sql = '''select count(vehicle_number) from vio_sch_vehicleinfo 
-                 where (user_id = 6 or user_id is null) and vehicle_number not in (
-                    select vehicle_number from vio_sch_loginfo_%s where user_id = 6
-                    and vehicle_number is not null);''' % day
+        # sql = '''select count(vehicle_number) from vio_sch_vehicleinfo
+        #          where (user_id = 6 or user_id is null) and vehicle_number not in (
+        #             select vehicle_number from vio_sch_loginfo_%s where user_id = 6
+        #             and vehicle_number is not null);''' % day
 
         cs.execute(sql)
         results = cs.fetchall()
 
-        # vehicle_dic[day] = len(results)
+        vehicle_dic[day] = len(results)
 
-        for r in results:
-            vehicle = r[0]
-        #     # 神州统计
-        #     save_vehicle_into_dic(vehicle, vehicle_dic)
-        #     # save_vehicle_into_dic_by_location(vehicle, vehicle_dic)
+        # for r in results:
+            # vehicle = r[0]
+            # 神州统计
+            # save_vehicle_into_dic(vehicle, vehicle_dic)
+            # save_vehicle_into_dic_by_location(vehicle, vehicle_dic)
 
             # 车辆差异统计
-            print(day, r[0])
+            # print(day, r[0])
 
         # for r in results:
         #     print(r)
@@ -152,8 +152,8 @@ def export_excel(vehicle_dic, month):
         i += 1
 
     # 将文件保存在内存中
-    # wb.save(r'/Users/Barry/99_temp/%s.xls' % month)
-    wb.save(r'd:/shenzhou_2019%s.xls' % month)
+    wb.save(r'/Users/Barry/99_temp/avis_2019%s.xls' % month)
+    # wb.save(r'd:/shenzhou_2019%s.xls' % month)
 
 
 if __name__ == '__main__':
@@ -164,7 +164,7 @@ if __name__ == '__main__':
     #
     # export_excel(v_dic, query_month)
 
-    month_list = ['09']
+    month_list = ['10']
 
     for query_month in month_list:
         v_dic = {}
