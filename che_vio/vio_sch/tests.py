@@ -403,7 +403,6 @@ def get_vio_from_haotong(v_number, v_type, v_code, e_code):
     return json.loads(response_data.read().decode('utf-8'))
 
 
-
 # 从懂云接口查询数据
 def get_vio_from_doyun(v_number, v_type, v_code, e_code, city=''):
     """
