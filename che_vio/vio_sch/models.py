@@ -79,6 +79,7 @@ class LogInfo(models.Model):
     city = models.CharField(max_length=20, blank=True, null=True)                               # 查询城市
     origin_status = models.IntegerField(default=0, blank=True, null=True)                       # 状态码
     origin_msg = models.CharField(max_length=200, blank=True, null=True)                        # 备注信息
+    is_cache = models.BooleanField(default=False)                                               # 是否为本地查询
 
 
 class VehicleBackup(models.Model):

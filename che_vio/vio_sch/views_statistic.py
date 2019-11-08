@@ -50,12 +50,12 @@ def day_times_query(day, vehicle_dic):
         #       'where url_id = 7 and status not in (97, 41, 39, 51, 31, 21, 19)' % day
 
         # 盔甲查询统计
-        # sql = 'SELECT vehicle_number, status from vio_sch_loginfo_%s ' \
-        #       'where user_id = 3 and status not in (97, 41, 39, 51, 31, 21, 19)' % day
+        sql = 'SELECT vehicle_number, status from vio_sch_loginfo_%s ' \
+              'where user_id = 3 and status not in (97, 41, 39, 51, 31, 21, 19)' % day
 
         # 安吉查询统计——每日查询车辆总数
-        sql = 'SELECT distinct vehicle_number from vio_sch_loginfo_%s ' \
-              'where user_id in (18, 19) and status not in (98, 97, 41, 39, 51, 31, 21, 19)' % day
+        # sql = 'SELECT distinct vehicle_number from vio_sch_loginfo_%s ' \
+        #       'where user_id in (18, 19) and status not in (98, 97, 41, 39, 51, 31, 21, 19)' % day
 
         # 点艺洗车查询统计——每日查询车辆总数
         # sql = 'SELECT distinct vehicle_number from vio_sch_loginfo_%s ' \
@@ -80,13 +80,26 @@ def day_times_query(day, vehicle_dic):
         cs.execute(sql)
         results = cs.fetchall()
 
-        vehicle_dic[day] = len(results)
+        # 按天统计
+        # vehicle_dic[day] = len(results)
 
+        # 按月统计
+        month = day[0: 6]
+
+        for k in vehicle_dic:
+            if k == month:
+                vehicle_dic[k] += len(results)
+                return
+
+        vehicle_dic[month] = len(results)
+
+        # 按车牌统计
         # for r in results:
-            # vehicle = r[0]
-            # 神州统计
-            # save_vehicle_into_dic(vehicle, vehicle_dic)
-            # save_vehicle_into_dic_by_location(vehicle, vehicle_dic)
+        #     vehicle = r[0]
+        #     # 按车牌统计
+        #     save_vehicle_into_dic(vehicle, vehicle_dic)
+        #     # 按车牌所在地统计
+        #     save_vehicle_into_dic_by_location(vehicle, vehicle_dic)
 
             # 车辆差异统计
             # print(day, r[0])
@@ -131,7 +144,7 @@ def export_excel(vehicle_dic, month):
     ws = wb.add_sheet('sheet1', cell_overwrite_ok=True)
 
     # 设置表头
-    title = ['车牌号码', '查询次数']
+    title = ['日期', '查询次数']
 
     # 生成表头
     len_col = len(title)
@@ -152,8 +165,9 @@ def export_excel(vehicle_dic, month):
         i += 1
 
     # 将文件保存在内存中
-    wb.save(r'/Users/Barry/99_temp/avis_2019%s.xls' % month)
+    # wb.save(r'/Users/Barry/99_temp/avis_vehicle_2019%s.xls' % month)
     # wb.save(r'd:/shenzhou_2019%s.xls' % month)
+    wb.save(r'/Users/Barry/99_temp/kuijia_2019.xls')
 
 
 if __name__ == '__main__':
@@ -164,10 +178,18 @@ if __name__ == '__main__':
     #
     # export_excel(v_dic, query_month)
 
-    month_list = ['10']
+    month_list = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10']
 
+    # 按月统计
+    # for query_month in month_list:
+    #     v_dic = {}
+    #     monthly_times_query(query_year, query_month, v_dic)
+    #     print(query_year, query_month)
+    #     export_excel(v_dic, query_month)
+
+    # 按年统计
+    v_dic = {}
     for query_month in month_list:
-        v_dic = {}
         monthly_times_query(query_year, query_month, v_dic)
-        export_excel(v_dic, query_month)
-
+        print(v_dic)
+    export_excel(v_dic, query_month)

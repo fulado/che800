@@ -1013,7 +1013,8 @@ def save_to_loc_db(vio_data, vehicle_number, vehicle_type):
 
 
 # 保存查询日志
-def save_log(v_number, v_type, v_code, e_code, origin_data, vio_data, user_id, url_id, user_ip, city=''):
+def save_log(v_number, v_type, v_code, e_code, origin_data, vio_data, user_id, url_id, user_ip, city='',
+             is_cache=False):
     """
     保存典典返回的查询结果到日志
     :param v_number: 车牌号
@@ -1023,6 +1024,7 @@ def save_log(v_number, v_type, v_code, e_code, origin_data, vio_data, user_id, u
     :param url_id: 查询url_id
     :param user_ip: 用户ip
     :param city: 查询城市
+    :param is_cache: 是否缓存
     :return:
     """
 
@@ -1039,6 +1041,7 @@ def save_log(v_number, v_type, v_code, e_code, origin_data, vio_data, user_id, u
     log_info.query_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
     log_info.ip = user_ip
     log_info.city = city
+    log_info.is_cache = is_cache
 
     # 判断使用的接口url_id
     if url_id is None:

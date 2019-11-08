@@ -116,7 +116,7 @@ def violation(request):
 
 
 # 根据车辆信息查询违章
-def get_violations(v_number, v_type=2, v_code='', e_code='', city='', user_id=99, user_ip='127.0.0.1'):
+def get_violations(v_number, v_type=2, v_code='', e_code='', city='', user_id=99, user_ip='127.0.0.1', is_cache=False):
     """
     根据车辆信息调用不同的接口查询违章
     :param v_number: 车牌号
@@ -126,6 +126,7 @@ def get_violations(v_number, v_type=2, v_code='', e_code='', city='', user_id=99
     :param city: 查询城市
     :param user_id: 用户id
     :param user_ip: 用户ip
+    :param is_cache: 是否为缓存数据
     :return: 违章数据, json格式
     """
 
@@ -139,7 +140,7 @@ def get_violations(v_number, v_type=2, v_code='', e_code='', city='', user_id=99
     if vio_data is not None:
 
         # 保存日志
-        save_log(v_number, v_type, v_code, e_code, '', vio_data, user_id, 99, user_ip, city)
+        save_log(v_number, v_type, v_code, e_code, '', vio_data, user_id, 99, user_ip, city, is_cache)
 
         # 查询次数+1
         try:
@@ -163,7 +164,7 @@ def get_violations(v_number, v_type=2, v_code='', e_code='', city='', user_id=99
 
     # 如果url_id是None就返回查询城市错误
     if url_id is None:
-        save_log(v_number, v_type, v_code, e_code, user_id, url_id, user_ip, city)
+        save_log(v_number, v_type, v_code, e_code, '', '', user_id, url_id, user_ip, city, is_cache)
         return {'status': 17, 'msg': '查询城市错误'}  # 查询城市错误
 
     # 根据url_id调用不同接口, 1-天津接口, 2-典典接口, 3-车轮接口
@@ -206,7 +207,7 @@ def get_violations(v_number, v_type=2, v_code='', e_code='', city='', user_id=99
         vio_data = {'status': 41, 'msg': '该城市不支持查询'}
 
     # 保存日志
-    save_log(v_number, v_type, v_code, e_code, origin_data, vio_data, user_id, url_id, user_ip, city)
+    save_log(v_number, v_type, v_code, e_code, origin_data, vio_data, user_id, url_id, user_ip, city, is_cache)
 
     # 如果查询成功
     if vio_data['status'] == 0:
@@ -299,7 +300,7 @@ def query_thread(v_queue, city):
             vehicle = v_queue.get(True, 30)
             # print(vehicle.vehicle_number)
             data = get_violations(vehicle.vehicle_number, vehicle.vehicle_type, vehicle.vehicle_code,
-                                  vehicle.engine_code, vehicle.city)
+                                  vehicle.engine_code, vehicle.city, vehicle, 99, '127.0.0.1', True)
 
             # 如果查询成功, 将车辆查询状态置为1
             if data['status'] == 0:
