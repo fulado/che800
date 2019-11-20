@@ -300,7 +300,7 @@ def query_thread(v_queue, city):
             vehicle = v_queue.get(True, 30)
             # print(vehicle.vehicle_number)
             data = get_violations(vehicle.vehicle_number, vehicle.vehicle_type, vehicle.vehicle_code,
-                                  vehicle.engine_code, vehicle.city, vehicle, 99, '127.0.0.1', True)
+                                  vehicle.engine_code, vehicle.city, vehicle.user_id, '127.0.0.1', True)
 
             # 如果查询成功, 将车辆查询状态置为1
             if data['status'] == 0:
@@ -398,6 +398,7 @@ def backup_log():
                       `engine_code` varchar(50) DEFAULT NULL,
                       `vehicle_code` varchar(50) DEFAULT NULL,
                       `vehicle_type` int(11) DEFAULT NULL,
+                      `is_cache` tinyint(1) NOT NULL,
                       PRIMARY KEY (`id`),
                       FOREIGN KEY (`url_id`) REFERENCES `vio_sch_urlinfo` (`id`),
                       FOREIGN KEY (`user_id`) REFERENCES `vio_sch_userinfo` (`id`)
@@ -452,4 +453,4 @@ def test_task():
 
 # 负载均衡测试
 def nginx_test(request):
-    return HttpResponse('<h1>server 03</h1>')
+    return HttpResponse('<h1>server 01</h1>')

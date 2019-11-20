@@ -440,7 +440,10 @@ def vio_dic_for_ddyc(v_number, data):
                     vio_code = ''
 
                 # 处理机关
-                if 'violationCity' in vio:
+                vio_id = vio.get('violationWritNo', '')
+                if vio_id != '':
+                    vio_loc = get_loc_by_vio_id_doyun(vio_id)
+                elif 'violationCity' in vio:
                     vio_loc = vio['violationCity']
                 else:
                     vio_loc = ''
@@ -960,6 +963,26 @@ def get_loc_by_vio_id(vio_id):
         return ''
 
     loc_id = vio_id[0: 4] + '00'
+
+    try:
+        loc_info = LocInfo.objects.get(loc_id=loc_id)
+    except Exception as e:
+        print(e)
+        return ''
+
+    return loc_info.loc_name
+
+
+# 通过懂云返回的违法文书号判断违法地点
+def get_loc_by_vio_id_doyun(vio_id):
+
+    if len(vio_id) < 4:
+        return ''
+
+    if vio_id[0: 2] in ['11', '12', '31', '50']:
+        loc_id = vio_id[0: 2] + '0000'
+    else:
+        loc_id = vio_id[0: 4] + '00'
 
     try:
         loc_info = LocInfo.objects.get(loc_id=loc_id)
