@@ -5,7 +5,7 @@ import json
 import requests
 import urllib.request
 import urllib.parse
-from .models import VioInfo, LogInfo, LocInfo, VehicleBackup, VioCode, LocUrlRelation
+from .models import VioInfo, LogInfo, LocInfo, VehicleBackup, VioCode, LocUrlRelation, VehicleInfo
 
 
 # 根据违法行为返回违法代码
@@ -1389,6 +1389,21 @@ def save_vehicle(v_number, v_type, v_code, e_code):
             vehicle.engine_code = e_code
 
             vehicle.save()
+    except Exception as e:
+        print(e)
+
+
+# 更新车辆查询时间
+def update_vehicle_query_time(v_number, v_type):
+    try:
+        vehicle_info = VehicleInfo.objects.filter(vehicle_number=v_number).filter(vehicle_type=v_type)
+
+        # 如果车辆已经存在，更新查询时间
+        if vehicle_info.exists():
+            vehicle_info.update(update_time=time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()))
+        else:
+            pass
+
     except Exception as e:
         print(e)
 

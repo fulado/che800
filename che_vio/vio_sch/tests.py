@@ -453,13 +453,13 @@ if __name__ == '__main__':
     # car2 = {'v_number': '津RPU307', 'v_type': '02', 'v_code': 'LXVD3GFC2JA014542', 'e_code': 'J014144'}
     car2 = {'v_number': '苏BW0H83', 'v_type': '02', 'v_code': 'LSGUD84X9FE000946', 'e_code': '143521247'}
     #
-    response_data = get_vio_from_doyun(car2['v_number'], car2['v_type'], car2['v_code'], car2['e_code'])
+    # response_data = get_vio_from_doyun(car2['v_number'], car2['v_type'], car2['v_code'], car2['e_code'])
     #
     # response_data = get_vio_from_haotong(car2['v_number'], car2['v_type'], car2['v_code'], car2['e_code'])
     #
-    pprint(response_data)
+    # pprint(response_data)
 
-    # create_sign('test', 'test')
+    create_sign('test', 'test')
 
     # q = queue.Queue(maxsize=5)
     # for i in range(10):

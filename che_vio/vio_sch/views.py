@@ -4,7 +4,7 @@ from .models import UserInfo, VehicleInfo, LogInfo
 from .utils import get_vio_from_tj, get_vio_from_chelun, get_vio_from_ddyc, vio_dic_for_ddyc, vio_dic_for_chelun,\
     save_to_loc_db, save_log, get_vio_from_loc, get_url_id, save_error_log, vio_dic_for_tj, save_vehicle,\
     get_vio_from_kuijia, vio_dic_for_kuijia, get_vio_from_zfb, vio_dic_for_zfb, get_vio_from_shaoshuai, \
-    vio_dic_for_shaoshuai, get_vio_from_doyun, get_vio_from_cwb, vio_dic_for_cwb
+    vio_dic_for_shaoshuai, get_vio_from_doyun, get_vio_from_cwb, vio_dic_for_cwb, update_vehicle_query_time
 from .utils_avis import save_vehicle as save_vehicle_avis
 from multiprocessing import Queue
 from threading import Thread
@@ -151,7 +151,12 @@ def get_violations(v_number, v_type=2, v_code='', e_code='', city='', user_id=99
         except Exception as e:
             print(e)
 
+        # 更新车辆信息库中车辆查询时间
+        update_vehicle_query_time(v_number, v_type)
+
         return vio_data
+    else:
+        pass
 
     # 将车牌类型转为字符串'02'
     if v_type < 10:
@@ -453,4 +458,4 @@ def test_task():
 
 # 负载均衡测试
 def nginx_test(request):
-    return HttpResponse('<h1>server 01</h1>')
+    return HttpResponse('<h1>server 03</h1>')

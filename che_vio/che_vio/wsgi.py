@@ -65,6 +65,6 @@ scheduler = BackgroundScheduler()
 #
 # # 每天1:00 删除库中超过30天未查询的车辆
 # scheduler.add_job(delete_vehicle_avis, 'cron', hour=1, minute=0, second=0)
-scheduler.add_job(main, 'cron', hour=14, minute=43, second=30)
+# scheduler.add_job(main, 'cron', hour=14, minute=43, second=30)
 
 scheduler.start()
