@@ -123,3 +123,54 @@ class VioCode(models.Model):
     vio_activity = models.CharField(max_length=100, blank=True, null=True)  # 违法行为
     vio_point = models.IntegerField(default=0, blank=True, null=True)       # 扣分
     vio_money = models.IntegerField(default=0, blank=True, null=True)       # 罚款
+
+
+# avis违章表
+class VioInfoAvis(models.Model):
+    vehicle_number = models.CharField(max_length=20, blank=True, null=True)     # 号牌号码
+    vehicle_type = models.IntegerField(default=2, blank=True, null=True)        # 车辆类型
+    vio_time = models.CharField(max_length=30, blank=True, null=True)           # 违法时间
+    vio_position = models.CharField(max_length=100, blank=True, null=True)      # 违法地点
+    vio_activity = models.CharField(max_length=255, blank=True, null=True)      # 违法行为
+    vio_point = models.IntegerField(default=0, blank=True, null=True)           # 扣分
+    vio_money = models.IntegerField(default=0, blank=True, null=True)           # 罚款
+    vio_code = models.CharField(max_length=20, blank=True, null=True)           # 违法代码
+    vio_loc = models.CharField(max_length=50, blank=True, null=True)            # 处理机关
+    deal_status = models.IntegerField(default=-1, blank=True, null=True)    # 是否已处理, 0-否, 1-是, -1-未知
+    pay_status = models.IntegerField(default=-1, blank=True, null=True)     # 是否已缴费, 0-否, 1-是, -1-未知
+    update_time = models.DateTimeField(blank=True, null=True)       # 更新时间
+    available = models.BooleanField(default=False)      # 是否可用
+    accumulation = models.IntegerField(default=1, blank=True, null=True)    # 数据累计天数
+
+
+# avis车辆信息表
+# class VehicleInfoAvis(models.Model):
+#     vehicle_number = models.CharField(max_length=20, blank=True, null=True)  # 号牌号码
+#     vehicle_type = models.IntegerField(default=2, blank=True, null=True)  # 车辆类型
+#     vehicle_code = models.CharField(max_length=50, blank=True, null=True)  # 车架号
+#     engine_code = models.CharField(max_length=50, blank=True, null=True)  # 发动机号
+#     status = models.IntegerField(default=0)  # 状态码: 0表示未查询，或未知问题导致的查询失败；1-查询成功
+#     city = models.CharField(max_length=20, blank=True, null=True)  # 运营地
+#     update_time = models.DateTimeField(default=timezone.now())  # 更新时间
+#     user = models.ForeignKey(UserInfo, on_delete=models.CASCADE, blank=True, null=True)  # 所属用户
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

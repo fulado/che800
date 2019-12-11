@@ -48,3 +48,6 @@ def delete_vehicle():
                 vehicle.delete()
         except Exception as e:
             print(e)
+
+
+# 查询违章
