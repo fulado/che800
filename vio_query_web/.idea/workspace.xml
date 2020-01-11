@@ -2,102 +2,17 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="cd4c9dc8-7aac-4fbe-b6df-4921b3359f7a" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/../vehicle_business/vio_query/urls.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/encodings.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/vio_query_web.iml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/conf/nginx.conf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/conf/uwsgi.ini" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/conf/uwsgi_params" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/manage.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/static/css/account_number.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/static/css/bootstrap-datetimepicker.min.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/static/css/bootstrap-theme.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/static/css/bootstrap-theme.min.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/static/css/bootstrap.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/static/css/bootstrap.min.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/static/css/company.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/static/css/darktooltip.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/static/css/header.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/static/css/initial.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/static/css/login.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/static/css/modle.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/static/css/paging.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/static/excel/vehicle.xls" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/static/excel/车辆信息.xlsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/static/fonts/glyphicons-halflings-regular.eot" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/static/fonts/glyphicons-halflings-regular.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/static/fonts/glyphicons-halflings-regular.ttf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/static/fonts/glyphicons-halflings-regular.woff" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/static/fonts/glyphicons-halflings-regular.woff2" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/static/fonts/simsun.ttf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/static/img/back.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/static/img/down.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/static/img/icon.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/static/img/return.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/static/img/text1.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/static/img/text2.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/static/img/text3.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/static/img/text4.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/static/img/text5.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/static/img/text6.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/static/img/text7.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/static/img/text8.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/static/img/text9.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/static/js/account_number.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/static/js/bootstrap-datetimepicker.min.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/static/js/bootstrap-datetimepicker.zh-CN.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/static/js/bootstrap.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/static/js/bootstrap.min.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/static/js/company.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/static/js/jquery-1.12.4.min.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/static/js/jquery-1.8.3.min.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/static/js/jquery-3.1.0.min.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/static/js/jquery.darktooltip.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/static/js/login.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/static/js/md5.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/static/js/paging.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/static/js/query.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/static/js/through.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/login.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/main.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/vehicle.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/violation.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/vio_query/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/vio_query/decorator.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/vio_query/models.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/vio_query/urls.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/vio_query/views.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/vio_query/violation.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/vio_query_web/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/vio_query_web/settings.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/vio_query_web/urls.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/vio_query_web/utils.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/vio_query_web/wsgi.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../che800_vp/che800_vp/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/../che800_vp/che800_vp/settings.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../che800_vp/v_api_tsn/driver.py" beforeDir="false" afterPath="$PROJECT_DIR$/../che800_vp/v_api_tsn/driver.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../che800_vp/v_api_tsn/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/../che800_vp/v_api_tsn/models.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../che800_vp/v_api_tsn/tests.py" beforeDir="false" afterPath="$PROJECT_DIR$/../che800_vp/v_api_tsn/tests.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../che800_vp/v_api_tsn/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/../che800_vp/v_api_tsn/urls.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../che800_vp/v_api_tsn/utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/../che800_vp/v_api_tsn/utils.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../che800_vp/v_api_tsn/views_temp.py" beforeDir="false" afterPath="$PROJECT_DIR$/../che800_vp/v_api_tsn/views_temp.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../che_vio/.idea/che_vio.iml" beforeDir="false" afterPath="$PROJECT_DIR$/../che_vio/.idea/che_vio.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../che_vio/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../che_vio/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../che_vio/che_vio/wsgi.py" beforeDir="false" afterPath="$PROJECT_DIR$/../che_vio/che_vio/wsgi.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../che_vio/vio_sch/tests.py" beforeDir="false" afterPath="$PROJECT_DIR$/../che_vio/vio_sch/tests.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../che_vio/vio_sch/utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/../che_vio/vio_sch/utils.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../vehicle_business/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../vehicle_business/.idea/modules.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../vehicle_business/.idea/vehicle_business.iml" beforeDir="false" afterPath="$PROJECT_DIR$/../vehicle_business/.idea/vehicle_business_bak.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../vehicle_business/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../vehicle_business/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../vehicle_business/static/css/header.css" beforeDir="false" afterPath="$PROJECT_DIR$/../vehicle_business/static/css/header.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../vehicle_business/templates/login.html" beforeDir="false" afterPath="$PROJECT_DIR$/../vehicle_business/templates/login.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../vehicle_business/templates/main.html" beforeDir="false" afterPath="$PROJECT_DIR$/../vehicle_business/templates/main.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../vehicle_business/templates/vehicle.html" beforeDir="false" afterPath="$PROJECT_DIR$/../vehicle_business/templates/vehicle.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../vehicle_business/vehicle_business/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/../vehicle_business/vehicle_business/settings.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../vehicle_business/vehicle_business/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/../vehicle_business/vehicle_business/urls.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../vehicle_business/vio_query/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/../vehicle_business/vio_query/models.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../vehicle_business/vio_query/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/../vehicle_business/vio_query/views.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../vehicle_business/vio_query/violation.py" beforeDir="false" afterPath="$PROJECT_DIR$/../vehicle_business/vio_query/violation.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../che_vio/vio_sch/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/../che_vio/vio_sch/views.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/vio_query_web.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vio_query_web.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vio_query/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/vio_query/views.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vio_query/violation.py" beforeDir="false" afterPath="$PROJECT_DIR$/vio_query/violation.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -105,127 +20,19 @@
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
-  <component name="FileEditorManager">
-    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/vio_query/views.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="74">
-              <caret line="203" column="11" lean-forward="true" selection-start-line="203" selection-start-column="11" selection-end-line="203" selection-end-column="11" />
-              <folding>
-                <element signature="e#0#35#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/vio_query/urls.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="494">
-              <caret line="31" selection-start-line="31" selection-end-line="31" />
-              <folding>
-                <element signature="e#641#673#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/templates/violation.html">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="4440">
-              <caret line="185" column="90" selection-start-line="185" selection-start-column="84" selection-end-line="185" selection-end-column="90" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/vio_query_web/settings.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="504">
-              <caret line="36" column="18" lean-forward="true" selection-start-line="36" selection-start-column="18" selection-end-line="36" selection-end-column="18" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-    </leaf>
-  </component>
-  <component name="FindInProjectRecents">
-    <findStrings>
-      <find>print(</find>
-      <find>add</find>
-      <find>print</find>
-    </findStrings>
-  </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
   </component>
-  <component name="IdeDocumentHistory">
-    <option name="CHANGED_PATHS">
-      <list>
-        <option value="$PROJECT_DIR$/vio_query_web/urls.py" />
-        <option value="$PROJECT_DIR$/templates/conf/uwsgi.ini" />
-        <option value="$PROJECT_DIR$/templates/conf/nginx.conf" />
-        <option value="$PROJECT_DIR$/conf/uwsgi.ini" />
-        <option value="$PROJECT_DIR$/vio_query_web/settings.py" />
-        <option value="$PROJECT_DIR$/vio_query/urls.py" />
-        <option value="$PROJECT_DIR$/vio_query/views.py" />
-      </list>
-    </option>
-  </component>
-  <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="-8" />
-    <option name="y" value="-8" />
-    <option name="width" value="2576" />
-    <option name="height" value="1416" />
-  </component>
+  <component name="ProjectId" id="1U0tmDdE5er49S3qvIsVuJKY2ML" />
   <component name="ProjectLevelVcsManager" settingsEditedManually="true">
     <ConfirmationsSetting value="2" id="Add" />
   </component>
-  <component name="ProjectView">
-    <navigator proportions="" version="1">
-      <foldersAlwaysOnTop value="true" />
-    </navigator>
-    <panes>
-      <pane id="ProjectPane">
-        <subPane>
-          <expand>
-            <path>
-              <item name="vio_query_web" type="b2602c69:ProjectViewProjectNode" />
-              <item name="vio_query_web" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="vio_query_web" type="b2602c69:ProjectViewProjectNode" />
-              <item name="vio_query_web" type="462c0819:PsiDirectoryNode" />
-              <item name="static" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="vio_query_web" type="b2602c69:ProjectViewProjectNode" />
-              <item name="vio_query_web" type="462c0819:PsiDirectoryNode" />
-              <item name="templates" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="vio_query_web" type="b2602c69:ProjectViewProjectNode" />
-              <item name="vio_query_web" type="462c0819:PsiDirectoryNode" />
-              <item name="vio_query" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="vio_query_web" type="b2602c69:ProjectViewProjectNode" />
-              <item name="vio_query_web" type="462c0819:PsiDirectoryNode" />
-              <item name="vio_query_web" type="462c0819:PsiDirectoryNode" />
-            </path>
-          </expand>
-          <select />
-        </subPane>
-      </pane>
-      <pane id="Scope" />
-    </panes>
-  </component>
   <component name="PropertiesComponent">
     <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
+    <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
   </component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
@@ -263,139 +70,28 @@
       <workItem from="1559810236466" duration="1086000" />
       <workItem from="1559811601190" duration="5231000" />
       <workItem from="1560066546724" duration="1573000" />
+      <workItem from="1574505499225" duration="5536000" />
+      <workItem from="1574610371782" duration="320000" />
+      <workItem from="1574688437204" duration="9000" />
+      <workItem from="1574693371609" duration="15000" />
+      <workItem from="1574739350525" duration="699000" />
     </task>
     <servers />
-  </component>
-  <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="7890000" />
-  </component>
-  <component name="ToolWindowManager">
-    <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
-    <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.25479743" />
-      <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
-      <window_info id="Favorites" order="2" side_tool="true" />
-      <window_info anchor="bottom" id="Message" order="0" />
-      <window_info anchor="bottom" id="Find" order="1" />
-      <window_info anchor="bottom" id="Run" order="2" />
-      <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
-      <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
-      <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
-      <window_info anchor="bottom" id="TODO" order="6" />
-      <window_info anchor="bottom" id="Docker" order="7" show_stripe_button="false" />
-      <window_info anchor="bottom" id="Version Control" order="8" />
-      <window_info anchor="bottom" id="Database Changes" order="9" />
-      <window_info anchor="bottom" id="Event Log" order="10" side_tool="true" />
-      <window_info active="true" anchor="bottom" id="Terminal" order="11" visible="true" weight="0.35791758" />
-      <window_info anchor="bottom" id="Python Console" order="12" />
-      <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
-      <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
-      <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
-      <window_info anchor="right" id="SciView" order="3" />
-      <window_info anchor="right" id="Database" order="4" />
-    </layout>
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="1" />
   </component>
-  <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/vio_query/models.py">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/vio_query/decorator.py">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/vio_query_web/utils.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="672">
-          <caret line="28" column="15" lean-forward="true" selection-start-line="28" selection-start-column="15" selection-end-line="28" selection-end-column="15" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/vio_query/__init__.py">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/static/js/md5.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="528">
-          <caret line="29" column="57" selection-start-line="29" selection-start-column="57" selection-end-line="29" selection-end-column="57" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/vio_query_web/__init__.py">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/vio_query_web/wsgi.py">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/vio_query/admin.py">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/vio_query/apps.py">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/vio_query/tests.py">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/templates/login.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-1872" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/conf/nginx.conf">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="288">
-          <caret line="12" column="8" lean-forward="true" selection-start-line="12" selection-start-column="8" selection-end-line="12" selection-end-column="8" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/conf/uwsgi.ini">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="384">
-          <caret line="16" column="17" lean-forward="true" selection-start-line="16" selection-start-column="17" selection-end-line="16" selection-end-column="17" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/vio_query_web/urls.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="528">
-          <caret line="23" selection-start-line="23" selection-end-line="23" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/templates/violation.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="4440">
-          <caret line="185" column="90" selection-start-line="185" selection-start-column="84" selection-end-line="185" selection-end-column="90" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/vio_query_web/settings.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="504">
-          <caret line="36" column="18" lean-forward="true" selection-start-line="36" selection-start-column="18" selection-end-line="36" selection-end-column="18" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/vio_query/urls.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="494">
-          <caret line="31" selection-start-line="31" selection-end-line="31" />
-          <folding>
-            <element signature="e#641#673#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/vio_query/views.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="74">
-          <caret line="203" column="11" lean-forward="true" selection-start-line="203" selection-start-column="11" selection-end-line="203" selection-end-column="11" />
-          <folding>
-            <element signature="e#0#35#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State>
+              <option name="COLUMN_ORDER" />
+            </State>
+          </value>
+        </entry>
+      </map>
+    </option>
   </component>
 </project>

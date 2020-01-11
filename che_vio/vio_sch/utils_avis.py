@@ -1,6 +1,7 @@
 import time
 
-from .models import VehicleInfo
+from .models import VehicleInfo, VioInfoAvis, VioInfo
+from django.db import connection
 
 
 def save_vehicle(v_number, v_type, v_code, e_code, user_id):
@@ -50,4 +51,60 @@ def delete_vehicle():
             print(e)
 
 
-# 查询违章
+# 定时任务，把安吉的违章数据插入到违章缓存表中
+def insert_avis_vio_data_into_loc_db():
+    try:
+        connection.connection.ping()
+    except:
+        connection.close()
+
+    avis_vio_list = VioInfoAvis.objects.all()
+
+    for avis_vio_info in avis_vio_list:
+        vio_info = VioInfo()
+
+        vio_info.vehicle_number = avis_vio_info.vehicle_number
+        vio_info.vehicle_type = '02'
+        vio_info.vio_code = avis_vio_info.vio_code
+
+        if vio_info.vio_code != '999999':
+            vio_info.vio_time = avis_vio_info.vio_time
+            vio_info.vio_position = avis_vio_info.vio_position
+            vio_info.vio_activity = avis_vio_info.vio_activity
+            vio_info.vio_point = avis_vio_info.vio_point
+            vio_info.vio_money = avis_vio_info.vio_money
+            vio_info.deal_status = avis_vio_info.deal_status
+            vio_info.pay_status = avis_vio_info.pay_status
+        else:
+            pass
+
+        vio_info.save()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

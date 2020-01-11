@@ -9,6 +9,7 @@ from .utils_avis import save_vehicle as save_vehicle_avis
 from multiprocessing import Queue
 from threading import Thread
 from django.db import connection
+from .class_avis import VehicleAvis
 
 import time
 import hashlib
@@ -85,7 +86,7 @@ def violation(request):
         return JsonResponse(result)
 
     # 判断时间戳是否超时, 默认5分钟
-    if int(time.time()) - timestamp_user > 60 * 5 or int(time.time()) < timestamp_user - 120:
+    if int(time.time()) - timestamp_user > 60 * 50 or int(time.time()) < timestamp_user - 120:
         result = {'status': 16, 'msg': '时间戳超时'}
         save_error_log(16, '时间戳超时', user.id, user_ip)
         return JsonResponse(result)
@@ -107,10 +108,15 @@ def violation(request):
         return JsonResponse(result)
 
     # 查询违章信息
-    # print('查询车辆, 号牌号码: %s, 号牌种类: %s' % (data['vehicleNumber'], data['vehicleType']))
-    vio_data = get_violations(v_number=data['vehicleNumber'], v_type=data['vehicleType'],
-                              v_code=data['vehicleCode'], e_code=data['engineCode'], city=data['city'],
-                              user_id=user.id, user_ip=user_ip)
+    if user.id == 19:
+        vehicle_avis = VehicleAvis(user.id, user_ip, data['vehicleNumber'], data['vehicleType'], data['vehicleCode'],
+                                   data['engineCode'])
+
+        vio_data = vehicle_avis.get_violations()
+    else:
+        vio_data = get_violations(v_number=data['vehicleNumber'], v_type=data['vehicleType'],
+                                  v_code=data['vehicleCode'], e_code=data['engineCode'], city=data['city'],
+                                  user_id=user.id, user_ip=user_ip)
 
     return JsonResponse(vio_data)
 
@@ -304,8 +310,15 @@ def query_thread(v_queue, city):
             # print('query thread %d start' % t_id)
             vehicle = v_queue.get(True, 30)
             # print(vehicle.vehicle_number)
-            data = get_violations(vehicle.vehicle_number, vehicle.vehicle_type, vehicle.vehicle_code,
-                                  vehicle.engine_code, vehicle.city, vehicle.user_id, '127.0.0.1', True)
+
+            if vehicle.user_id == 19:
+                vehicle_avis = VehicleAvis('99', '127.0.0.1', vehicle.vehicle_number, vehicle.vehicle_type,
+                                           vehicle.vehicle_code, vehicle.engine_code)
+
+                data = vehicle_avis.auto_query_violations()
+            else:
+                data = get_violations(vehicle.vehicle_number, vehicle.vehicle_type, vehicle.vehicle_code,
+                                      vehicle.engine_code, vehicle.city, '99', '127.0.0.1', True)
 
             # 如果查询成功, 将车辆查询状态置为1
             if data['status'] == 0:
@@ -458,4 +471,4 @@ def test_task():
 
 # 负载均衡测试
 def nginx_test(request):
-    return HttpResponse('<h1>server 03</h1>')
+    return HttpResponse('<h1>server 01</h1>')

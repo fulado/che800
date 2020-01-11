@@ -10,10 +10,10 @@ from .models import VioInfo
 
 class Violation(object):
 
-    def __init__(self, vehicle):
+    def __init__(self, vehicle, username, password):
         self.vehicle = vehicle
-        self.username = 'test'
-        self.password = 'test'
+        self.username = username
+        self.password = password
         self.timestamp = int(time.time())
         self.sign = ''
         self.response_data = {'status': 99}

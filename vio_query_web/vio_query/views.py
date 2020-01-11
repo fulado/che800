@@ -57,6 +57,9 @@ def login_handle(request):
     request.session['user_id'] = user.id
     request.session['authority'] = user.authority
 
+    request.session['username'] = username
+    request.session['password'] = password
+
     return HttpResponseRedirect('/main')
 
 
@@ -278,7 +281,7 @@ def is_exceed_limitation(request):
     user_id = int(request.session.get('user_id', ''))
     user_info = UserInfo.objects.get(id=user_id)
 
-    if user_info.queried_number >= user_info.limitation:
+    if 0 <= user_info.limitation <= user_info.queried_number:
         result = True
     else:
         result = False
@@ -305,10 +308,13 @@ def can_query_all(request):
 def query_vio(request):
     vehicle_id = request.GET.get('vehicle_id', '')
 
+    username = request.session.get('username', 'test')
+    password = request.session.get('password', 'test')
+
     vehicle = VehicleInfo.objects.get(id=vehicle_id)
 
     if vehicle.status < 0:
-        violation = Violation(vehicle)
+        violation = Violation(vehicle, username, password)
         violation.get_violations_from_api()
         violation.save_violations()
 
@@ -337,12 +343,15 @@ def query_vio(request):
 # 查询全部违章
 def query_all(request):
     user_id = int(request.session.get('user_id', ''))
+    username = request.session.get('username', 'test')
+    password = request.session.get('password', 'test')
+
     vehicle_list = VehicleInfo.objects.filter(user_id=user_id).filter(status__in=[-1, -3])
     user_info = UserInfo.objects.get(id=user_id)
 
     for vehicle in vehicle_list:
 
-        violation = Violation(vehicle)
+        violation = Violation(vehicle, username, password)
         violation.get_violations_from_api()
         violation.save_violations()
 
