@@ -37,7 +37,7 @@ scheduler = BackgroundScheduler()
 # scheduler.add_job(reset_status, 'cron', hour=2, minute=8, second=0)
 #
 # # 每天03:00, 开始查询违章数据
-scheduler.add_job(query_vio_auto, 'cron', hour=14, minute=44, second=0)
+scheduler.add_job(query_vio_auto, 'cron', hour=11, minute=37, second=0)
 #
 # # 每天10:00, 再查一遍
 # scheduler.add_job(query_vio_auto, 'cron', hour=10, minute=0, second=0)

@@ -251,9 +251,19 @@ class VehicleAvis(object):
         for vio_dic in vio_info_api_list:
             is_vio_in_local_db = False
             for vio_info_local in vio_info_local_list:
-                if vio_info_local.vehicle_number == vio_info_local.vio_time == vio_dic.get('time') \
-                        and vio_info_local.vio_position == vio_dic.get('position') \
-                        and vio_info_local.vio_activity == vio_dic.get('activity'):
+                # 时间取值到分钟
+                vio_time_local = (str(vio_info_local.vio_time))[: -3]
+                vio_time_api = (vio_dic.get('time', ''))[: -3]
+
+                # 取违法代码前4位
+                vio_code_local = vio_info_local.vio_code[0: 4] if len(vio_info_local.vio_code) > 4 \
+                    else vio_info_local.vio_code
+                vio_code_api = vio_dic.get('code')[0: 4] if len(vio_dic.get('code', '')) > 4 \
+                    else vio_dic.get('code', '')
+
+                # 如果api中查出的数据与表中现有数据一致
+                if vio_time_local == vio_time_api and vio_info_local.vio_position == vio_dic.get('position') \
+                        and vio_code_local == vio_code_api:
                     is_vio_in_local_db = True
                     break
 

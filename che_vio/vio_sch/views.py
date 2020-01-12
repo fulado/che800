@@ -358,7 +358,7 @@ def query_vio_auto():
     # 创建5个车辆查询线程
     for i in range(5):
         t_query_thread = Thread(target=query_thread, args=(vehicle_queue, 'all_%d' % (i + 1)))
-        t_query_thread.start()
+        # t_query_thread.start()
 
     # 创建2个上海车辆查询线程
     for i in range(2):
@@ -368,7 +368,7 @@ def query_vio_auto():
     # 创建3个浙江车辆查询线程
     for i in range(2):
         t_query_thread_zj = Thread(target=query_thread, args=(vehicle_queue_zj, 'zhejiang_%d' % (i + 1)))
-        t_query_thread_zj.start()
+        # t_query_thread_zj.start()
 
 
 # 定时任务, 备份并初始化违章表和日志表
