@@ -441,7 +441,7 @@ def vio_dic_for_ddyc(v_number, data):
 
                 # 处理机关
                 vio_id = vio.get('violationWritNo', '')
-                if vio_id != '':
+                if vio_id != '' and '.' not in vio_id:
                     vio_loc = get_loc_by_vio_id_doyun(vio_id)
                 elif 'violationCity' in vio:
                     vio_loc = vio['violationCity']

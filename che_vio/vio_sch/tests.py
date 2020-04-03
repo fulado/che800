@@ -446,13 +446,19 @@ def get_vio_from_doyun(v_number, v_type, v_code, e_code, city=''):
     return json.loads(response_data.read().decode('utf-8'))
 
 
+# 登录测试
+
+
+
+
 if __name__ == '__main__':
     # car2 = {'v_number': '京HD9596', 'v_type': '02', 'v_code': 'LGBF5AE00HR276883', 'e_code': '751757V'}
     # car2 = {'v_number': '津RAV877', 'v_type': '02', 'v_code': 'LSGGJ5450JS043259', 'e_code': '173073371'}
     # car2 = {'v_number': '闽DZ299M', 'v_type': '02', 'v_code': 'LSGJB84JXHY031967', 'e_code': '163084534'}
-    # car2 = {'v_number': '津RPU307', 'v_type': '02', 'v_code': 'LXVD3GFC2JA014542', 'e_code': 'J014144'}
-    car2 = {'v_number': '苏BW0H83', 'v_type': '02', 'v_code': 'LSGUD84X9FE000946', 'e_code': '143521247'}
-    #
+    car2 = {'v_number': '津RPU307', 'v_type': '02', 'v_code': 'LXVD3GFC2JA014542', 'e_code': 'J014144'}
+    # car2 = {'v_number': '苏BW0H83', 'v_type': '02', 'v_code': 'LSGUD84X9FE000946', 'e_code': '143521247'}
+    # car2 = {'v_number': '沪J08105', 'v_type': '02', 'v_code': 'YV1CZ985691524536', 'e_code': 'B6324S09040907225'}
+
     # response_data = get_vio_from_doyun(car2['v_number'], car2['v_type'], car2['v_code'], car2['e_code'])
     #
     # response_data = get_vio_from_haotong(car2['v_number'], car2['v_type'], car2['v_code'], car2['e_code'])
@@ -470,3 +476,10 @@ if __name__ == '__main__':
     # print('end')
 
     # backup()
+
+
+
+
+
+
+

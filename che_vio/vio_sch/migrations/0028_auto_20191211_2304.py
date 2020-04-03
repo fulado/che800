@@ -13,24 +13,24 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.CreateModel(
-            name='VioInfoAvis',
-            fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('vehicle_number', models.CharField(blank=True, max_length=20, null=True)),
-                ('vehicle_type', models.IntegerField(blank=True, default=2, null=True)),
-                ('vio_time', models.CharField(blank=True, max_length=30, null=True)),
-                ('vio_position', models.CharField(blank=True, max_length=100, null=True)),
-                ('vio_activity', models.CharField(blank=True, max_length=255, null=True)),
-                ('vio_point', models.IntegerField(blank=True, default=0, null=True)),
-                ('vio_money', models.IntegerField(blank=True, default=0, null=True)),
-                ('vio_code', models.CharField(blank=True, max_length=20, null=True)),
-                ('vio_loc', models.CharField(blank=True, max_length=50, null=True)),
-                ('deal_status', models.IntegerField(blank=True, default=-1, null=True)),
-                ('pay_status', models.IntegerField(blank=True, default=-1, null=True)),
-                ('update_time', models.DateTimeField(blank=True, null=True)),
-                ('available', models.BooleanField(default=False)),
-                ('accumulation', models.IntegerField(blank=True, default=1, null=True)),
-            ],
-        ),
+        # migrations.CreateModel(
+        #     name='VioInfoAvis',
+        #     fields=[
+        #         ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+        #         ('vehicle_number', models.CharField(blank=True, max_length=20, null=True)),
+        #         ('vehicle_type', models.IntegerField(blank=True, default=2, null=True)),
+        #         ('vio_time', models.CharField(blank=True, max_length=30, null=True)),
+        #         ('vio_position', models.CharField(blank=True, max_length=100, null=True)),
+        #         ('vio_activity', models.CharField(blank=True, max_length=255, null=True)),
+        #         ('vio_point', models.IntegerField(blank=True, default=0, null=True)),
+        #         ('vio_money', models.IntegerField(blank=True, default=0, null=True)),
+        #         ('vio_code', models.CharField(blank=True, max_length=20, null=True)),
+        #         ('vio_loc', models.CharField(blank=True, max_length=50, null=True)),
+        #         ('deal_status', models.IntegerField(blank=True, default=-1, null=True)),
+        #         ('pay_status', models.IntegerField(blank=True, default=-1, null=True)),
+        #         ('update_time', models.DateTimeField(blank=True, null=True)),
+        #         ('available', models.BooleanField(default=False)),
+        #         ('accumulation', models.IntegerField(blank=True, default=1, null=True)),
+        #     ],
+        # ),
     ]

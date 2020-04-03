@@ -59,21 +59,26 @@ class VehicleAvis(object):
     # 自动缓存违章数据
     def auto_query_violations(self):
         # 从接口查询违章数据
+        # print('get_api_info')
         self.get_api_info()
 
-        # print(self.api_id)
+        # print('get_violations_from_api')
         self.get_violations_from_api()
-        # print(self.origin_vio_data)
+
         if self.status != 41:
+            # print('standardize_vio_data_from_api')
             self.standardize_vio_data_from_api()
 
         # 如果查询成功更新本地违章数据表
         if not self.status:
+            # print('update_violations_in_local_db')
             self.update_violations_in_local_db()
         else:
+            # print('create_standard_error_data')
             self.create_standard_error_data()
 
         # 保存日志
+        # print('save_log')
         self.save_log(True)
 
         return self.standard_vio_data
@@ -116,8 +121,15 @@ class VehicleAvis(object):
         vehicle_loc = self.vehicle_number[0] if len(self.vehicle_number) > 0 else None
         # print('车牌所在地：%s' % vehicle_loc)
         # 根据车牌首字查询车辆所在地编码
+
         if vehicle_loc:
-            loc_info_list = LocInfo.objects.filter(plate_name=vehicle_loc)
+            try:
+                loc_info_list = LocInfo.objects.filter(plate_name=vehicle_loc)
+            except Exception as e:
+                print(e)
+                print('车牌所在地错误')
+                self.status = 32  # 车牌或车辆类型错误
+                return
         else:
             self.status = 32    # 车牌或车辆类型错误
             return
@@ -141,15 +153,15 @@ class VehicleAvis(object):
         vio_list = []
         for vio_info in vio_info_list:
             if vio_info.available:
-                vio_dic = {'vio_time': vio_info.vio_time,
-                           'vio_position': vio_info.vio_position,
-                           'vio_activity': vio_info.vio_activity,
-                           'vio_point': str(vio_info.vio_point),
-                           'vio_money': str(vio_info.vio_money),
-                           'vio_code': str(vio_info.vio_code),
-                           'vio_loc': vio_info.vio_loc,
-                           'deal_status': str(vio_info.deal_status),
-                           'pay_status': str(vio_info.pay_status),
+                vio_dic = {'time': vio_info.vio_time,
+                           'position': vio_info.vio_position,
+                           'activity': vio_info.vio_activity,
+                           'point': str(vio_info.vio_point),
+                           'money': str(vio_info.vio_money),
+                           'code': vio_info.vio_code,
+                           'location': vio_info.vio_loc,
+                           'deal': str(vio_info.deal_status),
+                           'pay': str(vio_info.pay_status),
                            }
 
                 vio_list.append(vio_dic)
@@ -162,10 +174,13 @@ class VehicleAvis(object):
     def standardize_vio_data_from_api(self):
 
         if self.api_id == 6:
+            # print('vio_dic_for_shaoshuai')
             self.standard_vio_data = vio_dic_for_shaoshuai(self.vehicle_number, self.origin_vio_data)
         elif self.api_id == 7:
+            # print('vio_dic_for_ddyc')
             self.standard_vio_data = vio_dic_for_ddyc(self.vehicle_number, self.origin_vio_data)
         elif self.api_id == 8:
+            # print('vio_dic_for_cwb')
             self.standard_vio_data = vio_dic_for_cwb(self.vehicle_number, self.origin_vio_data)
 
         # print(self.status)
@@ -221,11 +236,15 @@ class VehicleAvis(object):
             is_vio_in_api = False
             for vio_dic in vio_info_api_list:
                 # 时间取值到分钟
-                vio_time_local = (str(vio_info_local.vio_time))[: -3]
-                vio_time_api = (vio_dic.get('time', ''))[: -3]
+                vio_time_api = vio_dic.get('time', '')
+                vio_time_api = vio_time_api if len(vio_time_api) == 16 else vio_time_api[: -3]
+
+                vio_time_local = (str(vio_info_local.vio_time))
+                vio_time_local = vio_time_local if len(vio_time_local) == 16 else vio_time_local[: -3]
 
                 # 取违法代码前4位
-                vio_code_local = vio_info_local.vio_code[0: 4] if len(vio_info_local.vio_code) > 4 \
+                vio_code_local = vio_info_local.vio_code[0: 4] \
+                    if vio_info_local.vio_code is not None and len(vio_info_local.vio_code) > 4 \
                     else vio_info_local.vio_code
                 vio_code_api = vio_dic.get('code')[0: 4] if len(vio_dic.get('code', '')) > 4 \
                     else vio_dic.get('code', '')
@@ -233,6 +252,9 @@ class VehicleAvis(object):
                 # 如果api中查出的数据与表中现有数据一致
                 if vio_time_local == vio_time_api and vio_info_local.vio_position == vio_dic.get('position') \
                         and vio_code_local == vio_code_api:
+                    # print(vio_time_local, vio_time_api)
+                    # print(vio_info_local.vio_position, vio_dic.get('position'))
+                    # print(vio_code_local, vio_code_api)
                     is_vio_in_api = True
                     # 中断本次循环
                     break
@@ -240,23 +262,36 @@ class VehicleAvis(object):
             # 如果api中查询的违章数据与本地数据一直，则本地数据累计值+1，如果累计值为15，则数据变为可用
             if is_vio_in_api:
                 # 更新违法数据
-                vio_info_local.accumulation += 1 if vio_info_local.accumulation < 1 else 1
-                vio_info_local.available = True if vio_info_local.accumulation >= 1 else False
+                vio_info_local.accumulation = vio_info_local.accumulation + 1 if vio_info_local.accumulation < 3 else 3
+                if vio_info_local.accumulation >= 3:
+                    vio_info_local.available = True
+                else:
+                    pass
             else:
                 # 数据不一致，本地数据累计值-1，如果累计值为0则数据变为不可用
-                vio_info_local.accumulation -= 1 if vio_info_local.accumulation > 0 else 0
-                vio_info_local.available = False if vio_info_local.accumulation <= 0 else True
+                vio_info_local.accumulation = vio_info_local.accumulation - 1 if vio_info_local.accumulation > 0 else 0
+                if vio_info_local.accumulation <= 0:
+                    vio_info_local.available = False
+                else:
+                    pass
+
+            vio_info_local.update_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
+            vio_info_local.save()
 
         # 将新获取的违章数据插入本地违章数据表
         for vio_dic in vio_info_api_list:
             is_vio_in_local_db = False
             for vio_info_local in vio_info_local_list:
                 # 时间取值到分钟
-                vio_time_local = (str(vio_info_local.vio_time))[: -3]
-                vio_time_api = (vio_dic.get('time', ''))[: -3]
+                vio_time_local = (str(vio_info_local.vio_time))
+                vio_time_local = vio_time_local if len(vio_time_local) == 16 else vio_time_local[: -3]
+
+                vio_time_api = vio_dic.get('time', '')
+                vio_time_api = vio_time_api if len(vio_time_api) == 16 else vio_time_api[: -3]
 
                 # 取违法代码前4位
-                vio_code_local = vio_info_local.vio_code[0: 4] if len(vio_info_local.vio_code) > 4 \
+                vio_code_local = vio_info_local.vio_code[0: 4] \
+                    if vio_info_local.vio_code is not None and len(vio_info_local.vio_code) > 4 \
                     else vio_info_local.vio_code
                 vio_code_api = vio_dic.get('code')[0: 4] if len(vio_dic.get('code', '')) > 4 \
                     else vio_dic.get('code', '')
@@ -268,7 +303,7 @@ class VehicleAvis(object):
                     break
 
             if not is_vio_in_local_db:
-                self.insert_new_violation(vio_dic, False)
+                self.insert_new_violation(vio_dic, True)
 
     # 加入新的违章数据
     def insert_new_violation(self, vio_dic, is_vehicle_exists):
@@ -289,7 +324,7 @@ class VehicleAvis(object):
         # 如果该车是第一次查询违章，则违章直接可用
         if not is_vehicle_exists:
             vio_info.available = True
-            vio_info.accumulation = 1
+            vio_info.accumulation = 3
         else:
             pass
 

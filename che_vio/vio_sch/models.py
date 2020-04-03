@@ -143,6 +143,25 @@ class VioInfoAvis(models.Model):
     accumulation = models.IntegerField(default=1, blank=True, null=True)    # 数据累计天数
 
 
+# avis导入微张表
+class VioInfoAvisIn(models.Model):
+    vehicle_number = models.CharField(max_length=20, blank=True, null=True)  # 号牌号码
+    vehicle_type = models.IntegerField(default=2, blank=True, null=True)  # 车辆类型
+    vio_time = models.CharField(max_length=30, blank=True, null=True)  # 违法时间
+    vio_position = models.CharField(max_length=100, blank=True, null=True)  # 违法地点
+    vio_activity = models.CharField(max_length=255, blank=True, null=True)  # 违法行为
+    vio_point = models.IntegerField(default=0, blank=True, null=True)  # 扣分
+    vio_money = models.IntegerField(default=0, blank=True, null=True)  # 罚款
+    vio_code = models.CharField(max_length=20, blank=True, null=True)  # 违法代码
+    vio_loc = models.CharField(max_length=50, blank=True, null=True)  # 处理机关
+    deal_status = models.IntegerField(default=-1, blank=True, null=True)  # 是否已处理, 0-否, 1-是, -1-未知
+    pay_status = models.IntegerField(default=-1, blank=True, null=True)  # 是否已缴费, 0-否, 1-是, -1-未知
+
+
+class VehicleInfoAvisIn(models.Model):
+    vehicle_number = models.CharField(max_length=20, blank=True, null=True)     # 号牌号码
+
+
 # avis车辆信息表
 # class VehicleInfoAvis(models.Model):
 #     vehicle_number = models.CharField(max_length=20, blank=True, null=True)  # 号牌号码

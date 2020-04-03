@@ -196,22 +196,22 @@ if __name__ == '__main__':
     # v_type = '02'
     # vin = 'LSVNB4187HN044147'
 
-    # v_number = '苏B5SD12'
-    # v_type = '02'
-    # e_code = 'BK4374'
-    # vin = 'LSVNB4182HN048526'
+    v_number = '沪ATT909'
+    v_type = '02'
+    e_code = '034864'
+    vin = 'LSVCD6BM1FN041671'
     #
-    # vio_data = get_vio_from_doyun(v_number, v_type, e_code, vin, '')
-    # pprint.pprint(vio_data)
+    vio_data = get_vio_from_doyun(v_number, v_type, e_code, vin, '')
+    pprint.pprint(vio_data)
 
     # vio_dic = vio_dic_for_cwb(v_number, vio_data)
     # pprint.pprint(vio_dic)
 
-    hphm = 'A5P27T'
-    hpzl = '02'
-    sf = '川'
-    syr = '四川捷联汽车租赁有限公司'
+    # hphm = 'A5P27T'
+    # hpzl = '02'
+    # sf = '川'
+    # syr = '四川捷联汽车租赁有限公司'
 
-    sign = create_sign(hphm, hpzl, sf, syr)
-
-    print(sign)
+    # sign = create_sign(hphm, hpzl, sf, syr)
+    #
+    # print(sign)

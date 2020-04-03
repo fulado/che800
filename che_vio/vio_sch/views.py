@@ -259,7 +259,7 @@ def get_vehicle_thread(v_queue):
             connection.close()
         finally:
             vehicle_list = VehicleInfo.objects.filter(status=0).exclude(vehicle_number__contains='沪')\
-                .exclude(vehicle_number__contains='浙')
+                .exclude(vehicle_number__contains='浙').exclude(user_id=26)
 
         # 查询违章
         for vehicle in vehicle_list:
@@ -295,7 +295,7 @@ def get_vehicle_thread_sh(v_queue):
         except:
             connection.close()
         finally:
-            vehicle_list = VehicleInfo.objects.filter(status=0).filter(vehicle_number__contains='沪')
+            vehicle_list = VehicleInfo.objects.filter(status=0).filter(vehicle_number__contains='沪').exclude(user_id=26)
 
         for vehicle in vehicle_list:
             # 将车辆信息放入队列
@@ -352,13 +352,13 @@ def query_vio_auto():
     t_get_vehicle_thread_sh.start()
 
     # 创建车辆读取线程，浙江
-    t_get_vehicle_thread_zj = Thread(target=get_vehicle_thread_zj, args=(vehicle_queue_zj,))
-    t_get_vehicle_thread_zj.start()
+    # t_get_vehicle_thread_zj = Thread(target=get_vehicle_thread_zj, args=(vehicle_queue_zj,))
+    # t_get_vehicle_thread_zj.start()
 
     # 创建5个车辆查询线程
     for i in range(5):
         t_query_thread = Thread(target=query_thread, args=(vehicle_queue, 'all_%d' % (i + 1)))
-        # t_query_thread.start()
+        t_query_thread.start()
 
     # 创建2个上海车辆查询线程
     for i in range(2):
@@ -368,7 +368,7 @@ def query_vio_auto():
     # 创建3个浙江车辆查询线程
     for i in range(2):
         t_query_thread_zj = Thread(target=query_thread, args=(vehicle_queue_zj, 'zhejiang_%d' % (i + 1)))
-        # t_query_thread_zj.start()
+        t_query_thread_zj.start()
 
 
 # 定时任务, 备份并初始化违章表和日志表
@@ -471,4 +471,4 @@ def test_task():
 
 # 负载均衡测试
 def nginx_test(request):
-    return HttpResponse('<h1>server 01</h1>')
+    return HttpResponse('<h1>server 03</h1>')
